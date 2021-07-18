@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import useKey from 'react-use/lib/useKey';
 import {HEADER_HEIGHT} from '../utils';
 import {TextField} from '@apollo/space-kit/TextField';
-import {breakpoints, colors, smallCaps} from 'gatsby-theme-apollo-core';
+import {breakpoints, colors, smallCaps, NavHeight} from 'gatsby-theme-apollo-core';
 import {css} from '@emotion/react';
 import {position, size, transparentize} from 'polished';
 
@@ -52,7 +52,7 @@ const Container = styled.div({
         display: 'none'
       },
       '[class^=ds-dataset-]': {
-        maxHeight: `calc(100vh - ${HEADER_HEIGHT}px - 32px)`,
+        maxHeight: `calc(100vh - ${HEADER_HEIGHT}px - ${NavHeight}px - 32px)`,
         padding: 0,
         border,
         borderRadius: 'inherit'

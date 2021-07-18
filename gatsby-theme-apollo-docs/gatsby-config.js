@@ -1,7 +1,8 @@
 const path = require('path');
 const remarkTypescript = require('remark-typescript');
-const {colors} = require('gatsby-theme-apollo-core/src/utils/colors');
-const {HEADER_HEIGHT} = require('./src/utils');
+const { colors } = require('gatsby-theme-apollo-core/src/utils/colors');
+const { HEADER_HEIGHT } = require('./src/utils');
+const { NavHeight } = require('gatsby-theme-apollo-core/src/utils/constants');
 
 module.exports = ({
   root,
@@ -24,7 +25,7 @@ module.exports = ({
     {
       resolve: 'gatsby-remark-autolink-headers',
       options: {
-        offsetY: HEADER_HEIGHT
+        offsetY: HEADER_HEIGHT + NavHeight
       }
     },
     {
@@ -136,7 +137,7 @@ module.exports = ({
       options: {
         gatsbyRemarkPlugins: allGatsbyRemarkPlugins,
         remarkPlugins: [
-          [remarkTypescript, {wrapperComponent: 'MultiCodeBlock'}],
+          [remarkTypescript, { wrapperComponent: 'MultiCodeBlock' }],
           ...remarkPlugins
         ]
       }

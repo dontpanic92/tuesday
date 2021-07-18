@@ -10,6 +10,7 @@ import {IconStar} from '@apollo/space-kit/icons/IconStar';
 import {IconComment} from '@apollo/space-kit/icons/IconComment';
 import {PageNav, breakpoints, colors} from 'gatsby-theme-apollo-core';
 import {withPrefix} from 'gatsby';
+import { NavHeight } from 'gatsby-theme-apollo-core';
 
 const Wrapper = styled.div({
   display: 'flex',
@@ -76,12 +77,12 @@ const Aside = styled.aside({
   flexDirection: 'column',
   flexShrink: 0,
   width: 240,
-  maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+  maxHeight: `calc(100vh - ${HEADER_HEIGHT}px - ${NavHeight}px)`,
   marginTop: -36,
   padding: '40px 0',
   marginLeft: 40,
   position: 'sticky',
-  top: HEADER_HEIGHT,
+  top: HEADER_HEIGHT + NavHeight,
   [breakpoints.lg]: {
     display: 'none'
   },

@@ -1,7 +1,8 @@
-const sizes = {
+export const sizes = {
   sm: 600,
   md: 850,
-  lg: 1120
+  lg: 1120,
+  xlg: 1440,
 };
 
 export default Object.keys(sizes).reduce(

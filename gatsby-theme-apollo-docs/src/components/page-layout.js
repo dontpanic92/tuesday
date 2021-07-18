@@ -4,11 +4,11 @@ import DocsetSwitcher from './docset-switcher';
 import Header from './header';
 import HeaderButton from './header-button';
 import PropTypes from 'prop-types';
-import React, {createContext, useMemo, useRef, useState} from 'react';
+import React, { createContext, useMemo, useRef, useState } from 'react';
 import Search from './search';
 import styled from '@emotion/styled';
 import useLocalStorage from 'react-use/lib/useLocalStorage';
-import {Button} from '@apollo/space-kit/Button';
+import { Button } from '@apollo/space-kit/Button';
 import {
   FlexWrapper,
   Layout,
@@ -19,15 +19,16 @@ import {
   colors,
   useResponsiveSidebar
 } from 'gatsby-theme-apollo-core';
-import {Helmet} from 'react-helmet';
-import {IconLayoutModule} from '@apollo/space-kit/icons/IconLayoutModule';
-import {Link, graphql, navigate, useStaticQuery} from 'gatsby';
-import {MobileLogo} from './mobile-logo';
-import {Select} from './select';
-import {SelectedLanguageContext} from './multi-code-block';
-import {getVersionBasePath, trackCustomEvent} from '../utils';
-import {groupBy} from 'lodash';
-import {size} from 'polished';
+import { Helmet } from 'react-helmet';
+import { IconLayoutModule } from '@apollo/space-kit/icons/IconLayoutModule';
+import { Link, graphql, navigate, useStaticQuery } from 'gatsby';
+import { MobileLogo } from './mobile-logo';
+import { Select } from './select';
+import { SelectedLanguageContext } from './multi-code-block';
+import { getVersionBasePath, trackCustomEvent } from '../utils';
+import { groupBy } from 'lodash';
+import { size } from 'polished';
+import { Nav } from 'gatsby-theme-apollo-core/src/components/nav';
 
 const Main = styled.main({
   flexGrow: 1
@@ -141,8 +142,8 @@ export default function PageLayout(props) {
     setMenuOpen(false);
   }
 
-  const {pathname} = props.location;
-  const {siteName, title} = data.site.siteMetadata;
+  const { pathname } = props.location;
+  const { siteName, title } = data.site.siteMetadata;
   const {
     subtitle,
     sidebarContents,
@@ -162,7 +163,7 @@ export default function PageLayout(props) {
     menuTitle
   } = props.pluginOptions;
 
-  const {navItems, navCategories} = useMemo(() => {
+  const { navItems, navCategories } = useMemo(() => {
     const navItems = Object.entries(navConfig).map(([title, navItem]) => ({
       ...navItem,
       title
@@ -192,6 +193,7 @@ export default function PageLayout(props) {
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
       </Helmet>
+      <Nav />
       <FlexWrapper onClick={handleWrapperClick}>
         <Sidebar
           responsive
@@ -209,7 +211,7 @@ export default function PageLayout(props) {
                   color={colors.primary}
                   size="small"
                   onClick={openMenu}
-                  style={{display: 'flex'}}
+                  style={{ display: 'flex' }}
                 >
                   {sidebarTitle}
                   <StyledIcon />
@@ -224,7 +226,7 @@ export default function PageLayout(props) {
                 size="small"
                 value={versionDifference ? versionBasePath : '/'}
                 onChange={navigate}
-                style={{marginLeft: 8}}
+                style={{ marginLeft: 8 }}
                 options={versions.reduce(
                   (acc, version) => ({
                     ...acc,

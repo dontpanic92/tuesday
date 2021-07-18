@@ -7,6 +7,7 @@ exports.colors = {
   tertiary: colors.teal.dark,
   tertiaryLight: colors.teal.base,
   divider: colors.silver.dark,
+  backgroundPure: colors.white,
   background: colors.silver.light,
   background2: colors.silver.base,
   backgroundNotice: colors.yellow.lighter,

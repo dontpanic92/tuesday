@@ -11,6 +11,7 @@ export {
 } from './src/components/responsive-sidebar';
 export {default as Sidebar} from './src/components/sidebar';
 export {default as SidebarNav} from './src/components/sidebar-nav';
-export {default as breakpoints} from './src/utils/breakpoints';
+export {default as breakpoints, sizes} from './src/utils/breakpoints';
 export {colors} from './src/utils/colors';
 export {smallCaps} from './src/utils/typography';
+export {NavHeight} from './src/utils/constants';

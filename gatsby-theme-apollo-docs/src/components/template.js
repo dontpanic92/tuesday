@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import React, {Fragment, createContext, useContext} from 'react';
 import rehypeReact from 'rehype-react';
 import styled from '@emotion/styled';
-import {ContentWrapper, colors, smallCaps} from 'gatsby-theme-apollo-core';
+import {ContentWrapper, colors, smallCaps, NavHeight} from 'gatsby-theme-apollo-core';
 import {Global} from '@emotion/react';
 import {HEADER_HEIGHT} from '../utils';
 import {MDXProvider} from '@mdx-js/react';
@@ -178,7 +178,7 @@ export default function Template(props) {
       <Global
         styles={{
           html: {
-            scrollPaddingTop: HEADER_HEIGHT + 20
+            scrollPaddingTop: HEADER_HEIGHT + NavHeight + 20
           }
         }}
       />

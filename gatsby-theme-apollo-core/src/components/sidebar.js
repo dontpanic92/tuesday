@@ -5,16 +5,17 @@ import breakpoints from '../utils/breakpoints';
 import styled from '@emotion/styled';
 import {colors} from '../utils/colors';
 import {transparentize} from 'polished';
+import { NavHeight } from '../utils/constants';
 
 const Container = styled.aside({
   flexShrink: 0,
   width: 312,
-  height: '100vh',
+  height: `calc(100vh - ${NavHeight}px)`,
   padding: 24,
   borderRight: `1px solid ${colors.divider}`,
   overflowY: 'auto',
   position: 'sticky',
-  top: 0
+  top: NavHeight,
 });
 
 const ResponsiveContainer = styled(Container)(props => ({

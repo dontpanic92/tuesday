@@ -50,6 +50,24 @@ module.exports = {
             'whats-new',
           ],
           译文: [
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
+            'index',
           ]
         }
       }
