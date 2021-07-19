@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
-import {colors} from '../utils/colors';
-import {sizes} from '../utils/breakpoints';
+import { colors } from '../utils/colors';
+import { sizes } from '../utils/breakpoints';
 import { NavHeight } from '../utils/constants';
+import { Helmet } from 'react-helmet';
 
 var NavContainer = styled.nav({
     position: 'sticky',
@@ -21,13 +22,13 @@ var NavFlexWrapper = styled.div({
     margin: '0 auto'
 })
 
-var NavList = styled.ul({
+export var NavList = styled.ul({
     listStyleType: 'none',
     padding: '10px 10px',
     margin: 0,
 })
 
-var NavItem = styled.li({
+export var NavItem = styled.li({
     display: 'inline',
     fontSize: '1rem',
     a: {
@@ -43,11 +44,26 @@ var NavItem = styled.li({
     }
 });
 
+var Brand = styled.span({
+    fontSize: '1rem',
+    fontFamily: "'Righteous'",
+    color: 'transparent',
+    background: 'url("/1.jpg") center',
+    backgroundClip: 'text',
+    mixBlendMode: 'multiply',
+})
 
 export function Nav(props) {
     return <NavContainer>
+        <Helmet>
+            <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css?family=Righteous"
+            />
+        </Helmet>
         <NavFlexWrapper>
             <NavList>
+                <NavItem><a href="/"><Brand>Tuesday.</Brand></a></NavItem>
                 <NavItem><a href="/">文章</a></NavItem>
                 <NavItem><a href="/">关于</a></NavItem>
             </NavList>

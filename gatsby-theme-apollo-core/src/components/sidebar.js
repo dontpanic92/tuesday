@@ -12,7 +12,7 @@ const Container = styled.aside({
   width: 312,
   height: `calc(100vh - ${NavHeight}px)`,
   padding: 24,
-  borderRight: `1px solid ${colors.divider}`,
+  // borderRight: `1px solid ${colors.divider}`,
   overflowY: 'auto',
   position: 'sticky',
   top: NavHeight,
