@@ -1,0 +1,2 @@
+(self.webpackChunktuesday=self.webpackChunktuesday||[]).push([[380],{1346:function(u,n,t){"use strict";t.r(n),t.d(n,{default:function(){return f}});t(7378);var e=t(2861);function f(){return(0,e.tZ)("div",null,"not found")}}}]);
+//# sourceMappingURL=component---gatsby-theme-apollo-core-src-pages-404-js-fe929beb924e2cdddf9c.js.map
