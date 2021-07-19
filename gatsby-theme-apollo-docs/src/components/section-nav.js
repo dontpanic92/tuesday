@@ -90,7 +90,7 @@ export default function SectionNav(props) {
           <StyledListItem
             key={slug}
             className={cn({active: slug === activeHeading})}
-            style={{paddingLeft: depth !== 2 && 16}}
+            style={{paddingLeft: (depth - 1) * 16}}
           >
             <a href={`#${slug}`} onClick={handleHeadingClick}>
               {text}

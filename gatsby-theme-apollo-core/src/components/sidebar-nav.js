@@ -33,14 +33,14 @@ const ExpandAll = styled.button(smallCaps, {
 });
 
 const StyledList = styled.ul({
-  marginLeft: 0,
+  marginLeft: 16,
   marginBottom: 32,
   listStyle: 'none'
 });
 
 const StyledListItem = styled.li({
   display: 'flex',
-  fontSize: '1rem',
+  fontSize: '0.95rem',
   lineHeight: 1.5,
   marginBottom: 13,
   a: {
@@ -73,14 +73,14 @@ const Category = styled.div({
 
 const categoryTitleStyles = {
   display: 'flex',
-  alignItems: 'center',
+  // alignItems: 'center',
   justifyContent: 'space-between',
   padding: '12px 0',
   color: colors.text1,
   fontWeight: 'bold',
-  fontSize: 14,
-  lineHeight: '15px',
-  ...smallCaps,
+  // fontSize: 14,
+  // lineHeight: '15px',
+  textTransform: 'uppercase',
   svg: size(10),
   '&.active': {
     color: colors.primary

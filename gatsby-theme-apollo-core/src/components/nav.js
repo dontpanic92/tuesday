@@ -45,12 +45,19 @@ export var NavItem = styled.li({
 });
 
 var Brand = styled.span({
-    fontSize: '1rem',
+    fontSize: '1.125rem',
+    lineHeight: 1,
     fontFamily: "'Righteous'",
-    color: 'transparent',
-    background: 'url("/1.jpg") center',
+    color: colors.text1,
+    // background: 'url("/2.jpg") center',
     backgroundClip: 'text',
+    // backgroundSize: 'cover',
     mixBlendMode: 'multiply',
+})
+
+var Logo = styled.img({
+    height: `${NavHeight}px`,
+    margin: 0,
 })
 
 export function Nav(props) {

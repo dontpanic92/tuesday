@@ -38,7 +38,6 @@ module.exports = {
       resolve: 'gatsby-theme-apollo-docs',
       options: {
         root: __dirname,
-        subtitle: 'Tuesday.',
         description: 'dontpanic 的技术专栏',
         defaultVersion: '2',
         versions: {
@@ -47,27 +46,10 @@ module.exports = {
         sidebarCategories: {
           null: [
             'index',
-            'whats-new',
           ],
-          译文: [
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
-            'index',
+          错误模型: [
+            'the-error-model/0-introduction',
+            'the-error-model/1-ambitions-learnings',
           ]
         }
       }

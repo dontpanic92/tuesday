@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from '@emotion/styled';
-import {colors} from 'gatsby-theme-apollo-core';
+import { colors } from 'gatsby-theme-apollo-core';
+import { GatsbyImage, getImage } from 'gatsby-plugin-image';
+import { graphql } from 'gatsby';
 
 const Heading = styled.h1({
   ':not(:last-child)': {
@@ -24,5 +26,6 @@ export default function PageHeader(props) {
 
 PageHeader.propTypes = {
   title: PropTypes.string.isRequired,
-  description: PropTypes.string
+  description: PropTypes.string,
+  coverImage: PropTypes.string,
 };

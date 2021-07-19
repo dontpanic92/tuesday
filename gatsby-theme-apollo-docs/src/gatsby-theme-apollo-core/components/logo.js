@@ -15,7 +15,6 @@ const StyledDocsIcon = styled(DocsIcon)({
 export default function Logo() {
   return (
     <Wrapper>
-      <StyledDocsIcon />
     </Wrapper>
   );
 }

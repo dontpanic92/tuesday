@@ -192,7 +192,7 @@ export default function Template(props) {
           pages={pages}
           headings={headings.filter(
             heading =>
-              heading.depth === 2 ||
+              heading.depth <= 4 ||
               heading.depth === (fields.apiReference ? 4 : 3)
           )}
           hash={hash}
@@ -241,6 +241,7 @@ export const pageQuery = graphql`
         frontmatter {
           title
           description
+          coverImage
         }
         headings {
           value
@@ -256,6 +257,7 @@ export const pageQuery = graphql`
         frontmatter {
           title
           description
+          coverImage
         }
         headings {
           value
