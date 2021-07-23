@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React, {Fragment} from 'react';
 import {Helmet} from 'react-helmet';
 import {StaticQuery, graphql} from 'gatsby';
+import { Nav } from './nav';
 
 export default function Layout(props) {
   return (
@@ -24,6 +25,7 @@ export default function Layout(props) {
             <Helmet defaultTitle={title} titleTemplate={`%s - ${title}`}>
               <meta name="description" content={description} />
             </Helmet>
+            <Nav />
             {props.children}
           </Fragment>
         );

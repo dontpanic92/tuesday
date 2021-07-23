@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet';
 var NavContainer = styled.nav({
     position: 'sticky',
     top: 0,
+    zIndex: 1,
     width: '100%',
     color: colors.text2,
     background: colors.backgroundPure,

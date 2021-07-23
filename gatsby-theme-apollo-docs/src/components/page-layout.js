@@ -28,7 +28,6 @@ import { SelectedLanguageContext } from './multi-code-block';
 import { getVersionBasePath, trackCustomEvent } from '../utils';
 import { groupBy } from 'lodash';
 import { size } from 'polished';
-import { Nav } from 'gatsby-theme-apollo-core/src/components/nav';
 
 const Main = styled.main({
   flexGrow: 1
@@ -193,7 +192,6 @@ export default function PageLayout(props) {
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
       </Helmet>
-      <Nav />
       <FlexWrapper onClick={handleWrapperClick}>
         <Sidebar
           responsive

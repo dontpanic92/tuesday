@@ -12,10 +12,9 @@ module.exports = {
     {
       resolve: "gatsby-plugin-manifest",
       options: {
-        icon: "src/images/icon.png",
+        icon: "src/images/avatar.png",
       },
     },
-    "gatsby-plugin-mdx",
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
     {
@@ -26,14 +25,14 @@ module.exports = {
       },
       __key: "images",
     },
-    /*{
+    {
       resolve: "gatsby-source-filesystem",
       options: {
         name: "pages",
         path: "./src/pages/",
       },
       __key: "pages",
-    },*/
+    },
     {
       resolve: 'gatsby-theme-apollo-docs',
       options: {

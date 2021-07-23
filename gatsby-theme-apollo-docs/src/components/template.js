@@ -237,6 +237,7 @@ export const pageQuery = graphql`
       }
     }
     file(id: {eq: $id}) {
+      sourceInstanceName
       childMarkdownRemark {
         frontmatter {
           title

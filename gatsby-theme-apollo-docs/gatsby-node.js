@@ -228,7 +228,7 @@ exports.createPages = async (
 ) => {
   const {data} = await graphql(`
     {
-      allFile(filter: {extension: {in: ["md", "mdx"]}}) {
+      allFile(filter: {sourceInstanceName: {eq: "content"}, extension: {in: ["md", "mdx"]}}) {
         edges {
           node {
             id

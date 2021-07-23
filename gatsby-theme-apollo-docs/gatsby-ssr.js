@@ -1,5 +1,6 @@
 import PageLayout from './src/components/page-layout';
 import React from 'react';
+import { FlexWrapper, Layout } from 'gatsby-theme-apollo-core';
 
 export const onRenderBody = (
   {setPostBodyComponents, setHeadComponents},
@@ -35,8 +36,18 @@ export const onRenderBody = (
 export const wrapPageElement = (
   {element, props}, // eslint-disable-line react/prop-types
   pluginOptions
-) => (
-  <PageLayout {...props} pluginOptions={pluginOptions}>
-    {element}
-  </PageLayout>
-);
+) => {
+  if (props?.data?.file?.sourceInstanceName === "content") {
+    return <PageLayout {...props} pluginOptions={pluginOptions}>
+      {element}
+    </PageLayout>
+  } else {
+    return <Layout>
+      <FlexWrapper>
+        <div>
+          {element}
+        </div>
+      </FlexWrapper>
+    </Layout>
+  }
+};
