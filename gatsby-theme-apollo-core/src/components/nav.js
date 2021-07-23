@@ -3,8 +3,10 @@ import { colors } from '../utils/colors';
 import { sizes } from '../utils/breakpoints';
 import { NavHeight } from '../utils/constants';
 import { Helmet } from 'react-helmet';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGithubAlt } from '@fortawesome/free-brands-svg-icons';
 
-var NavContainer = styled.nav({
+const NavContainer = styled.nav({
     position: 'sticky',
     top: 0,
     zIndex: 1,
@@ -17,26 +19,35 @@ var NavContainer = styled.nav({
     height: NavHeight,
 })
 
-var NavFlexWrapper = styled.div({
+const NavFlexWrapper = styled.div({
     display: 'flex',
+    justifyContent: 'space-between',
     maxWidth: sizes.xlg,
-    margin: '0 auto'
+    margin: '0 auto',
+    height: '100%',
+    alignItems: 'center',
 })
 
-export var NavList = styled.ul({
+export const NavList = styled.ul({
     listStyleType: 'none',
-    padding: '10px 10px',
-    margin: 0,
+    margin: '0 12px',
+})
+
+export const NavListRight = styled(NavList)({
+    float: 'right',
 })
 
 export var NavItem = styled.li({
-    display: 'inline',
     fontSize: '1rem',
+    margin: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
     a: {
         color: 'inherit',
+        padding: '4px 12px',
         textDecoration: 'none',
-        padding: '8px 12px',
         borderRadius: 4,
+        display: 'inline-flex',
         ':hover': {
             opacity: colors.hoverOpacity,
             color: colors.primary,
@@ -45,9 +56,11 @@ export var NavItem = styled.li({
     }
 });
 
+export const ResizedFontAwesomeIcon = styled(FontAwesomeIcon)({
+    height: '1.7rem',
+})
+
 var Brand = styled.span({
-    fontSize: '1.125rem',
-    lineHeight: 1,
     fontFamily: "'Righteous'",
     color: colors.text1,
     // background: 'url("/2.jpg") center',
@@ -72,9 +85,11 @@ export function Nav(props) {
         <NavFlexWrapper>
             <NavList>
                 <NavItem><a href="/"><Brand>Tuesday.</Brand></a></NavItem>
-                <NavItem><a href="/">文章</a></NavItem>
-                <NavItem><a href="/">关于</a></NavItem>
+                <NavItem><a href="https://dontpanic.blog/about" target="_blank">关于</a></NavItem>
             </NavList>
+            <NavListRight>
+                <NavItem><a href="https://github.com/dontpanic92/tuesday" target="_blank"><ResizedFontAwesomeIcon icon={faGithubAlt} fixedWidth /></a></NavItem>
+            </NavListRight>
         </NavFlexWrapper>
     </NavContainer>
 }
