@@ -37,7 +37,7 @@ const BodyContent = styled.div({
   // style all anchors with an href and no prior classes
   // this helps avoid anchors with names and styled buttons
   'a[href]:not([class])': {
-    color: colors.primary,
+    color: colors.hyperlink,
     textDecoration: 'none',
     ':hover': {
       textDecoration: 'underline'

@@ -3,8 +3,8 @@ import React from 'react';
 import { FlexWrapper, Layout } from 'gatsby-theme-apollo-core';
 
 export const onRenderBody = (
-  {setPostBodyComponents, setHeadComponents},
-  {ffWidgetId}
+  { setPostBodyComponents, setHeadComponents },
+  { ffWidgetId }
 ) => {
   if (ffWidgetId) {
     setHeadComponents([
@@ -34,7 +34,7 @@ export const onRenderBody = (
 };
 
 export const wrapPageElement = (
-  {element, props}, // eslint-disable-line react/prop-types
+  { element, props }, // eslint-disable-line react/prop-types
   pluginOptions
 ) => {
   if (props?.data?.file?.sourceInstanceName === "content") {
@@ -43,11 +43,7 @@ export const wrapPageElement = (
     </PageLayout>
   } else {
     return <Layout>
-      <FlexWrapper>
-        <div>
-          {element}
-        </div>
-      </FlexWrapper>
+      {element}
     </Layout>
   }
 };

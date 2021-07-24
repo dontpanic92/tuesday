@@ -31,16 +31,13 @@ const NavFlexWrapper = styled.div({
 export const NavList = styled.ul({
     listStyleType: 'none',
     margin: '0 12px',
-})
-
-export const NavListRight = styled(NavList)({
-    float: 'right',
+    display: 'flex',
 })
 
 export var NavItem = styled.li({
     fontSize: '1rem',
     margin: 0,
-    display: 'inline-flex',
+    display: 'flex',
     alignItems: 'center',
     a: {
         color: 'inherit',
@@ -51,7 +48,7 @@ export var NavItem = styled.li({
         ':hover': {
             opacity: colors.hoverOpacity,
             color: colors.primary,
-            background: colors.background,
+            background: colors.background2,
         },
     }
 });
@@ -85,11 +82,13 @@ export function Nav(props) {
         <NavFlexWrapper>
             <NavList>
                 <NavItem><a href="/"><Brand>Tuesday.</Brand></a></NavItem>
+                <NavItem><a href="/">首页</a></NavItem>
+                <NavItem><a href="https://dontpanic.blog/" target="_blank">博客</a></NavItem>
                 <NavItem><a href="https://dontpanic.blog/about" target="_blank">关于</a></NavItem>
             </NavList>
-            <NavListRight>
+            <NavList>
                 <NavItem><a href="https://github.com/dontpanic92/tuesday" target="_blank"><ResizedFontAwesomeIcon icon={faGithubAlt} fixedWidth /></a></NavItem>
-            </NavListRight>
+            </NavList>
         </NavFlexWrapper>
     </NavContainer>
 }

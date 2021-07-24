@@ -1,0 +1,19 @@
+---
+title: dontpanic 的技术专栏
+description: 首页
+---
+
+import AvatarCard from '../components/avatar-card';
+import ArticleList from '../components/article-list';
+import { default as Layout } from '../components/page-layout';
+
+export default function PageLayout(props) {
+  return (
+    <Layout>
+        <AvatarCard />
+        <ArticleList />
+        {props.children}
+    </Layout>
+  )
+}
+

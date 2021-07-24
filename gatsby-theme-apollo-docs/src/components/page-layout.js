@@ -28,6 +28,7 @@ import { SelectedLanguageContext } from './multi-code-block';
 import { getVersionBasePath, trackCustomEvent } from '../utils';
 import { groupBy } from 'lodash';
 import { size } from 'polished';
+import { SidebarTitle } from './sidebar-title';
 
 const Main = styled.main({
   flexGrow: 1
@@ -175,7 +176,7 @@ export default function PageLayout(props) {
 
   const hasNavItems = navItems.length > 0;
   const sidebarTitle = (
-    <span className="title-sidebar">{subtitle || siteName}</span>
+    <SidebarTitle />
   );
 
   return (

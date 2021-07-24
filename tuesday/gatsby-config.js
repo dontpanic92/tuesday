@@ -1,3 +1,5 @@
+const { articles } = require("./src/articles");
+
 module.exports = {
   pathPrefix: "/",
   siteMetadata: {
@@ -43,13 +45,8 @@ module.exports = {
           '1': 'version-1'
         },
         sidebarCategories: {
-          null: [
-            'index',
-          ],
-          错误模型: [
-            'the-error-model/0-introduction',
-            'the-error-model/1-ambitions-learnings',
-          ]
+          null: [],
+          ...articles
         }
       }
     }
