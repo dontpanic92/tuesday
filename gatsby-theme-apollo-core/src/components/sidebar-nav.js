@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
 import styled from '@emotion/styled';
-import {IconArrowUp} from '@apollo/space-kit/icons/IconArrowUp';
+import {IconArrowDown} from '@apollo/space-kit/icons/IconArrowDown';
 import {IconCollapseList} from '@apollo/space-kit/icons/IconCollapseList';
 import {IconExpandList} from '@apollo/space-kit/icons/IconExpandList';
 import {IconOutlink} from '@apollo/space-kit/icons/IconOutlink';
@@ -33,7 +33,7 @@ const ExpandAll = styled.button(smallCaps, {
 });
 
 const StyledList = styled.ul({
-  marginLeft: 16,
+  marginLeft: 36,
   marginBottom: 32,
   listStyle: 'none'
 });
@@ -73,15 +73,18 @@ const Category = styled.div({
 
 const categoryTitleStyles = {
   display: 'flex',
-  // alignItems: 'center',
-  justifyContent: 'space-between',
+  alignItems: 'center',
+  // justifyContent: 'space-between',
   padding: '12px 0',
   color: colors.text1,
   fontWeight: 'bold',
   // fontSize: 14,
   // lineHeight: '15px',
   textTransform: 'uppercase',
-  svg: size(10),
+  svg: {
+    marginRight: '10px',
+    ...size(10),
+  },
   '&.active': {
     color: colors.primary
   }
@@ -108,7 +111,8 @@ const StyledCheckbox = styled.input({
   },
   ':not(:checked) ~': {
     [`${CategoryTitle} svg`]: {
-      transform: 'scaleY(-1)'
+      // transform: 'scaleY(-1)'
+      transform: 'rotate(-90deg)',
     },
     [StyledList]: {
       display: 'none'
@@ -210,12 +214,12 @@ export default function SidebarNav(props) {
           onLinkClick={props.onLinkClick}
         />
       )}
-      {!props.alwaysExpanded && categories.length > 1 && (
+      {/*!props.alwaysExpanded && categories.length > 1 && (
         <ExpandAll onClick={toggleAll}>
           {React.createElement(allExpanded ? IconCollapseList : IconExpandList)}
           {allExpanded ? 'Collapse' : 'Expand'} all
         </ExpandAll>
-      )}
+      )*/}
       <div ref={categoriesRef}>
         {categories.map((category, index) => {
           const isSelected = category.pages.some(page =>
@@ -238,8 +242,8 @@ export default function SidebarNav(props) {
                 </CategoryLink>
               ) : (
                 <CategoryTitle className={className}>
+                  {!props.alwaysExpanded && <IconArrowDown />}
                   {category.title}
-                  {!props.alwaysExpanded && <IconArrowUp />}
                 </CategoryTitle>
               )}
               <NavItems

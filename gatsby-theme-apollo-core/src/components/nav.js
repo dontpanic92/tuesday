@@ -5,6 +5,7 @@ import { NavHeight } from '../utils/constants';
 import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithubAlt } from '@fortawesome/free-brands-svg-icons';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 const NavContainer = styled.nav({
     position: 'sticky',
@@ -88,6 +89,7 @@ export function Nav(props) {
             </NavList>
             <NavList>
                 <NavItem><a href="https://github.com/dontpanic92/tuesday" target="_blank"><ResizedFontAwesomeIcon icon={faGithubAlt} fixedWidth /></a></NavItem>
+                <NavItem><a href="/license"><ResizedFontAwesomeIcon icon={faInfoCircle} fixedWidth /></a></NavItem>
             </NavList>
         </NavFlexWrapper>
     </NavContainer>
