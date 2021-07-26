@@ -11,6 +11,7 @@ import {IconComment} from '@apollo/space-kit/icons/IconComment';
 import {PageNav, breakpoints, colors} from 'gatsby-theme-apollo-core';
 import {withPrefix} from 'gatsby';
 import { NavHeight } from 'gatsby-theme-apollo-core';
+import Comments from './comment';
 
 const Wrapper = styled.div({
   display: 'flex',
@@ -153,6 +154,24 @@ function FeedbackLink(props) {
   );
 }
 
+function trimSlash(slug) {
+  return slug.replace(/^\/+|\/+$/g, '')
+}
+
+function getCategory(sidebarContents, currentPathname) {
+  const pathName = trimSlash(currentPathname);
+  for (let i = 0; i <sidebarContents.length; i++) {
+    for (let j = 0; j < sidebarContents[i].pages.length; j++) {
+      const pagePath = trimSlash(sidebarContents[i].pages[j].path);
+      if (pagePath === pathName) {
+        return sidebarContents[i].title;
+      }
+    }
+  }
+
+  return null;
+}
+
 FeedbackLink.propTypes = {
   title: PropTypes.string.isRequired
 };
@@ -223,6 +242,7 @@ export default function PageContent(props) {
     </AsideLink>
   );
 
+  const category = getCategory(props.sidebarContents, props.pathname);
   return (
     <Wrapper>
       <InnerWrapper>
@@ -239,6 +259,7 @@ export default function PageContent(props) {
           prevPage={props.pages[pageIndex - 1]}
           nextPage={props.pages[pageIndex + 1]}
         />
+        <Comments issueTerm={`${category} - ${props.title}`} />
       </InnerWrapper>
       <Aside>
         <AsideHeading>{props.title}</AsideHeading>

@@ -199,6 +199,7 @@ export default function Template(props) {
           githubUrl={githubUrl}
           forumUrl={forumUrl}
           ffWidgetId={ffWidgetId}
+          sidebarContents={sidebarContents}
         >
           <CustomLinkContext.Provider
             value={{
