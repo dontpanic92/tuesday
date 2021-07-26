@@ -1,7 +1,7 @@
 ---
 title: 二、Bug 不是可恢复错误！
 description: Bugs Aren’t Recoverable Errors!
-coverImage: /the-error-model/cover.jpg
+featuredImage: cover.jpg
 ---
 
 关于可恢复错误和 Bug，我们之前提到过二者之间明确的界限：

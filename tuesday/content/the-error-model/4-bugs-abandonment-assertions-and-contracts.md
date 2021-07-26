@@ -1,7 +1,7 @@
 ---
 title: 四、Bugs：放弃、断言和合约
 description: "Bugs: Abandonment, Assertions, and Contracts"
-coverImage: /the-error-model/cover.jpg
+featuredImage: cover.jpg
 ---
 
 在 Midori 中，很多类型的 bug 都可能会触发放弃：

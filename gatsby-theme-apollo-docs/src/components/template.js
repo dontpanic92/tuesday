@@ -91,7 +91,7 @@ export const StyledTable = styled.table({
         fontWeight: 'bold',
         marginBottom: '5px'
       },
-      '&:first-child p': {
+      '&:first-of-type p': {
         fontSize: '14px',
         code: {
           color: colors.tertiary
@@ -243,7 +243,11 @@ export const pageQuery = graphql`
         frontmatter {
           title
           description
-          coverImage
+          featuredImage {
+            childImageSharp {
+              gatsbyImageData
+            }
+          }
         }
         headings {
           value
@@ -259,7 +263,11 @@ export const pageQuery = graphql`
         frontmatter {
           title
           description
-          coverImage
+          featuredImage {
+            childImageSharp {
+              gatsbyImageData
+            }
+          }
         }
         headings {
           value

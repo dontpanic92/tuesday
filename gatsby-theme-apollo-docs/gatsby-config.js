@@ -118,6 +118,8 @@ module.exports = ({
 
   const plugins = [
     'gatsby-theme-apollo-core',
+    "gatsby-plugin-sharp",
+    "gatsby-transformer-sharp",
     {
       resolve: 'gatsby-source-filesystem',
       options: {

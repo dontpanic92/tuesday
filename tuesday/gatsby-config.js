@@ -17,8 +17,6 @@ module.exports = {
         icon: "src/images/avatar.png",
       },
     },
-    "gatsby-plugin-sharp",
-    "gatsby-transformer-sharp",
     {
       resolve: "gatsby-source-filesystem",
       options: {

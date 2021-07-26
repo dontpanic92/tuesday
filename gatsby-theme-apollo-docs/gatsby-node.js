@@ -198,7 +198,6 @@ const pageFragment = `
   frontmatter {
     title
     description
-    coverImage
   }
   fields {
     slug

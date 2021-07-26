@@ -1,7 +1,7 @@
 ---
 title: 五、可恢复错误：类型导向的异常
 description: "Recoverable Errors: Type-Directed Exceptions"
-coverImage: /the-error-model/cover.jpg
+featuredImage: cover.jpg
 ---
 
 我们当然不是只需要“放弃”就够了。在很多情况i西安，程序员能够把程序从发生的错误中恢复过来。例如：

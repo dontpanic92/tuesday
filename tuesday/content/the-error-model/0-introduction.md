@@ -1,6 +1,7 @@
 ---
 title: 〇、错误模型简介
 description: Introduction
+featuredImage: cover.jpg
 ---
 > 译注：
 >

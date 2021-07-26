@@ -1,7 +1,7 @@
 ---
 title: 三、可靠性、容错性和隔离性
 description: Reliability, Fault-Tolerance, and Isolation
-coverImage: /the-error-model/cover.jpg
+featuredImage: cover.jpg
 ---
 
 在继续下一个话题之前，我们需要明确的是：~~猫咪总是四脚朝地~~ 故障（Failure）总是会发生的。

@@ -1,7 +1,7 @@
 ---
 title: 六、回顾和总结
 description: Retrospective and Conclusions
-coverImage: /the-error-model/cover.jpg
+featuredImage: cover.jpg
 ---
 
 这趟旅程终于快要结束了。就像我一开始提到的一样，这趟旅程也许没什么惊喜，平淡无奇。但我希望所有的这些背景历程能够帮助你在错误模型方面取得更多的进展。
