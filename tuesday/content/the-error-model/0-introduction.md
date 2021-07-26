@@ -1,6 +1,6 @@
 ---
 title: 〇、错误模型简介
-description: 关于本文
+description: Introduction
 ---
 > 译注：
 >

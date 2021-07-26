@@ -1,6 +1,6 @@
 ---
 title: 一、野心和经验
-description: 野心和经验
+description: Ambitions and Learnings
 coverImage: /the-error-model/cover.jpg
 ---
 
@@ -39,7 +39,7 @@ coverImage: /the-error-model/cover.jpg
 
 错误码大概可以说是最简单的错误模型了，它背后的原理非常基础，甚至不需要语言或运行时的支持。函数返回一个值，通常来说是一个整数，来表明成功或失败。
 
-```
+```c
 int foo() {
     // 执行一些语句
     if (failed) {
@@ -51,7 +51,7 @@ int foo() {
 
 这就是很一种典型的模式，返回0表示成功，非零值表示失败。调用时必须检查返回值：
 
-```
+```c
 int err = foo();
 if (err) {
     // 出错了！赶紧搞定
@@ -95,13 +95,13 @@ Go 语言选择了使用错误码。虽然 Go 的方式与 C 很像，但它提�
 
 开发人员非常容易忘记检查函数返回的错误码。比如，有这样一个函数：
 
-```
+```c
 int foo() { ... }
 ```
 
 在调用时，如果我们默默地忽略返回值并且继续执行呢？
 
-```
+```c
 foo();
 // 继续执行 —— 但是 foo 可能已经失败了！
 ```
@@ -130,7 +130,7 @@ ignore foo();
 
 Go 提供了一种语法捷径，能够是标准的错误码检查 _稍微地_ 优雅一些：
 
-```
+```go
 if err := foo(); err != nil {
     // 错误处理
 }
@@ -142,7 +142,7 @@ if err := foo(); err != nil {
 
 很常见的是，一个函数通常会共享很多错误恢复和补救的逻辑。很多 C 语言程序员使用标签和goto来组织这些代码。比如：
 
-```
+```c
 int error;
 
 // ...
@@ -186,7 +186,7 @@ return error;
 
 第一种方案，用 C 语言来实现的话，就像这样：
 
-```
+```c
 int foo(int* out) {
     // 执行一些操作
     if (failed) {
@@ -199,7 +199,7 @@ int foo(int* out) {
 
 返回值只能从旁路返回，让调用的代码显得很笨：
 
-```
+```cpp
 int value;
 int ret = foo(&value);
 if (ret) {
@@ -214,7 +214,7 @@ else {
 
 针对这个问题，Go 同样提供了很漂亮的语法，得益于多返回值：
 
-```
+```go
 func foo() (int, error) {
     if failed {
         return 0, errors.New("Bad things happened")
@@ -225,7 +225,7 @@ func foo() (int, error) {
 
 调用方也因此变得简洁很多。与上面提到的单行if检查将结合的话——虽然有点奇怪，因为初看下面的代码可能会以为value不在作用域中，但它确实在——错误检查也变得更优雅：
 
-```
+```go
 if value, err := foo(); err != nil {
     // Error!  Deal with it.
 } else {
@@ -253,7 +253,7 @@ Haskell 甚至更酷，它使用了错误值和局部控制流来给人一种“
 
 虽然 Rust 也使用错误码，但它提供了一种函数式的错误类型。例如，在 Go 语言中，我们有一个bar函数：我们在其中调用 `foo` 函数，并且简单地把foo的错误传播回调用者：
 
-```
+```go
 func bar() error {
     if value, err := foo(); err != nil {
         return err
@@ -265,7 +265,7 @@ func bar() error {
 
 在 Rust 中，如果想写的比较长，那么与 Go 相比并没有更加简洁。下面的代码对于 C 语言程序员来说可能像是在看外语，因为我们使用了模式匹配的语法（这是个问题，但不那么严重）。如果你熟悉函数式编程，那么你应该马上就能理解这段代码，它会时刻提醒你需要处理错误：
 
-```
+```rust
 fn bar() -> Result<(), Error> {
     match foo() {
         Ok(value) => /* Use value ... */,
@@ -276,7 +276,7 @@ fn bar() -> Result<(), Error> {
 
 不过 Rust 做的更好之处在于：它提供了一个 `try!` 宏，减少了不必要的繁文缛节，上面那一堆代码就变成了一句：
 
-```
+```rust
 fn bar() -> Result<(), Error> {
     let value = try!(foo);
     // Use value ...
@@ -297,7 +297,7 @@ fn bar() -> Result<(), Error> {
 
 快速回顾一下。在一个不受检查的异常模型中，你可以throw或是catch异常，而异常并不是类型系统或函数签名的一部分。例如：
 
-```
+```cpp
 // Foo 会抛出一个未处理的异常:
 void Foo() {
     throw new Exception(...);
@@ -368,7 +368,7 @@ C++ 至少还尝试过通过 [`throw` 异常规范](https://en.cppreference.com/
 
 在 Java 中，你能知道一个方法所能抛出的大部分异常，因为它必须显示地声明出来：
 
-```
+```java
 void foo() throws FooException, BarException {
     ...
 }
@@ -376,7 +376,7 @@ void foo() throws FooException, BarException {
 
 这样的话，`foo` 的调用者就能够知道它可能会抛出FooException或者BarException。程序员在调用它时必须选择：1）将这些异常原封不动地再抛给上层；2）catch 住这些异常然后处理；3）把这些异常转换为其他异常然后再抛出（很有可能会“不小心”抹掉异常的类型）。比如：
 
-```
+```java
 // 1) 原封不动地抛给上层：
 void bar() throws FooException, BarException {
     foo();
