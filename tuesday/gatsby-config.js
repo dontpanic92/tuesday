@@ -47,7 +47,8 @@ module.exports = {
         sidebarCategories: {
           null: [],
           ...articles
-        }
+        },
+        gaTrackingId: ['G-TZ8V0QY4Z8'],
       }
     }
   ],

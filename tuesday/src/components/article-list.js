@@ -72,8 +72,6 @@ export default function ArticleList(props) {
       });
       let fragments = <></>
       for (let key in articles) {
-        console.log(key)
-        console.log(articles)
         fragments = <>
           {fragments}
           <Title>{key}</Title>
