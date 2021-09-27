@@ -1,4 +1,4 @@
-const { articles } = require("./src/articles");
+const { getSidebarCategoryList } = require("./src/articles");
 
 module.exports = {
   pathPrefix: "/",
@@ -44,7 +44,7 @@ module.exports = {
         },
         sidebarCategories: {
           null: [],
-          ...articles
+          ...getSidebarCategoryList()
         },
         gaTrackingId: ['G-TZ8V0QY4Z8'],
       }

@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import { StaticQuery, graphql } from "gatsby"
 import { colors } from 'gatsby-theme-apollo-core';
 import { articles } from '../articles';
+import { MDXProvider } from '@mdx-js/react';
+import { MDXRenderer } from 'gatsby-plugin-mdx';
 
 function getMdCommon(x) {
   return x.childMarkdownRemark || x.childMdx
@@ -26,12 +28,34 @@ const ArticleListWrapper = styled.div({
 })
 
 const Title = styled.div({
-  fontSize: '1.125rem',
+  fontSize: '1.25rem',
   marginBottom: '10px',
+})
+
+const ShortIntro = styled.section({
+  color: colors.text2,
+  p: {
+    fontSize: '0.9rem',
+    marginLeft: 24,
+  },
 })
 
 function trimSlash(slug) {
   return slug.replace(/^\/+|\/+$/g, '')
+}
+
+function makeSlug(root, chapter) {
+  return trimSlash(root) + '/' + trimSlash(chapter);
+}
+
+function renderContent(md) {
+  if (!!md.html) {
+    return  <ShortIntro dangerouslySetInnerHTML={{ __html: md.html }} />;
+  } else if (!!md.body) {
+    return <ShortIntro><MDXProvider><MDXRenderer>{md.body}</MDXRenderer></MDXProvider></ShortIntro>;
+  } else {
+    return <></>;
+  }
 }
 
 export default function ArticleList(props) {
@@ -50,6 +74,7 @@ export default function ArticleList(props) {
                     frontmatter {
                       title
                     }
+                    html
                   }
                   childMdx {
                     fields {
@@ -58,36 +83,40 @@ export default function ArticleList(props) {
                     frontmatter {
                       title
                     }
+                    body
                   }
                 }
             }
             }
         }
     `}
-    render={data => {
-      const articlesInfo = {}
-      data.allFile.edges.forEach(obj => {
-        let md = getMdCommon(obj.node);
-        articlesInfo[trimSlash(md.fields.slug)] = md.frontmatter.title;
-      });
-      let fragments = <></>
-      for (let key in articles) {
-        fragments = <>
-          {fragments}
-          <Title>{key}</Title>
-          <ul>
-            {
-              articles[key]
-                .map(s => {
-                  const slug = trimSlash(s);
-                  return <li><a href={slug}>{articlesInfo[slug]}</a></li>
-                })
-                .reduce((result, item) => <>{result}{item}</>)
-            }
-          </ul>
-        </>
-      }
-      return <ArticleListWrapper>{fragments}</ArticleListWrapper>;
-    }}
+    render={
+      data => {
+        const articlesContent = {}
+        data.allFile.edges.forEach(obj => {
+          let md = getMdCommon(obj.node);
+          articlesContent[trimSlash(md.fields.slug)] = md;
+        });
+        let fragments = <></>
+        for (let key in articles) {
+          const shortIntroSlug = makeSlug(articles[key].root, 'short-intro');
+          fragments = <>
+            {fragments}
+            <Title>{key}</Title>
+            {shortIntroSlug in articlesContent ? renderContent(articlesContent[shortIntroSlug]) : <></>}
+            <ul>
+              {
+                articles[key].chapters
+                  .map(s => {
+                    const slug = makeSlug(articles[key].root, s);
+                    return <li><a href={slug}>{articlesContent[slug].frontmatter.title}</a></li>
+                  })
+                  .reduce((result, item) => <>{result}{item}</>)
+              }
+            </ul>
+          </>
+        }
+        return <ArticleListWrapper>{fragments}</ArticleListWrapper>;
+      }}
   />
 }
