@@ -2,6 +2,8 @@
 exports.articles = {
   公共语言运行时: {
     root: 'botr',
+    original_title: 'Boot of the Runtime',
+    origin: 'https://github.com/dotnet/coreclr/blob/master/Documentation/botr/',
     chapters: [
       '1-introduction',
       '2-garbage-collection',
@@ -10,6 +12,8 @@ exports.articles = {
   },
   错误模型: {
     root: 'the-error-model',
+    original_title: 'The Error Model',
+    origin: 'http://joeduffyblog.com/2016/02/07/the-error-model/',
     chapters: [
       '0-introduction',
       '1-ambitions-and-learnings',

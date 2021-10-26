@@ -102,7 +102,7 @@ export default function ArticleList(props) {
           const shortIntroSlug = makeSlug(articles[key].root, 'short-intro');
           fragments = <>
             {fragments}
-            <Title>{key}</Title>
+            <Title>{key}</Title><a href="/{articles[key].root}.pdf" target="_blank">PDF</a>
             {shortIntroSlug in articlesContent ? renderContent(articlesContent[shortIntroSlug]) : <></>}
             <ul>
               {

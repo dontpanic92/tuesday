@@ -5,7 +5,7 @@ title: 六、CLR 类型加载器的设计
 > 这是一篇译文。作者：Ladi Prosek - 2007  
 > 原文链接：https://github.com/dotnet/coreclr/blob/master/Documentation/botr/type-loader.md
 
-## 1 引言
+## 引言
 
 在一个基于类的面向对象系统中，类型就是一种模板，它描述了每个独立的实例所包含的数据、以及它们能够提供的功能。如果没有定义一个对象的类型，我们就不可能创建出这个对象来<sup>1</sup>。如果我们说某两个对象的类型相同，那么它们一定是同一个类型的两个实例。事实上，这两个对象也定义了完全相同的成员，但这与类型判断完全无关。
 
@@ -19,7 +19,7 @@ title: 六、CLR 类型加载器的设计
 
 <sup>1</sup> C# 3.0 中的“匿名类型”能够让你无需显式定义类型即可创建一个对象，只需要直接列出它的所有字段即可。不要被这个功能蒙蔽双眼，编译器其实背着你创建了一个类型。
 
-### 1.1 相关阅读
+### 相关阅读
 
 [1] Martin Abadi, Luca Cardelli, A Theory of Objects, ISBN
 978-0387947754
@@ -33,7 +33,7 @@ Runtime][generics-design]
 [3] [ECMA Standard for the Common Language Infrastructure (CLI)](http://www.ecma-international.org/publications/standards/Ecma-335.htm)
 
 
-### 1.2 设计目标
+### 设计目标
 
 有时我们也把类型加载器（type loader）叫做类加载器（class laoder），但严格来说这个叫法并不正确，因为类只能算是类型的一个子集，即引用类型。这个加载器也能加载值类型。类型加载器的终极目标是：当有人需要加载一个类型时，它能够构建出表示这个类型的数据结构。下面的这些性质是加载器所应该具备的：
 
@@ -42,7 +42,7 @@ Runtime][generics-design]
 - 类型安全——拒绝加载不正确的类型，并抛出 `TypeLoadException`.
 - 并发——能够扩展至多线程的场景。
 
-## 2 类型加载器的架构
+## 类型加载器的架构
 
 加载器的公开方法很少。尽管这几个方法的函数签名不尽相同，它们都有着相似的语义：接收一个元数据 **token** 或是类型名 **name** 字符串参数，它代表了某个类型或成员；接收另一个参数，代表了这个 token 所在的范围（某个 **module** 或是 **assembly**）；再接收一些额外信息，比如一些标志。它会以 **handle** 的型时返回加载好的实体。
 
@@ -120,7 +120,7 @@ object CreateClass()
 
 <sup>3</sup>需要注意的是，`ref` 和 `out` 之间只在参数属性上有所不同。对于类型系统来说，它们其实是相同的类型。
 
-### 2.1 加载级别（Load Levels）
+### 加载级别（Load Levels）
 
 我们可以使用诸如 typedef/typeref/typespec 之类的 **token**、并指定一个 **Module** 来加载类型。当类型加载器加载类型时，它并不会一次性做完所有的工作，而是分阶段完成的。这样做的原因是，有一些类型可能会依赖其他类型，因此如果要完成类型的加载，则必须先加载那些被依赖的类型，二者可能会导致无限递归和死锁。例如：
 
@@ -145,7 +145,7 @@ class C<T>
 for the .NET Common Language
 Runtime][generics-design]。
 
-### 2.2 Generics
+### Generics
 
 在没有泛型的世界里，一切都很友好、所有人都很开心——因为每个普通的类型（即不是由 `TypeDesc` 所表示的类型）都只有一个 `MethodTable`，其中包含了指向了它所关联的 `EEClass` 的指针，而 `EEClass` 又指回了这个 `MethodTable`。为了节省空间，代表了方法的 `MethodDesc` 几个组成一组，每组之间以链表的形式相连<sup>4</sup>：
 
@@ -153,7 +153,7 @@ Runtime][generics-design]。
 
 <sup>4</sup>在执行托管代码时，并不是需要去查询这些组才能进行方法调用。方法调用是一种非常常见的操作，通常只需要 `MethodTable` 中的信息就能完成。
 
-#### 2.2.1 术语
+#### 术语
 
 **泛型形式参数（Generic Parameter）**
 
@@ -235,7 +235,7 @@ C# 会把 `typeof(A<,,>)` 编译为一个 IdToken A'3，运行时就会加载使
 
 是指所有的泛型实参均为 `System.__Canon` 的实例。`System.__Canon` 是定义在 mscorlib 中的一个内部类型，它就只充当一种约定，与其他的泛型实参都不同。类型和方法的规范实例用来代表所有的其他实例，并且携带有会在所有实例之间共享的信息。显然，`System.__Canon` 无法满足泛型形参上可能携带的任何约束，因此对于 `System.__Canon` 约束检查是个特例，加载器会将不满足的约束忽略。
 
-### 2.2.2 共享
+### 共享
 
 随着泛型的加入，运行时需要加载的类型变得更多了。虽然泛型类型的不同实例（例如 `List<string>` 和 `List<object>`）是不同的类型，也各自有它们自己的 `MethodTable`，但还是有有一些信息是重复的，可以共享。这种共享会给内存占用和性能都带来积极影响。
 

@@ -7576,6 +7576,11 @@ get-stdin@^4.0.1:
   resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-4.0.1.tgz#b968c6b0a04384324902e8bf1a5df32579a450fe"
   integrity sha1-uWjGsKBDhDJJAui/Gl3zJXmkUP4=
 
+get-stdin@~7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-7.0.0.tgz#8d5de98f15171a125c5e516643c7a6d0ea8a96f6"
+  integrity sha512-zRKcywvrXlXsA0v0i9Io4KDRaAw7+a1ZpjRwl9Wox8PFlVCCHra7E9c4kqXCoCM9nR5tBkaTTZRBoCm60bFqTQ==
+
 get-stream@3.0.0, get-stream@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-3.0.0.tgz#8e943d1358dc37555054ecbe2edb05aa174ede14"
@@ -11250,6 +11255,13 @@ pako@^1.0.5:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
+
+pandoc-filter@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/pandoc-filter/-/pandoc-filter-2.0.2.tgz#371990d3a01d0a25191ed390bb2b0f6a852b9cdf"
+  integrity sha512-PRovUOBe+5+z3j7ykca2MOEFvE9n9bo6wN9FsnK0wFA5kEFu0bxfQ5eIKvX+phGNJwXKns8hOWIA5hsDUQ5RDQ==
+  dependencies:
+    get-stdin "~7.0.0"
 
 param-case@^2.1.0:
   version "2.1.1"
