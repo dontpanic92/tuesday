@@ -5,6 +5,8 @@ import { colors } from 'gatsby-theme-apollo-core';
 import { articles } from '../articles';
 import { MDXProvider } from '@mdx-js/react';
 import { MDXRenderer } from 'gatsby-plugin-mdx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilePdf } from '@fortawesome/free-solid-svg-icons';
 
 function getMdCommon(x) {
   return x.childMarkdownRemark || x.childMdx
@@ -27,9 +29,18 @@ const ArticleListWrapper = styled.div({
   },
 })
 
-const Title = styled.div({
+const TitleLine = styled.div({
   fontSize: '1.25rem',
   marginBottom: '10px',
+})
+
+const Title = styled.span({
+  verticalAlign: 'text-top',
+})
+
+const Badge = styled.img({
+  margin: '0 0 0 20px',
+  verticalAlign: 'middle',
 })
 
 const ShortIntro = styled.section({
@@ -102,7 +113,12 @@ export default function ArticleList(props) {
           const shortIntroSlug = makeSlug(articles[key].root, 'short-intro');
           fragments = <>
             {fragments}
-            <Title>{key}</Title><a href="/{articles[key].root}.pdf" target="_blank">PDF</a>
+            <TitleLine>
+            <Title>{key}</Title>
+            <a href={articles[key].root + ".pdf"} target="_blank">
+              <Badge src="https://img.shields.io/badge/Download-PDF-green?style=flat-square&logo=adobeacrobatreader&color=7156d9" alt="Download PDF" />
+            </a>
+            </TitleLine>
             {shortIntroSlug in articlesContent ? renderContent(articlesContent[shortIntroSlug]) : <></>}
             <ul>
               {
