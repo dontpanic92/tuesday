@@ -28,7 +28,7 @@ jobs:
         cache: 'yarn'
     - uses: r-lib/actions/setup-pandoc@v1
     - name: Install texlive 
-      run: sudo apt install -y texlive
+      run: sudo apt install -y texlive texlive-xetex
     - run: yarn install && yarn workspace tuesday build
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
