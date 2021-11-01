@@ -32,9 +32,9 @@ jobs:
     - name: Install source-serif
       run: |
         wget https://github.com/adobe-fonts/source-serif/releases/download/4.004R/source-serif-4.004.zip
-        unzip source-serif-4.004.zip /usr/share/fonts
+        unzip source-serif-4.004.zip /usr/share/fonts/
         wget https://github.com/adobe-fonts/source-han-serif/releases/download/2.000R/SourceHanSerif.ttc.zip
-        unzip SourceHanSerif.ttc.zip /usr/share/fonts
+        unzip SourceHanSerif.ttc.zip /usr/share/fonts/
         fc-cache
     - run: yarn install && yarn workspace tuesday build
     - name: Deploy
