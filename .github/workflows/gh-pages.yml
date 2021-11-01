@@ -27,6 +27,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
     - uses: r-lib/actions/setup-pandoc@v1
+      with:
+        pandoc-version: 2.9.2.1
     - name: Install texlive 
       run: sudo apt install -y texlive texlive-xetex
     - name: Install source-serif
