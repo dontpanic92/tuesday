@@ -123,7 +123,7 @@ const StyledCheckbox = styled.input({
 const StyledOutlinkIcon = styled(IconOutlink)(size(14), {
   verticalAlign: -1,
   marginLeft: 8,
-  color: colors.text3
+  color: colors.text3,
 });
 
 function isPageSelected(path, pathname) {
@@ -143,7 +143,7 @@ function NavItems(props) {
             {page.anchor ? (
               <a href={page.path} target="_blank" rel="noopener noreferrer">
                 {pageTitle}
-                <StyledOutlinkIcon />
+                <StyledOutlinkIcon style={{height: '1rem'}} />
               </a>
             ) : (
               <Link

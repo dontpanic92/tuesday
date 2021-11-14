@@ -6,7 +6,7 @@ import { articles } from '../articles';
 import { MDXProvider } from '@mdx-js/react';
 import { MDXRenderer } from 'gatsby-plugin-mdx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 
 function getMdCommon(x) {
   return x.childMarkdownRemark || x.childMdx
@@ -61,7 +61,7 @@ function makeSlug(root, chapter) {
 
 function renderContent(md) {
   if (!!md.html) {
-    return  <ShortIntro dangerouslySetInnerHTML={{ __html: md.html }} />;
+    return <ShortIntro dangerouslySetInnerHTML={{ __html: md.html }} />;
   } else if (!!md.body) {
     return <ShortIntro><MDXProvider><MDXRenderer>{md.body}</MDXRenderer></MDXProvider></ShortIntro>;
   } else {
@@ -114,18 +114,30 @@ export default function ArticleList(props) {
           fragments = <>
             {fragments}
             <TitleLine>
-            <Title>{key}</Title>
-            <a href={articles[key].root + ".pdf"} target="_blank">
-              <Badge src="https://img.shields.io/badge/Download-PDF-green?style=flat-square&logo=adobeacrobatreader&color=7156d9" alt="Download PDF" />
-            </a>
+              <Title>{key}</Title>
+              {
+                !!articles[key].origin ?
+                  <Badge src="https://img.shields.io/badge/%E8%AF%91-green?style=flat-square&color=7156d9" alt="译文" /> : null
+              }
+              {
+                articles[key].pdf === false ? null :
+                  <a href={articles[key].root + ".pdf"} target="_blank">
+                    <Badge src="https://img.shields.io/badge/Download-PDF-green?style=flat-square&logo=adobeacrobatreader&color=7156d9" alt="Download PDF" />
+                  </a>
+              }
             </TitleLine>
             {shortIntroSlug in articlesContent ? renderContent(articlesContent[shortIntroSlug]) : <></>}
             <ul>
               {
                 articles[key].chapters
                   .map(s => {
-                    const slug = makeSlug(articles[key].root, s);
-                    return <li><a href={slug}>{articlesContent[slug].frontmatter.title}</a></li>
+                    const match = s.match(/^\[(.+)\]\((https?:\/\/.+)\)$/);
+                    if (match) {
+                      return <li><a href={match[2]}>{match[1]}&nbsp;&nbsp;<FontAwesomeIcon icon={faExternalLinkAlt} /></a></li>
+                    } else {
+                      const slug = makeSlug(articles[key].root, s);
+                      return <li><a href={slug}>{articlesContent[slug].frontmatter.title}</a></li>
+                    }
                   })
                   .reduce((result, item) => <>{result}{item}</>)
               }

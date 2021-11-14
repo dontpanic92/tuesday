@@ -24,12 +24,21 @@ exports.articles = {
       '6-retrospective-and-conclusions',
     ]
   },
+  '栈缓冲区溢出 101': {
+    root: 'stack-buffer-overflow',
+    pdf: false,
+    chapters: [
+      '[一、栈缓冲区溢出 101](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-101.html)',
+      '[二、ASLR](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-aslr.html)',
+      '[三、Security Cookie / Canary](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-canary.html)'
+    ]
+  },
 };
 
 exports.getSidebarCategoryList = () => {
   let x =
     Object.entries(this.articles)
-      .map(([k, v]) => [k, v.chapters.map(c => v.root + '/' + c)])
+      .map(([k, v]) => [k, v.chapters.map(c => c.startsWith('[') ? c : (v.root + '/' + c))])
       .reduce((p, c) => {p[c[0]] = c[1]; return p;}, {});
   return x;
 }
