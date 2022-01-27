@@ -4,7 +4,8 @@ function latest_modification {
     LATEST_DATE="19900101"
     for f in $1/*.md; do
         if [[ $f != *"short-intro"* ]]; then
-            DATE=`date -r $f "+%Y%m%d"`
+            #DATE=`date -r $f "+%Y%m%d"`
+            DATE=`date -d "$(git log -1 --format=%ci $f)" "+%Y%m%d"`
             if [[ $DATE -gt $LATEST_DATE ]]; then
                 LATEST_DATE=$DATE
             fi

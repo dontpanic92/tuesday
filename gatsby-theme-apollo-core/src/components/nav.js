@@ -4,8 +4,8 @@ import { sizes } from '../utils/breakpoints';
 import { NavHeight } from '../utils/constants';
 import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithubAlt } from '@fortawesome/free-brands-svg-icons';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCreativeCommons, faCreativeCommonsBy, faCreativeCommonsNcJp, faCreativeCommonsSa, faGithubAlt } from '@fortawesome/free-brands-svg-icons';
+import { faBlog, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 const NavContainer = styled.nav({
     position: 'sticky',
@@ -84,12 +84,16 @@ export function Nav(props) {
             <NavList>
                 <NavItem><a href="/"><Brand>Tuesday.</Brand></a></NavItem>
                 <NavItem><a href="/">首页</a></NavItem>
-                <NavItem><a href="https://dontpanic.blog/" target="_blank">博客</a></NavItem>
-                <NavItem><a href="https://dontpanic.blog/about" target="_blank">关于</a></NavItem>
             </NavList>
             <NavList>
-                <NavItem><a href="https://github.com/dontpanic92/tuesday" target="_blank"><ResizedFontAwesomeIcon icon={faGithubAlt} fixedWidth /></a></NavItem>
-                <NavItem><a href="/license"><ResizedFontAwesomeIcon icon={faInfoCircle} fixedWidth /></a></NavItem>
+                <NavItem><a href="https://dontpanic.blog/" target="_blank" title="随笔博客"><ResizedFontAwesomeIcon icon={faBlog} fixedWidth /></a></NavItem>
+                <NavItem><a href="https://dontpanic.blog/about" target="_blank" title="关于我"><ResizedFontAwesomeIcon icon={faInfoCircle} fixedWidth /></a></NavItem>
+                <NavItem><a href="https://github.com/dontpanic92/tuesday" target="_blank" title="本站源代码"><ResizedFontAwesomeIcon icon={faGithubAlt} fixedWidth /></a></NavItem>
+                <NavItem>
+                    <a href="/license" title="协议：CC BY-NC-SA 4.0">
+                        <ResizedFontAwesomeIcon icon={faCreativeCommons} fixedWidth />
+                    </a>
+                </NavItem>
             </NavList>
         </NavFlexWrapper>
     </NavContainer>
