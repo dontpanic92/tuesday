@@ -1,1 +1,5 @@
-{"componentChunkName":"component---src-pages-index-mdx","path":"/","result":{"pageContext":{"frontmatter":{"title":"dontpanic 的技术专栏","description":"首页"}}},"staticQueryHashes":["1511030359","2468095761","2645605535"]}
+{
+    "componentChunkName": "component---src-pages-index-mdx",
+    "path": "/",
+    "result": {"pageContext":{"frontmatter":{"title":"dontpanic 的技术专栏","description":"首页"}}},
+    "staticQueryHashes": ["1511030359","2468095761","2645605535"]}

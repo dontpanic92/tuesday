@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunktuesday=self.webpackChunktuesday||[]).push([[380],{1346:function(u,n,t){t.r(n),t.d(n,{default:function(){return f}});t(7378);var e=t(2861);function f(){return(0,e.tZ)("div",null,"not found")}}}]);
+//# sourceMappingURL=component---gatsby-theme-apollo-core-src-pages-404-js-b66e7ee97587ae8b57e1.js.map
