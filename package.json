@@ -1,5 +1,9 @@
 {
   "name": "root",
   "private": true,
-  "workspaces": ["gatsby-theme-apollo-core", "gatsby-theme-apollo-docs", "tuesday"]
+  "workspaces": [
+    "gatsby-theme-apollo-core",
+    "gatsby-theme-apollo-docs",
+    "tuesday"
+  ]
 }
