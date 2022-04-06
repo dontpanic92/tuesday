@@ -30,7 +30,7 @@ jobs:
       with:
         pandoc-version: 2.9.2.1
     - name: Install texlive 
-      run: sudo apt install -y texlive texlive-xetex
+      run: sudo apt install -y texlive texlive-xetex texlive-luatex
     - name: Install source-serif
       run: |
         wget https://github.com/adobe-fonts/source-serif/releases/download/4.004R/source-serif-4.004.zip
