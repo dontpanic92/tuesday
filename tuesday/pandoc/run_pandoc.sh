@@ -33,4 +33,6 @@ VERSION=`latest_modification $2`
 --metadata original_title="$4" \
 --metadata origin="$5" \
 --template template.tex \
---pdf-engine=xelatex -o "$3"
+--pdf-engine=lualatex -o "$3" 
+# \
+# --verbose > log.txt 2>&1

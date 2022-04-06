@@ -51,6 +51,10 @@ const ShortIntro = styled.section({
   },
 })
 
+const Icon = styled(FontAwesomeIcon)({
+  height: '1rem',
+})
+
 function trimSlash(slug) {
   return slug.replace(/^\/+|\/+$/g, '')
 }
@@ -133,7 +137,7 @@ export default function ArticleList(props) {
                   .map(s => {
                     const match = s.match(/^\[(.+)\]\((https?:\/\/.+)\)$/);
                     if (match) {
-                      return <li><a href={match[2]}>{match[1]}&nbsp;&nbsp;<FontAwesomeIcon icon={faExternalLinkAlt} /></a></li>
+                      return <li><a href={match[2]}>{match[1]}&nbsp;&nbsp;<Icon icon={faExternalLinkAlt} /></a></li>
                     } else {
                       const slug = makeSlug(articles[key].root, s);
                       return <li><a href={slug}>{articlesContent[slug].frontmatter.title}</a></li>

@@ -1,14 +1,22 @@
 
 exports.articles = {
-  公共语言运行时: {
-    root: 'botr',
-    original_title: 'Boot of the Runtime',
-    origin: 'https://github.com/dotnet/coreclr/blob/master/Documentation/botr/',
+  '栈缓冲区溢出 101': {
+    root: 'stack-buffer-overflow',
+    pdf: false,
+    chapters: [
+      '[一、栈缓冲区溢出 101](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-101.html)',
+      '[二、ASLR](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-aslr.html)',
+      '[三、Security Cookie / Canary](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-canary.html)'
+    ]
+  },
+  "Erlang 快速入门": {
+    root: 'erlang-getting-started',
+    original_title: 'Getting Started with Erlang',
+    origin: 'https://www.erlang.org/doc/getting_started/intro.html',
     chapters: [
       '1-introduction',
-      '2-garbage-collection',
-      '6-type-loader',
-    ],
+      '2-sequential-programming',
+    ]
   },
   错误模型: {
     root: 'the-error-model',
@@ -24,14 +32,15 @@ exports.articles = {
       '6-retrospective-and-conclusions',
     ]
   },
-  '栈缓冲区溢出 101': {
-    root: 'stack-buffer-overflow',
-    pdf: false,
+  公共语言运行时: {
+    root: 'botr',
+    original_title: 'Boot of the Runtime',
+    origin: 'https://github.com/dotnet/coreclr/blob/master/Documentation/botr/',
     chapters: [
-      '[一、栈缓冲区溢出 101](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-101.html)',
-      '[二、ASLR](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-aslr.html)',
-      '[三、Security Cookie / Canary](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-canary.html)'
-    ]
+      '1-introduction',
+      '2-garbage-collection',
+      '6-type-loader',
+    ],
   },
 };
 

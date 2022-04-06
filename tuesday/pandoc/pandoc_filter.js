@@ -3,9 +3,10 @@
 let pandoc = require("pandoc-filter");
 var Header = pandoc.Header;
 var added = false;
-function action({ t: type, c: value }, format, meta) {
-    // console.error(type + " | " + JSON.stringify(value));
-    if (!added && !!meta["title"]) {
+function action(content, format, meta) {
+    let { t: type, c: value } = content;
+    if (!added && !!meta["title"] && (type != "Str" && type != "Space")) {
+        console.error(type + " | " + JSON.stringify(value));
         added = true;
 
         let title = meta["title"]["c"][0]["c"];

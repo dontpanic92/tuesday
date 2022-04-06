@@ -5,6 +5,10 @@ exports.createPages = async (
   {actions, graphql},
 ) => {
   for (let title in articles) {
+    if (articles[title].pdf === false) {
+      continue;
+    }
+
     let root = articles[title].root;
     let o_title = !!articles[title].original_title ? articles[title].original_title : "";
     let o = !!articles[title].origin ? articles[title].origin : "";

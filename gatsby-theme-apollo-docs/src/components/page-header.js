@@ -6,7 +6,7 @@ import { GatsbyImage, getImage } from 'gatsby-plugin-image';
 
 const FeaturedImage = styled(GatsbyImage)({
   marginBottom: '20px',
-  maxHeight: '400px',
+  maxHeight: '280px',
 })
 
 const Heading = styled.h1({
