@@ -1,5 +1,13 @@
 
 exports.articles = {
+  "山海狂心：仙古轩系列游戏逆向研究（一、打包格式）": {
+    root: 'xgx-research-1',
+    pdf: true,
+    chapters: [
+      '0-preface',
+      '1-cpk',
+    ]
+  },
   '栈缓冲区溢出 101': {
     root: 'stack-buffer-overflow',
     pdf: false,
@@ -9,7 +17,7 @@ exports.articles = {
       '[三、Security Cookie / Canary](https://ctf.dontpanic.blog/notes/stack-buffer-overflow-canary.html)'
     ]
   },
-  "Erlang 快速入门": {
+  /*"Erlang 快速入门": {
     root: 'erlang-getting-started',
     original_title: 'Getting Started with Erlang',
     origin: 'https://www.erlang.org/doc/getting_started/intro.html',
@@ -17,7 +25,7 @@ exports.articles = {
       '1-introduction',
       '2-sequential-programming',
     ]
-  },
+  },*/
   错误模型: {
     root: 'the-error-model',
     original_title: 'The Error Model',
