@@ -1,6 +1,6 @@
 
 exports.articles = {
-  "山海狂心：仙古轩系列游戏逆向研究（一、打包格式）": {
+  "山海狂心：仙古轩系列游戏逆向研究": {
     root: 'xgx-research-1',
     pdf: true,
     chapters: [

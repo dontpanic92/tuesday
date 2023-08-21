@@ -7,10 +7,8 @@ import { MDXProvider } from '@mdx-js/react';
 import { MDXRenderer } from 'gatsby-plugin-mdx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
-
-function getMdCommon(x) {
-  return x.childMarkdownRemark || x.childMdx
-}
+import { badges } from '../badges';
+import { getMdCommon, makeSlug, trimSlash } from '../utils';
 
 const ArticleListWrapper = styled.div({
   'a[href]:not([class])': {
@@ -55,14 +53,6 @@ const Icon = styled(FontAwesomeIcon)({
   height: '1rem',
 })
 
-function trimSlash(slug) {
-  return slug.replace(/^\/+|\/+$/g, '')
-}
-
-function makeSlug(root, chapter) {
-  return trimSlash(root) + '/' + trimSlash(chapter);
-}
-
 function renderContent(md) {
   if (!!md.html) {
     return <ShortIntro dangerouslySetInnerHTML={{ __html: md.html }} />;
@@ -88,6 +78,7 @@ export default function ArticleList(props) {
                     }
                     frontmatter {
                       title
+                      badges
                     }
                     html
                   }
@@ -110,6 +101,7 @@ export default function ArticleList(props) {
         const articlesContent = {}
         data.allFile.edges.forEach(obj => {
           let md = getMdCommon(obj.node);
+          md.frontmatter.badges ??= [];
           articlesContent[trimSlash(md.fields.slug)] = md;
         });
         let fragments = <></>
@@ -140,7 +132,15 @@ export default function ArticleList(props) {
                       return <li><a href={match[2]}>{match[1]}&nbsp;&nbsp;<Icon icon={faExternalLinkAlt} /></a></li>
                     } else {
                       const slug = makeSlug(articles[key].root, s);
-                      return <li><a href={slug}>{articlesContent[slug].frontmatter.title}</a></li>
+                      return <li>
+                        <a href={slug}>{articlesContent[slug].frontmatter.title}</a>
+                        {articlesContent[slug].frontmatter.badges.map((b) => {
+                          console.log(b);
+                          if (badges[b]) {
+                            return <Badge src={badges[b]} />;
+                          }
+                        })}
+                      </li>
                     }
                   })
                   .reduce((result, item) => <>{result}{item}</>)
