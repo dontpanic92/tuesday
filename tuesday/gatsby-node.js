@@ -17,8 +17,8 @@ exports.createPages = async (
     let o_title = !!articles[title].original_title ? articles[title].original_title : "";
     let o = !!articles[title].origin ? articles[title].origin : "";
     let command = `cd pandoc && bash run_pandoc.sh "${title}" ../content/${root} "../public/${root}.pdf" "${o_title}" "${o}"`;
-    // let result = execSync(command);
-    // console.log(result.toString());
+    let result = execSync(command);
+    console.log(result.toString());
   }
 };
 
