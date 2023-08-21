@@ -17,8 +17,8 @@ exports.createPages = async (
     let o_title = !!articles[title].original_title ? articles[title].original_title : "";
     let o = !!articles[title].origin ? articles[title].origin : "";
     let command = `cd pandoc && bash run_pandoc.sh "${title}" ../content/${root} "../public/${root}.pdf" "${o_title}" "${o}"`;
-    let result = execSync(command);
-    console.log(result.toString());
+    // let result = execSync(command);
+    // console.log(result.toString());
   }
 };
 
@@ -91,13 +91,12 @@ function generate_article_list(data) {
     } else {
       const slug = makeSlug(articles[key].root, s);
       return `<li>
-<a href=${slug}>${articlesContent[slug].frontmatter.title}</a>
+<a href='https://tuesday.dontpanic.blog/${slug}'>${articlesContent[slug].frontmatter.title}</a>
             ${articlesContent[slug].frontmatter.badges.map((b) => {
-        console.log(b);
         if (badges[b]) {
           return `<img src=${badges[b]} />`;
         }
-      })}
+      }).join("  ")}
  </li>`
     }
   })

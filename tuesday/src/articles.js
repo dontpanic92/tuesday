@@ -1,11 +1,12 @@
 
 exports.articles = {
   "山海狂心：仙古轩系列游戏逆向研究": {
-    root: 'xgx-research-1',
+    root: 'xgx-research',
     pdf: true,
     chapters: [
       '0-preface',
       '1-cpk',
+      '2-fmb',
     ]
   },
   '栈缓冲区溢出 101': {
