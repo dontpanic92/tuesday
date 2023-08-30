@@ -18,11 +18,17 @@ CPK 是仙剑三、仙剑三外传和仙剑四使用的打包格式。CPK 打包
 
 虽然 CPK 文件保留了目录结构，但是在游戏读取文件时，并不会真的生成层次化的目录结构，而是通过计算文件完整路径的 CRC32 值后查表得到对应的文件节点。例如，当游戏需要读取一个 CPK 文件包中的 `musiuc\P01.mp3` 文件时，首先会对字符串 "music\P01.mp3" 计算 CRC32 值，随后在节点表中查找该 CRC32 值对应的文件节点，从而得到文件的起始位置和大小。
 
+CPK 包内文件可以被压缩，如果文件原始大小和压缩后大小不等则可判定其已被压缩，压缩算法为 LZO1X。可使用 minilzo 库进行解压。
+
 CPK 文件可能会存在被加密的部分，可以通过文件头中的 `data_start` 字段的值是否为 `0x00100080` 来判断。如果存在加密部分，则自 CPK 文件头之后的 `0x1000` 个字节采用 xxtea 算法加密，解密密钥为字符串 "Vampire.C.J at Softstar Technology (ShangHai) Co., Ltd"。
 
 
-
 **妖弓源文件**：https://github.com/dontpanic92/OpenPAL3/blob/master/yaobow/shared/src/fs/cpk/cpk_archive.rs
+
+## 参考资料
+
+- [看雪论坛：仙剑3剧情控制码解析和cpk格式分析](https://bbs.pediy.com/thread-157228.htm)
+- 记得还看过一版 Java 版本的 CPK 解包代码，但是突然找不到了（
 
 
 ## 文件格式描述
