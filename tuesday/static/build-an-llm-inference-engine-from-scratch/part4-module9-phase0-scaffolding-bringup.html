@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Part IV · Module 9 — Phase 0：项目脚手架与 Backend Bring-up｜从零构建 LLM 推理引擎</title>
+  <link rel="stylesheet" href="assets/textbook.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script defer src="assets/textbook.js"></script>
+</head>
+<body>
+<main class="page">
+  <div class="coursemark">
+    <span>Building an LLM Inference Engine from Scratch</span>
+    <span>Part IV / Module 9</span>
+  </div>
+
+  <span class="part-badge">Part IV · Implementation</span>
+  <h1>Module 9：Phase 0 — 项目脚手架与 Backend Bring-up</h1>
+  <p class="subtitle">从空目录开始：搭建 Cargo workspace，创建 D3D12 + DirectML device，跑通第一个 DML GEMM 和第一个 HLSL compute shader。</p>
+
+  <section class="objectives">
+    <h4>学习目标</h4>
+    <ul>
+      <li>理解为什么大型系统需要清晰的 workspace / crate 边界。</li>
+      <li>能解释 Phase 0 的最小成功标准：device 可创建、GEMM 可验证、custom kernel 可 dispatch。</li>
+      <li>理解 D3D12 + DirectML device creation 的基本步骤。</li>
+      <li>能写出第一个 smoke test：CPU reference vs GPU output。</li>
+      <li>完成 Lab 9：搭建脚手架并通过 GEMM / compute smoke tests。</li>
+    </ul>
+  </section>
+
+  <h2><span class="num">9.1</span>为什么先搭 Cargo workspace？</h2>
+
+  <p>
+    一个 LLM 推理引擎不是单个文件能承载的。即使我们从最小原型开始，也很快会遇到模型数学、GPU backend、权重加载、
+    tokenizer、runtime、CLI、Xbox host 等不同关注点。如果不在第一天就划清边界，后续每个模块都会互相缠在一起。
+  </p>
+
+  <p>
+    因此 Phase 0 的第一步是创建 Cargo workspace，并把未来会变化的部分分成多个 crate：
+  </p>
+
+  <table class="tbl">
+    <thead><tr><th>Crate</th><th>Phase 0 中的角色</th><th>未来扩展</th></tr></thead>
+    <tbody>
+      <tr><td><code>xinfer-core</code></td><td>dtype、shape、config、错误类型</td><td>CPU reference ops</td></tr>
+      <tr><td><code>xinfer-backend</code></td><td>HAL trait 草图</td><td>Device / Buffer abstraction</td></tr>
+      <tr><td><code>xinfer-dml</code></td><td>D3D12 + DirectML bring-up</td><td>kernels、copy queue、timer</td></tr>
+      <tr><td><code>xinfer-model</code></td><td>空壳</td><td>Qwen2 forward</td></tr>
+      <tr><td><code>xinfer-loader</code></td><td>空壳</td><td>safetensors / config</td></tr>
+      <tr><td><code>xinfer-runtime</code></td><td>空壳</td><td>KV cache + generation</td></tr>
+      <tr><td><code>xinfer-cli</code></td><td><code>xinfer device</code></td><td>generate 命令</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout note">
+    <span class="tag">工程原则</span>
+    Phase 0 不追求功能完整，而追求“边界正确”。只要边界正确，后续每个 phase 都可以局部扩展，而不是重写整个项目。
+  </div>
+
+  <figure class="fig-card">
+    <svg width="820" height="360" viewBox="0 0 820 360" role="img" aria-label="Phase 0 workspace layout">
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .gpu{fill:#f3f0fb;stroke:#6b4fbb;stroke-width:1.5}
+        .app{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+      </style>
+      <text x="410" y="32" text-anchor="middle" class="txt">Phase 0 workspace：先建立边界，再填充实现</text>
+      <rect x="60" y="70" width="150" height="62" rx="12" class="hi"/><text x="135" y="96" text-anchor="middle" class="txt">xinfer-core</text><text x="135" y="116" text-anchor="middle" class="sm">shared types</text>
+      <rect x="250" y="70" width="150" height="62" rx="12" class="box"/><text x="325" y="96" text-anchor="middle" class="txt">xinfer-backend</text><text x="325" y="116" text-anchor="middle" class="sm">HAL traits</text>
+      <rect x="440" y="70" width="150" height="62" rx="12" class="gpu"/><text x="515" y="96" text-anchor="middle" class="txt">xinfer-dml</text><text x="515" y="116" text-anchor="middle" class="sm">D3D12 + DML</text>
+      <rect x="630" y="70" width="130" height="62" rx="12" class="app"/><text x="695" y="96" text-anchor="middle" class="txt">xinfer-cli</text><text x="695" y="116" text-anchor="middle" class="sm">device cmd</text>
+
+      <rect x="120" y="190" width="130" height="55" rx="10" class="box"/><text x="185" y="222" text-anchor="middle" class="txt">loader</text>
+      <rect x="285" y="190" width="130" height="55" rx="10" class="box"/><text x="350" y="222" text-anchor="middle" class="txt">model</text>
+      <rect x="450" y="190" width="130" height="55" rx="10" class="box"/><text x="515" y="222" text-anchor="middle" class="txt">runtime</text>
+      <text x="410" y="305" text-anchor="middle" class="sm">Phase 0 中许多 crate 只是空壳；这不是浪费，而是为后续 phase 留出稳定接口。</text>
+    </svg>
+    <figcaption><b>图 9-1：</b>Phase 0 的 workspace 不是“过度设计”，而是后续可维护性的基础。</figcaption>
+  </figure>
+
+  <h2><span class="num">9.2</span>创建 D3D12 + DirectML device</h2>
+
+  <p>
+    第一条真正的 GPU 路径是 device creation。PC 上通常通过 DXGI 枚举 adapter，选择支持 D3D12 的硬件 adapter，
+    然后创建 <code>ID3D12Device</code>。DirectML device 再建立在这个 D3D12 device 之上。
+  </p>
+
+  <p>
+    Phase 0 的关键步骤可以概括为：
+  </p>
+
+  <ol>
+    <li>创建 DXGI factory；</li>
+    <li>枚举 hardware adapter，跳过 software adapter；</li>
+    <li>用 <code>D3D12CreateDevice</code> 测试并创建 D3D12 device；</li>
+    <li>创建 direct command queue；</li>
+    <li>调用 <code>DMLCreateDevice</code> 创建 DirectML device；</li>
+    <li>在 CLI 中打印 adapter 名称，作为 smoke test。</li>
+  </ol>
+
+  <figure class="fig-card">
+    <svg width="820" height="310" viewBox="0 0 820 310" role="img" aria-label="D3D12 DirectML device creation flow">
+      <defs>
+        <marker id="p9a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#p9a)}
+      </style>
+      <rect x="40" y="82" width="110" height="62" rx="12" class="box"/><text x="95" y="108" text-anchor="middle" class="txt">DXGI Factory</text>
+      <rect x="190" y="82" width="120" height="62" rx="12" class="box"/><text x="250" y="108" text-anchor="middle" class="txt">Adapter</text><text x="250" y="128" text-anchor="middle" class="sm">hardware GPU</text>
+      <rect x="350" y="82" width="130" height="62" rx="12" class="hi"/><text x="415" y="108" text-anchor="middle" class="txt">D3D12 Device</text>
+      <rect x="520" y="48" width="130" height="62" rx="12" class="box"/><text x="585" y="74" text-anchor="middle" class="txt">Command Queue</text>
+      <rect x="520" y="132" width="130" height="62" rx="12" class="hot"/><text x="585" y="158" text-anchor="middle" class="txt">DirectML Device</text>
+      <rect x="690" y="82" width="100" height="62" rx="12" class="hi"/><text x="740" y="108" text-anchor="middle" class="txt">DmlDevice</text><text x="740" y="128" text-anchor="middle" class="sm">wrapper</text>
+      <line x1="150" y1="113" x2="187" y2="113" class="edge"/>
+      <line x1="310" y1="113" x2="347" y2="113" class="edge"/>
+      <path d="M480 113 C500 95 500 79 517 79" class="edge"/>
+      <path d="M480 113 C500 135 500 163 517 163" class="edge"/>
+      <path d="M650 79 C675 79 675 105 687 105" class="edge"/>
+      <path d="M650 163 C675 163 675 123 687 123" class="edge"/>
+      <text x="410" y="250" text-anchor="middle" class="sm">如果这条链路失败，后续所有 GPU kernel 都无从谈起。</text>
+    </svg>
+    <figcaption><b>图 9-2：</b>D3D12 + DirectML device creation 的对象链。</figcaption>
+  </figure>
+
+  <pre><code><span class="tok-c"># Phase 0 的第一个用户可见 smoke test</span>
+cargo run -p xinfer-cli -- device
+
+<span class="tok-c"># 期望输出</span>
+D3D12 + DirectML device created.
+Adapter: AMD Radeon RX 9070 XT</code></pre>
+
+  <h2><span class="num">9.3</span>第一个 DirectML GEMM 与第一个 HLSL kernel</h2>
+
+  <p>
+    Device 能创建不代表计算正确。Phase 0 还需要两个计算 smoke tests：
+  </p>
+
+  <ul>
+    <li><strong>DirectML GEMM：</strong>验证 DirectML operator create/compile/init/bind/dispatch 全链路。</li>
+    <li><strong>Custom HLSL affine：</strong>验证我们能编译并 dispatch 自己写的 compute shader。</li>
+  </ul>
+
+  <h3>GEMM 的 CPU reference</h3>
+
+  <p>
+    对矩阵 \(A\in\mathbb{R}^{M\times K}\)、\(B\in\mathbb{R}^{K\times N}\)，GEMM 输出：
+  </p>
+
+  \[
+    C_{i,j}=\sum_{p=0}^{K-1}A_{i,p}B_{p,j}
+  \]
+
+  <p>
+    GPU 输出必须与 CPU reference 在容差内一致：
+  </p>
+
+  \[
+    \max_{i,j}|C^{\text{gpu}}_{i,j}-C^{\text{cpu}}_{i,j}| < \varepsilon
+  \]
+
+  <h3>Affine kernel</h3>
+
+  <p>
+    自写 HLSL kernel 选择一个极简单的函数：
+  </p>
+
+  \[
+    y_i = 2x_i + 1
+  \]
+
+  <p>
+    简单并不意味着没价值。这个 kernel 证明了 root signature、pipeline state、root constants、SRV/UAV 绑定、dispatch、
+    readback 的最小路径全部可用。后续 RMSNorm、RoPE、SwiGLU、attention 都是从这条路径扩展出来的。
+  </p>
+
+  <figure class="fig-card">
+    <div class="chart-wrap"><canvas id="phase0Chart"></canvas></div>
+    <figcaption><b>图 9-3：</b>Phase 0 的三个门槛：能创建设备、能跑库算子、能跑自写 kernel。</figcaption>
+  </figure>
+
+  <h2><span class="num">9.4</span>Smoke test 的设计原则</h2>
+
+  <p>
+    Phase 0 的测试不应该复杂，但必须能覆盖关键风险：
+  </p>
+
+  <table class="tbl">
+    <thead><tr><th>测试</th><th>覆盖风险</th><th>失败时优先检查</th></tr></thead>
+    <tbody>
+      <tr><td><code>xinfer device</code></td><td>D3D12/DML device creation</td><td>驱动、DXGI、DirectML runtime</td></tr>
+      <tr><td><code>gemm_smoke</code></td><td>DML operator 生命周期 + binding</td><td>tensor desc、binding table、resource state</td></tr>
+      <tr><td><code>compute_smoke</code></td><td>HLSL 编译 + root signature + dispatch</td><td>shader 编译、root 参数顺序、UAV 输出</td></tr>
+      <tr><td>CPU reference 对比</td><td>数值正确性</td><td>shape、row-major layout、转置约定</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout note">
+    <span class="tag">Phase 0 的核心心态</span>
+    不要一开始就写完整 transformer。先让最小 GPU 计算闭环成立：上传 → dispatch → readback → verify。
+    这个闭环可靠后，后面的复杂 kernel 才有调试基础。
+  </div>
+
+  <h2><span class="num">Lab 9</span>站起工作区，通过 GEMM 与 compute smoke tests</h2>
+
+  <p>
+    本实验要求从一个空目录或 starter branch 开始，复现 Phase 0。
+  </p>
+
+  <ol>
+    <li>创建 Cargo workspace 和主要 crate 目录。</li>
+    <li>实现 <code>xinfer-core</code> 中的 <code>DType</code>、<code>Shape</code>、错误类型。</li>
+    <li>在 <code>xinfer-dml</code> 中实现 D3D12 + DirectML device creation。</li>
+    <li>实现 CLI 命令 <code>xinfer device</code>。</li>
+    <li>实现一个 DirectML GEMM smoke test，与 CPU reference 对比。</li>
+    <li>实现一个自写 HLSL affine kernel smoke test。</li>
+  </ol>
+
+  <pre><code><span class="tok-c"># 最终验收命令</span>
+cargo build
+cargo run -p xinfer-cli -- device
+cargo test -p xinfer-dml --test gemm_smoke
+cargo test -p xinfer-dml --test compute_smoke</code></pre>
+
+  <div class="exercises">
+    <h3>思考与练习</h3>
+    <details class="qa">
+      <summary><span class="diff easy">基础</span>为什么 Phase 0 不直接实现 transformer，而先实现 affine kernel？</summary>
+      <div class="answer">
+        <p>因为要先打通最小可行管线（device 创建、buffer 分配/上传/下载、kernel 编译/dispatch、fence 同步、结果 readback），并验证它正确。affine kernel（<code>out=a*in+b</code>）极简，能在不引入复杂数值的情况下确认整条 GPU 路径可用。若直接上 transformer，一旦出错很难分清是管线 bug 还是模型逻辑 bug。先立“地基”再盖楼。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff easy">基础</span>GEMM 中 \(M,K,N\) 分别代表什么？</summary>
+      <div class="answer">
+        <p>\(C_{M\times N}=A_{M\times K}\cdot B_{K\times N}\)。\(M\) 是输出行数（如序列长度/batch），\(K\) 是被求和消去的内积维（contraction，如 in_features），\(N\) 是输出列数（如 out_features）。decode 时 \(M=1\)（GEMV），prefill 时 \(M=\) 序列长度。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff mid">进阶</span>如果 CPU/GPU GEMM 结果不一致，列出三个可能原因。</summary>
+      <div class="answer">
+        <p>① 行/列主序或转置约定不一致（A 或 B 的 layout、是否 \(W^\top\)）；② 累加顺序/精度差异（GPU 并行归约 + f16 输入导致与 CPU f32 串行结果有浮点误差——若超出容差才算 bug）；③ 索引/边界错误（越界、stride 算错、threadgroup 覆盖不全导致部分输出未写）。其他还有未同步（读了未完成的 UAV 写）、未初始化输出 buffer 等。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff mid">进阶</span>解释为什么 readback 是 smoke test 的必要部分。</summary>
+      <div class="answer">
+        <p>因为只有把 GPU 输出拷回 CPU 并和参考值比较，才能证明 kernel 真的算对了。dispatch 不报错不代表结果正确——可能根本没写、写错位置或数值错。readback（经 readback heap + fence 等待）是闭环验证的最后一环，没有它 smoke test 只验证了“能跑”而非“跑对”。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff hard">挑战</span>把 affine kernel 改成 <code>out[i]=a*in[i]+b</code>，其中 <code>a,b</code> 来自 root constants。</summary>
+      <div class="answer">
+        <p>HLSL：用 root constants 传 a、b（例如 <code>cbuffer Params : register(b0) { float a; float b; }</code> 或 32-bit root constants）。kernel：</p>
+        <p><code>uint i = DTid.x; if (i &lt; count) outBuf[i] = a * inBuf[i] + b;</code></p>
+        <p>Rust 侧：root signature 增加一个 root constant 槽（2 个 float），dispatch 前用 <code>SetComputeRoot32BitConstants</code> 写入 a、b，再绑定 in/out UAV。相比把 a、b 放进 buffer，root constants 更轻量、无需额外 buffer 与 barrier，适合这种少量标量参数。</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="pager">
+    <a href="part3-module8-directml-d3d12-backend.html">← Module 8：DirectML & D3D12 Backend</a>
+    <a href="../toc.md">教程目录 ↑</a>
+    <a href="part4-module10-hal.html">Module 10：硬件抽象层 HAL →</a>
+  </div>
+</main>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const P = window.XINFER_PALETTE || { teal: "#1f6f78", orange: "#b8531a", purple: "#6b4fbb", green: "#2e7d4f", grayline: "#e3e1da" };
+  makeChart("phase0Chart", {
+    type: "bar",
+    data: {
+      labels: ["Device", "DML GEMM", "HLSL affine"],
+      datasets: [{
+        label: "bring-up 信心等级",
+        data: [1, 2, 3],
+        backgroundColor: [P.teal, P.purple, P.orange]
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: "milestone" }, grid: { color: P.grayline } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>从零构建 LLM 推理引擎｜教程首页</title>
+  <link rel="stylesheet" href="assets/textbook.css" />
+  <style>
+    .hero {
+      background: linear-gradient(135deg, #eef6f6 0%, #fff 55%, #fdf2e9 100%);
+      border: 1px solid var(--rule);
+      border-radius: 18px;
+      padding: 30px 34px;
+      margin: 20px 0 36px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .hero h1 { margin-top: 0; }
+.toc-part {
+      margin: 34px 0;
+      padding: 18px 20px;
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+    }
+    .toc-part h2 {
+      margin: 0 0 10px;
+      padding: 0;
+      border: 0;
+      font-size: 21px;
+    }
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .toc-list li {
+      border-top: 1px dashed var(--rule);
+      padding: 10px 0;
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 12px;
+      align-items: baseline;
+    }
+    .toc-list li:first-child { border-top: 0; }
+    .modno {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .toc-list a {
+      font-family: "Noto Sans SC", system-ui, sans-serif;
+      text-decoration: none;
+      font-weight: 650;
+    }
+    .toc-list p {
+      margin: 4px 0 0;
+      color: var(--ink-soft);
+      font-size: 14.5px;
+      line-height: 1.55;
+    }
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 22px 0;
+    }
+    .quick a {
+      display: block;
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--accent);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-family: "Noto Sans SC", system-ui, sans-serif;
+      font-weight: 650;
+    }
+    .quick span {
+      display: block;
+      font-weight: 400;
+      color: var(--ink-soft);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+<main class="page">
+  <div class="coursemark">
+    <span>xinfer tutorial materials</span>
+    <span>Front Page / Table of Contents</span>
+  </div>
+
+  <section class="hero">
+    <span class="part-badge">教程首页</span>
+    <h1>从零构建 LLM 推理引擎</h1>
+    <p class="subtitle">
+      项目式教程：构建 <strong>xinfer</strong> — 一个 Rust + DirectML / D3D12 的
+      自写 LLM 推理引擎，运行 Qwen2.5，并理解 GPU kernel、KV cache、采样、优化与 Xbox GDK 部署。
+    </p>
+</section>
+
+  <div class="quick">
+    <a href="part0-course-orientation.html">开始学习<span>Part 0：教程导论与 Lab 0</span></a>
+    <a href="appendices.html">查看附录<span>数学、Rust、浮点、调试、术语</span></a>
+  </div>
+
+  <section class="toc-part">
+    <h2>Part 0 — Tutorial Orientation</h2>
+    <ul class="toc-list">
+      <li><span class="modno">Part 0</span><div><a href="part0-course-orientation.html">教程导论：我们要从零构建什么？</a><p>教程目标、无黑盒哲学、工具链、crate 图、Lab 0。</p></div></li>
+    </ul>
+  </section>
+
+  <section class="toc-part">
+    <h2>Part I — Foundations: Large Language Models</h2>
+    <ul class="toc-list">
+      <li><span class="modno">Module 1</span><div><a href="part1-module1-from-ngrams-to-transformers.html">从 n-gram 到 Transformer</a><p>next-token prediction、logits、n-gram 局限、attention 直觉、decoder-only 总览。</p></div></li>
+      <li><span class="modno">Module 2</span><div><a href="part1-module2-transformer-block.html">Transformer Block：算子逐个看</a><p>RMSNorm、linear、attention、GQA、RoPE、SwiGLU、LM head 的数学与 shape。</p></div></li>
+      <li><span class="modno">Module 3</span><div><a href="part1-module3-autoregressive-generation.html">自回归生成、KV Cache 与采样</a><p>prefill/decode、KV cache、sampling、tokenizer、chat template、吞吐指标。</p></div></li>
+    </ul>
+  </section>
+
+  <section class="toc-part">
+    <h2>Part II — Foundations: GPU Compute & Shaders</h2>
+    <ul class="toc-list">
+      <li><span class="modno">Module 4</span><div><a href="part2-module4-gpu-compute-and-shaders.html">为什么需要 GPU，什么是 Shader？</a><p>CPU/GPU 模型、SIMT、内存层次、coalescing、dispatch grid、roofline。</p></div></li>
+      <li><span class="modno">Module 5</span><div><a href="part2-module5-gpu-api-landscape.html">GPU Compute API 版图</a><p>CUDA、Vulkan、Metal、OpenCL、D3D12+DirectML 的取舍与 HAL 动机。</p></div></li>
+      <li><span class="modno">Module 6</span><div><a href="part2-module6-hlsl-d3d12-programming.html">HLSL 与 Direct3D 12 编程模型</a><p>HLSL compute、资源类型、groupshared、FXC/DXC、D3D12 对象、barriers、root signature。</p></div></li>
+    </ul>
+  </section>
+
+  <section class="toc-part">
+    <h2>Part III — The Concrete Candidates</h2>
+    <ul class="toc-list">
+      <li><span class="modno">Module 7</span><div><a href="part3-module7-qwen2-model.html">Qwen2 / Qwen2.5 模型</a><p>config.json、Qwen 特性、safetensors、dtype、模型尺寸与显存估算。</p></div></li>
+      <li><span class="modno">Module 8</span><div><a href="part3-module8-directml-d3d12-backend.html">DirectML 与 Direct3D 12 Backend</a><p>DirectML operator 生命周期、自写 HLSL kernel、RDNA4 GEMM 故障、PC/Xbox device creation。</p></div></li>
+    </ul>
+  </section>
+
+  <section class="toc-part">
+    <h2>Part IV — Implementation: Building xinfer</h2>
+    <ul class="toc-list">
+      <li><span class="modno">Module 9</span><div><a href="part4-module9-phase0-scaffolding-bringup.html">Phase 0：项目脚手架与 Backend Bring-up</a><p>Cargo workspace、D3D12+DML device、第一个 GEMM 与 affine kernel。</p></div></li>
+      <li><span class="modno">Module 10</span><div><a href="part4-module10-hal.html">Phase 1：硬件抽象层 HAL</a><p>Device/Buffer traits、状态跟踪 buffer、Executor、operator/kernel wrapper、GPU timer。</p></div></li>
+      <li><span class="modno">Module 11</span><div><a href="part4-module11-transformer-ops-kernels.html">Phase 2：Transformer Ops as Kernels</a><p>CPU reference、RMSNorm/RoPE/SwiGLU/add/GQA attention、matmul、parity 测试。</p></div></li>
+      <li><span class="modno">Module 12</span><div><a href="part4-module12-assembling-qwen2.html">Phase 3：组装 Qwen2 模型</a><p>权重命名、CPU/GPU forward、debug layer、device removed、custom matmul。</p></div></li>
+      <li><span class="modno">Module 13</span><div><a href="part4-module13-runtime-kv-decode-sampling.html">Phase 4：Runtime、KV Cache、Decode 与 Sampling</a><p>per-layer KV cache、prefill/decode、samplers、tokenizer、第一次真实 demo。</p></div></li>
+      <li><span class="modno">Module 14</span><div><a href="part4-module14-layer-streaming.html">Phase 5：Layer Streaming</a><p>大于 VRAM 的模型、copy queue、staging、double-buffering、cross-queue state。</p></div></li>
+    </ul>
+  </section>
+
+  <section class="toc-part">
+    <h2>Part V — Performance Engineering</h2>
+    <ul class="toc-list">
+      <li><span class="modno">Module 15</span><div><a href="part5-module15-measuring-before-optimizing.html">先测量，再优化</a><p>benchmark、prefill/decode tok/s、memory reporting、bottleneck 分类、regression gate。</p></div></li>
+      <li><span class="modno">Module 16</span><div><a href="part5-module16-optimization-case-studies.html">六层优化案例</a><p>batching、f16、coalesced GEMV、single-pass attention、cooperative RMSNorm、GPU argmax。</p></div></li>
+      <li><span class="modno">Module 17</span><div><a href="part5-module17-advanced-optimization.html">高级优化方向</a><p>量化、tiled GEMM、fused epilogues、GPU sampling、speculative decoding、paged KV。</p></div></li>
+    </ul>
+  </section>
+
+  <section class="toc-part">
+    <h2>Part VI — Portability & Deployment</h2>
+    <ul class="toc-list">
+      <li><span class="modno">Module 18</span><div><a href="part6-module18-xbox-gdk.html">Xbox GDK 部署路径</a><p>Rust C ABI staticlib、C++ GDK host、device injection、ctypes 与 GDK desktop 验证。</p></div></li>
+      <li><span class="modno">Module 19</span><div><a href="part6-module19-productionizing.html">Productionizing</a><p>logging/tracing、GenerateStats、memory reporting、CLI、reproducibility、README。</p></div></li>
+    </ul>
+  </section>
+
+  <section class="toc-part">
+    <h2>Appendices</h2>
+    <ul class="toc-list">
+      <li><span class="modno">A–G</span><div><a href="appendices.html">附录：数学、Rust、浮点、调试、术语与阅读清单</a><p>点积、matmul、softmax、FFI、f32/f16/bf16、PIX、D3D12 debug layer、术语表、仓库地图。</p></div></li>
+    </ul>
+  </section>
+
+  <div class="pager">
+    <span class="disabled">← 前一页：无</span>
+    <a href="part0-course-orientation.html">开始学习 →</a>
+  </div>
+</main>
+</body>
+</html>
+
+
+
+
+

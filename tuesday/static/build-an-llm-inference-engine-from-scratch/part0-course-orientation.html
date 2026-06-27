@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Part 0 — 教程导论｜从零构建 LLM 推理引擎</title>
+  <link rel="stylesheet" href="assets/textbook.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script defer src="assets/textbook.js"></script>
+</head>
+<body>
+<main class="page">
+  <div class="coursemark">
+    <span>Building an LLM Inference Engine from Scratch</span>
+    <span>Part 0 / Tutorial Orientation</span>
+  </div>
+
+  <span class="part-badge">Part 0</span>
+  <h1>教程导论：我们要从零构建什么？</h1>
+  <p class="subtitle">项目式教材：从“LLM 是什么”走到一个能运行 Qwen2.5 的 Rust + DirectML 推理引擎。</p>
+
+  <section class="objectives">
+    <h4>学习目标</h4>
+    <ul>
+      <li>理解本教程最终产物：一个可读、可测试、可优化的 LLM 推理引擎 <code>xinfer</code>。</li>
+      <li>理解“无黑盒”哲学：为什么不用 ONNX Runtime / cuBLAS，而要亲手写 kernel。</li>
+      <li>能解释仓库的 crate 边界、依赖方向，以及各目录与教程模块的对应关系。</li>
+      <li>完成 Lab 0：构建工作区、检测 DirectML 设备、运行测试。</li>
+    </ul>
+  </section>
+
+  <h2><span class="num">0.1</span>我们正在构建什么，为什么值得构建？</h2>
+  <p>
+    大语言模型（Large Language Model, LLM）在用户看来像一个会对话的程序；但在系统工程师看来，
+    它是一个非常大的、反复执行的数值计算图。给定一串 token，模型输出下一 token 的概率分布；
+    把这个过程循环起来，就得到文本生成。
+  </p>
+  <p>
+    本教程的目标不是“调用一个现成 API”，而是构建一个能阅读、能调试、能优化的推理引擎：
+    <strong>从 tokenizer 到 KV cache，从 Qwen2 权重加载到 HLSL compute shader，从 Windows PC 到 Xbox GDK 的 C++ host</strong>。
+  </p>
+
+  <div class="callout def">
+    <span class="tag">定义：推理（Inference）</span>
+    在本教程中，推理指的是：加载已经训练好的模型权重，然后对输入 token 执行前向计算，得到下一 token 的分布。
+    我们不训练模型，也不计算梯度；我们只关心如何<strong>正确、快速、可移植</strong>地运行它。
+  </div>
+
+  <p>用一个公式概括语言模型：</p>
+  \[
+    P(x_{t+1}\mid x_1,\ldots,x_t)
+      = \operatorname{softmax}\left(f_\theta(x_1,\ldots,x_t)\right)
+  \]
+  <p>
+    其中 \(x_i\) 是第 \(i\) 个 token，\(f_\theta\) 是由模型权重 \(\theta\) 定义的 transformer 网络。
+    推理引擎的任务就是高效计算这个 \(f_\theta\)，然后根据 logits 选择下一个 token。
+  </p>
+
+  <figure class="fig-card">
+    <svg width="820" height="260" viewBox="0 0 820 260" role="img" aria-label="从文本到下一 token 的推理流水线">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"></path>
+        </marker>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.15"/>
+        </filter>
+      </defs>
+      <rect x="20" y="48" width="130" height="70" rx="12" fill="#eef6f6" stroke="#1f6f78" filter="url(#shadow)"/>
+      <text x="85" y="78" text-anchor="middle" font-size="16" font-family="sans-serif">文本 Prompt</text>
+      <text x="85" y="101" text-anchor="middle" font-size="12" font-family="monospace" fill="#555">"你好，..."</text>
+      <rect x="190" y="48" width="130" height="70" rx="12" fill="#fff" stroke="#e3e1da" filter="url(#shadow)"/>
+      <text x="255" y="78" text-anchor="middle" font-size="16" font-family="sans-serif">Tokenizer</text>
+      <text x="255" y="101" text-anchor="middle" font-size="12" font-family="monospace" fill="#555">[151644, ...]</text>
+      <rect x="360" y="32" width="150" height="102" rx="12" fill="#f3f0fb" stroke="#6b4fbb" filter="url(#shadow)"/>
+      <text x="435" y="65" text-anchor="middle" font-size="16" font-family="sans-serif">Qwen2 Transformer</text>
+      <text x="435" y="91" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#555">RMSNorm · Attention</text>
+      <text x="435" y="111" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#555">SwiGLU · LM Head</text>
+      <rect x="548" y="48" width="120" height="70" rx="12" fill="#fff" stroke="#e3e1da" filter="url(#shadow)"/>
+      <text x="608" y="78" text-anchor="middle" font-size="16" font-family="sans-serif">Logits</text>
+      <text x="608" y="101" text-anchor="middle" font-size="12" font-family="monospace" fill="#555">151936 维</text>
+      <rect x="704" y="48" width="96" height="70" rx="12" fill="#fdf2e9" stroke="#b8531a" filter="url(#shadow)"/>
+      <text x="752" y="78" text-anchor="middle" font-size="16" font-family="sans-serif">采样</text>
+      <text x="752" y="101" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#555">下一 token</text>
+      <line x1="150" y1="83" x2="187" y2="83" stroke="#1f6f78" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <line x1="320" y1="83" x2="357" y2="83" stroke="#1f6f78" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <line x1="510" y1="83" x2="545" y2="83" stroke="#1f6f78" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <line x1="668" y1="83" x2="701" y2="83" stroke="#1f6f78" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <path d="M752 118 C752 190 105 190 105 122" fill="none" stroke="#b8531a" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
+      <text x="415" y="215" text-anchor="middle" font-size="14" font-family="sans-serif" fill="#b8531a">
+        自回归循环：把新 token 接到输入末尾，再计算下一 token
+      </text>
+    </svg>
+    <figcaption><b>图 0-1：</b>LLM 推理不是“一次函数调用”，而是不断循环的数值计算流水线。</figcaption>
+  </figure>
+
+  <h2><span class="num">0.2</span>“无黑盒”哲学：为什么不用现成运行时？</h2>
+  <p>
+    工业界有许多成熟推理运行时，例如 ONNX Runtime、TensorRT、llama.cpp、vLLM。它们非常实用，
+    但对教学来说会把很多关键知识封装起来。你可以调用它们，却不一定知道：
+  </p>
+  <ul>
+    <li>一个 attention head 的 \(QK^\top\) 究竟怎样访问内存？</li>
+    <li>为什么 decode 阶段常常是 GEMV 而不是 GEMM？</li>
+    <li>为什么一次 608 KB 的 logits readback 会拖慢每个 token？</li>
+    <li>为什么同样的数学公式在 GPU 上需要 threadgroup、barrier、资源状态？</li>
+  </ul>
+  <p>
+    因此，本教程选择“可解释优先”：我们不调用 ONNX Runtime，也不把 matmul 交给 cuBLAS。
+    我们会亲手实现 HLSL kernel，并在每一步用 CPU reference 做 correctness oracle。
+  </p>
+
+  <div class="callout warn">
+    <span class="tag">工程现实</span>
+    “无黑盒”并不等于“永远不用库”。本教程仍然使用 Rust、Direct3D 12、DirectML、HuggingFace tokenizer 等工具。
+    区别在于：我们把 <em>transformer 的核心计算路径</em> 暴露出来，自己掌握它的正确性和性能。
+  </div>
+
+  <h2><span class="num">0.3</span>工具与环境：从第一天能跑起来开始</h2>
+  <p>
+    教程使用 Windows + DirectML / Direct3D 12 作为主要 GPU backend。原因是 Direct3D 12 是 Windows
+    和 Xbox 的共同底层图形/计算 API；DirectML 可以与 D3D12 资源协同工作；Rust 通过 <code>windows</code>
+    crate 可以直接调用这些 COM API。
+  </p>
+  <table class="tbl">
+    <thead><tr><th>组件</th><th>用途</th><th>本教程中的位置</th></tr></thead>
+    <tbody>
+      <tr><td>Rust</td><td>系统语言、模块化、FFI</td><td><code>crates/*</code></td></tr>
+      <tr><td>D3D12</td><td>GPU 设备、buffer、command list、fence</td><td><code>xinfer-dml</code></td></tr>
+      <tr><td>HLSL</td><td>编写 compute shader</td><td><code>shaders/*.hlsl</code></td></tr>
+      <tr><td>DirectML</td><td>Windows ML operator API；也作为对比案例</td><td><code>DmlOperator</code></td></tr>
+      <tr><td>Qwen2.5</td><td>真实 decoder-only transformer checkpoint</td><td><code>models/</code>（gitignored）</td></tr>
+      <tr><td>Xbox GDK</td><td>原生 host、device injection、部署路径</td><td><code>xbox/</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>你会反复看到两个量：吞吐量和显存占用。吞吐量通常写作：</p>
+  \[
+    \text{tokens/sec} = \frac{\text{生成的 token 数}}{\text{耗时（秒）}}
+  \]
+  <p>一个 f32 权重矩阵 \(W\in\mathbb{R}^{m\times n}\) 的显存大约是：</p>
+  \[
+    \operatorname{bytes}(W) = m\cdot n\cdot 4
+  \]
+  <p>换成 f16 后，公式中的 4 变成 2。因此同样的权重矩阵显存和带宽需求大约减半。</p>
+
+  <figure class="fig-card">
+    <div class="chart-wrap"><canvas id="phaseChart"></canvas></div>
+    <figcaption><b>图 0-2：</b>教程项目推进路线：先保证正确，再测量，再优化。</figcaption>
+  </figure>
+
+  <h2><span class="num">0.4</span>如何阅读这个代码库：crate 图与依赖方向</h2>
+  <p>
+    <code>xinfer</code> 是一个 Cargo workspace。设计原则是：越靠近模型数学，越不应该依赖具体 GPU API；
+    越靠近平台，越可以直接处理 D3D12、DirectML、Xbox GDK 这些细节。
+  </p>
+  <figure class="fig-card">
+    <svg width="820" height="420" viewBox="0 0 820 420" role="img" aria-label="xinfer crate dependency graph">
+      <defs><marker id="dep" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker></defs>
+      <style>
+        .box { fill:#fff; stroke:#e3e1da; stroke-width:1.5; }
+        .core { fill:#eef6f6; stroke:#1f6f78; }
+        .gpu { fill:#f3f0fb; stroke:#6b4fbb; }
+        .app { fill:#fdf2e9; stroke:#b8531a; }
+        .label { font-family:sans-serif; font-size:14px; fill:#1a1a1a; }
+        .small { font-family:sans-serif; font-size:11px; fill:#555; }
+        .edge { stroke:#1f6f78; stroke-width:2; fill:none; marker-end:url(#dep); }
+      </style>
+      <rect x="320" y="25" width="180" height="62" rx="10" class="core"/><text x="410" y="52" text-anchor="middle" class="label">xinfer-core</text><text x="410" y="72" text-anchor="middle" class="small">形状、dtype、CPU reference</text>
+      <rect x="95" y="130" width="160" height="62" rx="10" class="box"/><text x="175" y="157" text-anchor="middle" class="label">xinfer-loader</text><text x="175" y="177" text-anchor="middle" class="small">config + safetensors</text>
+      <rect x="330" y="130" width="160" height="62" rx="10" class="box"/><text x="410" y="157" text-anchor="middle" class="label">xinfer-backend</text><text x="410" y="177" text-anchor="middle" class="small">Device / Buffer trait</text>
+      <rect x="565" y="130" width="160" height="62" rx="10" class="gpu"/><text x="645" y="157" text-anchor="middle" class="label">xinfer-dml</text><text x="645" y="177" text-anchor="middle" class="small">D3D12 + HLSL kernels</text>
+      <rect x="200" y="235" width="170" height="62" rx="10" class="box"/><text x="285" y="262" text-anchor="middle" class="label">xinfer-model</text><text x="285" y="282" text-anchor="middle" class="small">Qwen2 forward + KV cache</text>
+      <rect x="450" y="235" width="170" height="62" rx="10" class="box"/><text x="535" y="262" text-anchor="middle" class="label">xinfer-runtime</text><text x="535" y="282" text-anchor="middle" class="small">prefill / decode / sampling</text>
+      <rect x="85" y="335" width="155" height="52" rx="10" class="app"/><text x="162" y="366" text-anchor="middle" class="label">xinfer-cli</text>
+      <rect x="335" y="335" width="155" height="52" rx="10" class="app"/><text x="412" y="366" text-anchor="middle" class="label">xinfer-ffi</text>
+      <rect x="585" y="335" width="155" height="52" rx="10" class="app"/><text x="662" y="366" text-anchor="middle" class="label">xbox/ host</text>
+      <path d="M410 88 L410 126" class="edge"/><path d="M380 88 C310 105 238 117 190 128" class="edge"/><path d="M480 88 C545 105 608 116 638 128" class="edge"/>
+      <path d="M410 193 C375 215 330 228 300 235" class="edge"/><path d="M645 193 C600 215 560 228 540 235" class="edge"/>
+      <path d="M285 298 C250 318 205 329 170 335" class="edge"/><path d="M535 298 C500 318 455 329 420 335" class="edge"/><path d="M412 388 C470 405 590 405 645 388" class="edge"/>
+    </svg>
+    <figcaption><b>图 0-3：</b>依赖方向从应用层指向模型/运行时，再指向 backend；核心数学层不依赖具体平台。</figcaption>
+  </figure>
+  <div class="callout note">
+    <span class="tag">阅读建议</span>
+    第一次阅读代码库时，建议按教程顺序：<code>xinfer-core::cpu</code> → <code>shaders/*.hlsl</code> →
+    <code>xinfer-dml</code> → <code>xinfer-model</code> → <code>xinfer-runtime</code> → <code>xinfer-cli</code>。
+  </div>
+
+  <h2><span class="num">0.5</span>Lab 0：把项目跑起来</h2>
+  <p>Lab 0 的目标非常朴素：确认你的开发环境可以构建项目、找到 DirectML GPU、运行测试。</p>
+
+  <h3>步骤 1：构建工作区</h3>
+  <pre><code><span class="tok-c"># 在仓库根目录执行</span>
+<span class="tok-f">cargo build</span></code></pre>
+
+  <h3>步骤 2：确认 GPU backend 可用</h3>
+  <pre><code><span class="tok-f">cargo run -p xinfer-cli -- device</span></code></pre>
+  <p>期望看到类似输出：</p>
+  <pre><code>D3D12 + DirectML device created.
+Adapter: AMD Radeon RX 9070 XT</code></pre>
+
+  <h3>步骤 3：运行测试</h3>
+  <pre><code><span class="tok-f">cargo test</span></code></pre>
+  <p>本教程的基本工程纪律是：</p>
+  \[
+    \text{每次优化前后都必须满足：}\quad
+    \lVert y_{\mathrm{gpu}} - y_{\mathrm{cpu}}\rVert_\infty < \varepsilon
+  \]
+
+  <figure class="fig-card">
+    <div class="chart-wrap"><canvas id="speedChart"></canvas></div>
+    <figcaption><b>图 0-4：</b>真实项目历史中的优化结果：同一个模型、同一个问题，decode 从 3.6 tok/s 到 30.9 tok/s。</figcaption>
+  </figure>
+
+  <h2><span class="num">小结</span></h2>
+  <p>
+    Part 0 的重点不是让你立刻懂 transformer 的全部细节，而是建立一张地图：我们要构建的系统是什么、为什么要亲手构建、
+    用哪些工具、代码怎样组织、第一步怎样跑起来。后面的 Part I 会从语言模型的基本概念开始。
+  </p>
+
+  <div class="exercises">
+    <h3>思考与练习</h3>
+    <details class="qa">
+      <summary><span class="diff easy">基础</span>用自己的话解释：为什么 LLM 推理可以被看作“反复计算下一 token 概率”？</summary>
+      <div class="answer">
+        <p>语言模型本质上建模条件分布 \(P(x_{t+1}\mid x_1,\ldots,x_t)\)：给定已有 token，输出下一个 token 的概率。生成时，我们采样或取 argmax 得到一个新 token，把它接到序列末尾，再把更长的序列重新喂回模型预测下一个。如此循环，就把“一次预测”变成了“持续生成文本”。因此推理引擎的工作就是高效、反复地计算这个分布并选 token。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff easy">基础</span>运行 <code>cargo run -p xinfer-cli -- device</code>，记录你的 GPU 名称。</summary>
+      <div class="answer">
+        <p>命令会创建 D3D12 + DirectML device 并打印所选 adapter，例如：</p>
+        <p><code>D3D12 + DirectML device created.</code><br><code>Adapter: AMD Radeon RX 9070 XT</code></p>
+        <p>如果失败，通常说明没有 DirectML-capable GPU、驱动过旧，或缺少图形运行时——这正是 Lab 0 要先排除的环境问题。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff mid">进阶</span>在仓库中找到 <code>shaders/linear_f16.hlsl</code>，读注释并写下它为什么使用 2D dispatch grid。</summary>
+      <div class="answer">
+        <p>该 kernel 让一个 threadgroup 计算一个输出元素，因此需要的 group 数等于输出元素总数。LM head 的输出维度是词表大小 151936，远超过 D3D12 单个 dispatch 维度 65535 的上限。把 grid 拆成二维（<code>idx = gy*grid_x + gx</code>）就能覆盖超过 65535 的输出，而不会超出单轴限制。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff mid">进阶</span>从图 0-3 中选择两个 crate，说明它们之间为什么应该是这个依赖方向，而不是反过来。</summary>
+      <div class="answer">
+        <p>例如 <code>xinfer-model</code> 依赖 <code>xinfer-backend</code>，而不是反过来。模型层表达“需要什么能力”（分配 buffer、执行 kernel），backend 层表达“某个平台怎样实现”。让模型依赖抽象接口，可以在不改模型的情况下替换 backend；如果反过来让 backend 依赖具体模型，backend 就被绑死在 Qwen2 上，失去通用性。这就是“依赖指向稳定的抽象”。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff hard">挑战</span>如果要把 backend 从 DirectML 换成 Vulkan，你认为哪些 crate 应该改？哪些 crate 不应该改？</summary>
+      <div class="answer">
+        <p><span class="label">应该改：</span><code>xinfer-dml</code>（替换为一个新的 <code>xinfer-vulkan</code> backend，实现同样的 HAL traits），以及 HLSL shader（需要改写或编译成 SPIR-V）。</p>
+        <p><span class="label">不应该改：</span><code>xinfer-core</code>（纯数学/类型）、<code>xinfer-backend</code>（trait 定义本身）、<code>xinfer-model</code>、<code>xinfer-runtime</code>、<code>xinfer-tokenizer</code>。如果 HAL 设计得当，模型与 runtime 只依赖抽象 trait，因此理想情况下完全不需要修改。这正是引入 HAL 的价值。</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="pager">
+    <span class="disabled">← 前一部分：无</span>
+    <a href="../toc.md">教程目录 ↑</a>
+    <a href="part1-module1-from-ngrams-to-transformers.html">下一部分：Module 1 从 n-gram 到 Transformer →</a>
+  </div>
+</main>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const P = window.XINFER_PALETTE || {
+    teal: "#1f6f78", orange: "#b8531a", purple: "#6b4fbb",
+    green: "#2e7d4f", grayline: "#e3e1da"
+  };
+
+  makeChart("phaseChart", {
+    type: "line",
+    data: {
+      labels: ["0 设备", "1 HAL", "2 Ops", "3 Qwen", "4 Runtime", "5 Streaming", "6 Xbox", "7 Polish", "Opt"],
+      datasets: [{
+        label: "能力里程碑（概念指数）",
+        data: [1, 2, 3, 5, 8, 10, 11, 12, 16],
+        borderColor: P.teal,
+        backgroundColor: "rgba(31,111,120,0.12)",
+        pointBackgroundColor: P.teal,
+        pointRadius: 4,
+        tension: 0.28,
+        fill: true
+      }]
+    },
+    options: {
+      scales: {
+        y: { title: { display: true, text: "从可运行到可优化" }, grid: { color: P.grayline } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  makeChart("speedChart", {
+    type: "bar",
+    data: {
+      labels: ["Baseline", "Batch", "f16", "GEMV", "Argmax"],
+      datasets: [{
+        label: "decode 吞吐量（tok/s）",
+        data: [3.6, 8.5, 10.3, 12.3, 30.9],
+        backgroundColor: [P.orange, P.teal, P.purple, P.green, "#222"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} tok/s` } } },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: "tokens / second" }, grid: { color: P.grayline } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>
+
+
+
+
