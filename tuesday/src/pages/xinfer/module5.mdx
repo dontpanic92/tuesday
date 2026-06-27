@@ -1,0 +1,268 @@
+import Layout from "../../components/xinfer/Layout";
+
+export default function Page(props) {
+  return <Layout slug="module5">{props.children}</Layout>;
+}
+
+<h1>Module 5：GPU Compute API 版图</h1>
+
+<p className="subtitle">理解 kernel、buffer、command queue、同步这些共通概念，并比较 CUDA、Vulkan、Metal、OpenCL、Direct3D 12 + DirectML 的取舍。</p>
+
+<Objectives>
+  <ul>
+        <li>抽象出所有 GPU compute API 的共同模型：buffer、kernel、dispatch、queue、barrier、fence。</li>
+        <li>理解 CUDA 为什么是深度学习事实标准，以及它的 vendor lock-in 代价。</li>
+        <li>理解 Vulkan / SPIR-V 的跨平台能力与复杂度。</li>
+        <li>理解 Metal、OpenCL 的定位。</li>
+        <li>解释为什么本项目选择 Direct3D 12 + DirectML，并为什么仍要设计 HAL。</li>
+      </ul>
+</Objectives>
+
+<h2><span className="num">5.1</span>大图景：所有 API 都在表达同一件事</h2>
+
+不管你使用 CUDA、Vulkan、Metal、OpenCL 还是 Direct3D 12，GPU compute 的核心动作都类似：
+    准备 buffer，把 kernel 编译成 GPU 能执行的形式，绑定资源，向 command queue 提交 dispatch，
+    最后通过 fence / event 等机制等待完成。
+
+<Diagram
+  caption={<><b>图 5-1：</b>GPU compute API 的共同执行模型。</>}
+  svg={`<svg width="820" height="290" viewBox="0 0 820 290" role="img" aria-label="common GPU compute abstraction">
+      <defs>
+        <marker id="apiArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.6}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#apiArrow)}
+      </style>
+      <rect x="30" y="88" width="110" height="64" rx="12" class="hi"/>
+      <text x="85" y="113" text-anchor="middle" class="txt">Buffers</text>
+      <text x="85" y="135" text-anchor="middle" class="sm">A, W, Out</text>
+      <rect x="178" y="88" width="110" height="64" rx="12" class="box"/>
+      <text x="233" y="113" text-anchor="middle" class="txt">Kernel</text>
+      <text x="233" y="135" text-anchor="middle" class="sm">HLSL/CUDA/...</text>
+      <rect x="326" y="88" width="120" height="64" rx="12" class="box"/>
+      <text x="386" y="113" text-anchor="middle" class="txt">Bind resources</text>
+      <text x="386" y="135" text-anchor="middle" class="sm">SRV/UAV/params</text>
+      <rect x="484" y="88" width="120" height="64" rx="12" class="box"/>
+      <text x="544" y="113" text-anchor="middle" class="txt">Dispatch</text>
+      <text x="544" y="135" text-anchor="middle" class="sm">grid / groups</text>
+      <rect x="642" y="88" width="140" height="64" rx="12" class="hot"/>
+      <text x="712" y="113" text-anchor="middle" class="txt">Synchronize</text>
+      <text x="712" y="135" text-anchor="middle" class="sm">barrier / fence</text>
+      <line x1="140" y1="120" x2="175" y2="120" class="edge"/>
+      <line x1="288" y1="120" x2="323" y2="120" class="edge"/>
+      <line x1="446" y1="120" x2="481" y2="120" class="edge"/>
+      <line x1="604" y1="120" x2="639" y2="120" class="edge"/>
+      <text x="410" y="220" text-anchor="middle" class="sm">API 之间的语法差异很大，但抽象动作高度相似。</text>
+    </svg>`}
+/>
+
+<h2><span className="num">5.2</span>CUDA：深度学习的事实标准</h2>
+
+CUDA 是 NVIDIA 的专有 GPU compute 平台。它之所以成为深度学习事实标准，不只是因为 kernel 语言好用，
+    更因为围绕它有完整生态：cuBLAS、cuDNN、NCCL、TensorRT、Nsight、成熟的 PyTorch/TensorFlow 后端。
+
+<table className="tbl">
+    <thead><tr><th>优点</th><th>代价</th></tr></thead>
+    <tbody>
+      <tr><td>生态成熟，资料丰富</td><td>绑定 NVIDIA GPU</td></tr>
+      <tr><td>cuBLAS/cuDNN 性能极强</td><td>Windows/Xbox/AMD/Apple 路径不适用</td></tr>
+      <tr><td>调试和 profiling 工具完善</td><td>跨平台抽象需要额外层</td></tr>
+      <tr><td>很多论文和 kernel 以 CUDA 为参考实现</td><td>教学上容易把 matmul 直接交给库，隐藏细节</td></tr>
+    </tbody>
+  </table>
+
+<Callout kind="note" tag="本教程视角">
+
+如果教程目标是“最快跑起来”，CUDA + cuBLAS 是合理选择；如果目标是理解 GPU compute backend，
+    并兼顾 Windows / Xbox，则 CUDA 不是合适的唯一后端。
+
+</Callout>
+
+<h2><span className="num">5.3</span>Vulkan compute 与 SPIR-V</h2>
+
+Vulkan 是跨厂商、跨平台的低层图形/计算 API。它的 shader 通常编译成 SPIR-V 中间表示。
+    Vulkan 的优势是可移植性强：Windows、Linux、Android，NVIDIA/AMD/Intel 都支持。但它也非常显式：
+    设备、内存、descriptor set、pipeline、barrier、queue family 都需要程序员管理。
+
+Vulkan 适合构建跨平台底层 backend，但教学门槛比 D3D12/HLSL 更高；而且 Xbox 原生路径不是 Vulkan。
+
+<Figure caption={<><b>图 5-2：</b>几种 GPU compute API 的相对取舍（示意，不是绝对评分）。</>}>
+  <Chart
+    type="radar"
+    data={{
+          labels: ["性能生态", "跨厂商", "平台覆盖", "教学透明度", "Xbox 路径", "工具成熟度"],
+          datasets: [
+            { label: "CUDA", data: [5, 1, 2, 3, 1, 5], borderColor: "#b8531a", backgroundColor: "rgba(184,83,26,0.13)" },
+            { label: "Vulkan", data: [3, 5, 4, 3, 1, 3], borderColor: "#6b4fbb", backgroundColor: "rgba(107,79,187,0.13)" },
+            { label: "D3D12 + DirectML", data: [4, 3, 3, 4, 5, 4], borderColor: "#1f6f78", backgroundColor: "rgba(31,111,120,0.13)" }
+          ]
+        }}
+    options={{
+          scales: {
+            r: {
+              min: 0,
+              max: 5,
+              ticks: { stepSize: 1 },
+              grid: { color: "#e3e1da" },
+              angleLines: { color: "#e3e1da" }
+            }
+          }
+        }}
+  />
+</Figure>
+
+<h2><span className="num">5.4</span>Metal 与 OpenCL：作为背景</h2>
+
+Metal 是 Apple 平台的现代 GPU API。它在 macOS / iOS 上体验很好，工具链统一，但不适用于 Windows / Xbox。
+    如果教程目标是 Apple 生态，Metal 是自然选择；但本项目的主平台是 Windows PC 与 Xbox GDK。
+
+OpenCL 曾经是通用计算跨平台方案，但生态和性能调优体验不如 CUDA / Vulkan / Metal / D3D12 现代路线。
+    了解 OpenCL 有助于理解 GPU compute 历史，但本教程不选它作为主线。
+
+<h2><span className="num">5.5</span>Direct3D 12 + DirectML：本项目的选择</h2>
+
+本项目选择 Direct3D 12 + DirectML，有几个现实原因：
+
+- **Windows 原生：**目标机器是 Windows PC，D3D12 是第一等公民。
+- **Xbox 路径：**Xbox GDK 使用 D3D12 风格设备创建；host 可以把设备注入 Rust core。
+- **HLSL 教学友好：**HLSL compute shader 语法直观，适合讲 threadgroup、SRV/UAV、barrier。
+- **DirectML 可作为 operator API：**我们可以研究它的生命周期，也能在遇到问题时切换到自写 kernel。
+
+<Callout kind="warn" tag="真实案例：为什么不能盲信库算子">
+
+在本项目机器的 RDNA4 GPU 上，DirectML GEMM 在某些 shape 会导致 device removed。
+    因此 matmul 最终改成自写 HLSL kernel。这个案例正好说明：理解 backend 不是可选项。
+
+</Callout>
+
+<Diagram
+  caption={<><b>图 5-3：</b>xinfer 的 backend 分层：模型通过 HAL 使用 D3D12/HLSL/DirectML。</>}
+  svg={`<svg width="820" height="340" viewBox="0 0 820 340" role="img" aria-label="Direct3D12 DirectML xinfer stack">
+      <defs>
+        <marker id="stackArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .mid{fill:#f3f0fb;stroke:#6b4fbb;stroke-width:1.5}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#stackArrow)}
+      </style>
+      <rect x="65" y="60" width="170" height="60" rx="12" class="hot"/>
+      <text x="150" y="86" text-anchor="middle" class="txt">xinfer-model</text>
+      <text x="150" y="106" text-anchor="middle" class="sm">Qwen2 layer graph</text>
+      <rect x="325" y="60" width="170" height="60" rx="12" class="hi"/>
+      <text x="410" y="86" text-anchor="middle" class="txt">xinfer-backend HAL</text>
+      <text x="410" y="106" text-anchor="middle" class="sm">Device / Buffer / Kernel</text>
+      <rect x="585" y="60" width="170" height="60" rx="12" class="mid"/>
+      <text x="670" y="86" text-anchor="middle" class="txt">xinfer-dml</text>
+      <text x="670" y="106" text-anchor="middle" class="sm">D3D12 + DirectML</text>
+
+      <rect x="145" y="185" width="150" height="62" rx="12" class="box"/>
+      <text x="220" y="211" text-anchor="middle" class="txt">HLSL kernels</text>
+      <text x="220" y="231" text-anchor="middle" class="sm">linear / rms / attn</text>
+      <rect x="335" y="185" width="150" height="62" rx="12" class="box"/>
+      <text x="410" y="211" text-anchor="middle" class="txt">D3D12 queues</text>
+      <text x="410" y="231" text-anchor="middle" class="sm">direct / copy / fences</text>
+      <rect x="525" y="185" width="150" height="62" rx="12" class="box"/>
+      <text x="600" y="211" text-anchor="middle" class="txt">DirectML</text>
+      <text x="600" y="231" text-anchor="middle" class="sm">operator lifecycle</text>
+
+      <line x1="235" y1="90" x2="322" y2="90" class="edge"/>
+      <line x1="495" y1="90" x2="582" y2="90" class="edge"/>
+      <path d="M670 120 C670 160 220 160 220 182" class="edge"/>
+      <path d="M670 120 C670 160 410 160 410 182" class="edge"/>
+      <path d="M670 120 C670 160 600 160 600 182" class="edge"/>
+      <text x="410" y="305" text-anchor="middle" class="sm">
+        模型层不直接依赖 D3D12；平台细节收敛到 xinfer-dml 与 FFI host。
+      </text>
+    </svg>`}
+/>
+
+<h2><span className="num">5.6</span>可移植性策略：为什么要建 HAL？</h2>
+
+如果模型代码里到处直接调用 `ID3D12Resource`、root signature、descriptor heap，
+    将来换 backend 会非常痛苦。HAL（Hardware Abstraction Layer）把模型需要的能力抽象成更稳定的接口：
+
+$$
+\text{Model code} \rightarrow \text{Device / Buffer / Kernel traits}
+\rightarrow \text{Backend implementation}
+$$
+
+在 xinfer 中，`xinfer-backend` 定义了抽象边界，`xinfer-dml` 实现 D3D12/DirectML backend。
+    Xbox 支持也依赖这个思想：console host 创建设备，然后把 device 指针注入 Rust core；模型和 runtime 不需要知道设备来自 DXGI 还是 GDK。
+
+<h2><span className="num">5.7</span>如何选择 backend？一个工程决策表</h2>
+
+<table className="tbl">
+    <thead><tr><th>候选</th><th>适合场景</th><th>不适合本项目的点</th></tr></thead>
+    <tbody>
+      <tr><td>CUDA</td><td>NVIDIA-only，高性能深度学习</td><td>不能覆盖 AMD / Xbox；vendor lock-in</td></tr>
+      <tr><td>Vulkan</td><td>跨平台、跨厂商底层 backend</td><td>学习曲线陡；Xbox 不是原生 Vulkan 路线</td></tr>
+      <tr><td>Metal</td><td>Apple 平台最佳体验</td><td>不覆盖 Windows/Xbox</td></tr>
+      <tr><td>OpenCL</td><td>历史上的跨平台 compute</td><td>生态与现代调优体验较弱</td></tr>
+      <tr><td>D3D12 + DirectML</td><td>Windows / Xbox；HLSL；可注入 host-created device</td><td>非 Windows 平台不可用；某些 DML operator 可能有坑</td></tr>
+    </tbody>
+  </table>
+
+教程选择 D3D12 + DirectML，不是因为它“绝对最好”，而是因为它最符合本项目目标：
+    Windows 可运行、Xbox 可迁移、HLSL 可教学、底层足够透明。
+
+<h2><span className="num">Lab 5</span>概念比较：两个 API 的 Hello Compute</h2>
+
+选择 CUDA、Vulkan、Metal、D3D12 中任意两个，比较它们完成 `out[i]=in[i]*2+1` 需要哪些概念步骤。
+    不要求写代码，但要画出概念流程。
+
+1. 如何创建 device / context？
+2. 如何分配 GPU buffer？
+3. kernel / shader 用什么语言写？编译成什么格式？
+4. 如何绑定 input/output buffer？
+5. 如何提交 dispatch？
+6. 如何等待完成并读回结果？
+
+<QAGroup>
+
+### 思考与练习
+
+<QA question={<><span className="diff easy">基础</span>列出所有 GPU compute API 都需要表达的 5 个共同概念。</>}>
+
+① 设备/队列（device & command queue，提交工作）；② 缓冲区/资源（buffer/memory，存数据）；③ kernel/shader（要执行的程序）；④ 资源绑定（descriptor/binding，告诉 kernel 用哪些 buffer）；⑤ dispatch + 同步（启动 N 个线程组并用 fence/barrier 同步）。无论 CUDA、D3D12、Vulkan、Metal，都要表达这五件事。
+
+</QA>
+
+<QA question={<><span className="diff easy">基础</span>为什么 CUDA 在深度学习中很强，但不适合作为本教程唯一 backend？</>}>
+
+CUDA 生态成熟、kernel 库丰富，但它只支持 NVIDIA GPU。本教程目标是 Windows PC + Xbox，且要在 AMD（RX 9070 XT）上跑，还要走 Xbox GDK 路线——这些都不支持 CUDA。DirectML/D3D12 才能覆盖跨厂商 GPU 与主机平台，所以选它作为可移植 backend。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>解释 descriptor / resource binding 在 D3D12 或 Vulkan 中解决了什么问题。</>}>
+
+它解决“shader 如何知道该访问哪块 GPU 内存”的问题。shader 里只写逻辑寄存器槽（如 `register(u0)`），descriptor 把这些槽映射到具体的 GPU 资源（buffer/texture 的地址、格式、范围）。这层间接让同一个 shader 可在不同帧绑定不同资源，并让驱动统一管理资源生命周期与访问权限。xinfer 用 root descriptor 直接绑定 buffer 地址，省去描述符堆重绑。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>如果模型代码直接依赖 D3D12 COM 类型，会怎样影响未来移植？</>}>
+
+模型层会和 Windows/D3D12 紧耦合：想换 Vulkan/Metal 或上别的平台就得改 Qwen 前向逻辑本身，而不仅是 backend。这违背关注点分离。正确做法是把 D3D12 细节藏在 backend trait（Device/Buffer/Kernel）后面，让 `xinfer-model` 只依赖抽象接口，移植时只替换 `xinfer-dml` 这一层。
+
+</QA>
+
+<QA question={<><span className="diff hard">挑战</span>为 xinfer 设计一个假想 Vulkan backend 的 crate 边界，说明哪些 trait 可以复用。</>}>
+
+新增 `xinfer-vk` crate，实现 `xinfer-backend` 中已有的同一组 trait：`Device`（alloc/upload/download/创建 kernel）、`Buffer`（GPU 内存句柄+状态）、kernel dispatch / executor（命令缓冲 + fence）。Vulkan 概念一一对应：VkDevice/VkQueue↔Device，VkBuffer+VkDeviceMemory↔Buffer，VkPipeline(compute)+descriptor set↔Kernel/绑定，VkCommandBuffer+VkFence↔Executor。可完全复用的是上层：`xinfer-core`（tensor/config/CPU 参考）、`xinfer-model`（Qwen 结构）、`xinfer-runtime`（KV cache/采样/decode 循环）、`xinfer-loader`、`xinfer-tokenizer`——它们都只依赖 trait，不依赖具体 API。HLSL shader 需重编为 SPIR-V，是少数需要改的部分。
+
+</QA>
+
+</QAGroup>

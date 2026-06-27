@@ -1,0 +1,265 @@
+import Layout from "../../components/xinfer/Layout";
+
+export default function Page(props) {
+  return <Layout slug="module14">{props.children}</Layout>;
+}
+
+<h1>Module 14：Phase 5 — 运行大于 VRAM 的模型：Layer Streaming</h1>
+
+<p className="subtitle">当所有权重放不进显存时，把 decoder layer 权重从主存流式搬入 GPU slot，并用 copy queue 与 compute overlap。</p>
+
+<Objectives>
+  <ul>
+<li>理解 resident weights 的显存瓶颈，以及为什么大模型需要 streaming。</li>
+<li>掌握 per-layer weight streaming：host RAM 保存完整权重，GPU 只保留少量 layer slots。</li>
+<li>理解 dedicated copy queue、persistently-mapped staging buffer 与 fence 的协作。</li>
+<li>理解 double-buffering：为什么上传 $l+N$ 可以与当前计算重叠。</li>
+<li>理解 cross-queue resource state correctness。</li>
+<li>完成 Lab 14：用小 slot pool 跑模型，并证明 streaming 输出等于 resident 输出。</li>
+</ul>
+</Objectives>
+
+<h2><span className="num">14.1</span>Residency problem：权重不一定都放得下</h2>
+
+Resident GPU forward 很简单：加载时把所有权重上传到 GPU，推理时一直留在显存里。 但模型规模变大后，权重显存可能超过 GPU 可用 VRAM。即使能放下，也可能没有足够空间给 KV cache、activation、临时 buffer。
+
+一个粗略估算：
+
+$$
+\text{VRAM}_{\text{weights}} \approx
+    \sum_{\text{tensors}} \#\text{elements}\times \text{bytes(dtype)}
+$$
+
+对大模型，权重通常按层组织。推理一个 token 时，layer 是按顺序执行的：第 0 层用完后，短时间内不会再用第 0 层权重， 直到下一个 token 的下一轮 forward。因此可以只在 GPU 上保留一个“小窗口”的 layer weights。
+
+<Figure caption={<><b>图 14-1：</b>resident 模式显存随层数线性增长；streaming 模式由 resident slot 数决定。</>}>
+  <Chart
+    type="line"
+    data={{
+      labels: ["4", "8", "16", "24", "32", "48"],
+      datasets: [
+        { label: "Resident weights", data: [4, 8, 16, 24, 32, 48], borderColor: "#b8531a", backgroundColor: "rgba(184,83,26,0.10)", fill: true, tension: 0.15 },
+        { label: "Streaming (4 slots)", data: [4, 4, 4, 4, 4, 4], borderColor: "#1f6f78", backgroundColor: "rgba(31,111,120,0.10)", fill: true, tension: 0.15 }
+      ]
+    }}
+    options={{
+      scales: {
+        x: { title: { display: true, text: "模型层数 L" }, grid: { display: false } },
+        y: { title: { display: true, text: "相对 layer-weight VRAM" }, grid: { color: "#e3e1da" } }
+      }
+    }}
+  />
+</Figure>
+
+<h2><span className="num">14.2</span>Per-layer weight streaming</h2>
+
+Streaming 的基本想法是：
+
+- 完整权重保存在 CPU host RAM / mmap 文件中；
+- GPU 上只分配 $N$ 个 layer slots；
+- 第 $i$ 层执行前，把第 $i$ 层权重上传到 slot $i\bmod N$；
+- 执行完第 $i$ 层后，这个 slot 可以被第 $i+N$ 层重用。
+
+$$
+\operatorname{slot}(i)=i\bmod N_{\text{slots}}
+$$
+
+<Diagram
+  caption={<><b>图 14-2：</b>Layer streaming：完整权重在 host，GPU 上只有少量可复用 slots。</>}
+  svg={`<svg width="820" height="330" viewBox="0 0 820 330" role="img" aria-label="Layer streaming slot rotation">
+      <defs>
+        <marker id="m14a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .host{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .gpu{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.5}
+        .slot{fill:#fff;stroke:#e3e1da;stroke-width:1.3}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.1;fill:none;marker-end:url(#m14a)}
+      </style>
+      <rect x="55" y="70" width="230" height="185" rx="14" class="host"/>
+      <text x="170" y="100" text-anchor="middle" class="txt">Host RAM / mmap weights</text>
+      <text x="170" y="130" text-anchor="middle" class="sm">Layer 0, 1, 2, ... 23</text>
+      <text x="170" y="156" text-anchor="middle" class="sm">完整权重都在这里</text>
+
+      <rect x="480" y="62" width="260" height="200" rx="14" class="gpu"/>
+      <text x="610" y="94" text-anchor="middle" class="txt">GPU resident slots (N=4)</text>
+      <rect x="515" y="122" width="85" height="44" rx="8" class="slot"/><text x="557" y="149" text-anchor="middle" class="sm">slot 0</text>
+      <rect x="620" y="122" width="85" height="44" rx="8" class="slot"/><text x="662" y="149" text-anchor="middle" class="sm">slot 1</text>
+      <rect x="515" y="180" width="85" height="44" rx="8" class="slot"/><text x="557" y="207" text-anchor="middle" class="sm">slot 2</text>
+      <rect x="620" y="180" width="85" height="44" rx="8" class="slot"/><text x="662" y="207" text-anchor="middle" class="sm">slot 3</text>
+
+      <path d="M285 145 C360 120 420 135 512 144" class="edge"/>
+      <path d="M285 168 C360 190 420 198 512 202" class="edge"/>
+      <text x="410" y="292" text-anchor="middle" class="sm">第 i 层权重上传到 slot(i mod N)；slot 循环复用。</text>
+    </svg>`}
+/>
+
+<h2><span className="num">14.3</span>Copy queue 与 persistently-mapped staging buffer</h2>
+
+GPU 不能直接从普通 CPU 内存高效读取权重。常见流程是：
+
+1. 创建 upload heap staging buffer，并保持 mapped；
+2. CPU 把 layer 权重写入 staging；
+3. copy queue 记录 `CopyBufferRegion`，从 staging 拷贝到 GPU default heap；
+4. copy queue signal fence；
+5. direct queue 在使用该 layer 前等待对应 fence。
+
+<Diagram
+  caption={<><b>图 14-3：</b>copy queue 上传路径：host → staging → GPU slot，并用 fence 表示完成。</>}
+  svg={`<svg width="820" height="330" viewBox="0 0 820 330" role="img" aria-label="copy queue upload pipeline">
+      <defs>
+        <marker id="m14b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .host{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .gpu{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.5}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.1;fill:none;marker-end:url(#m14b)}
+      </style>
+      <rect x="50" y="80" width="150" height="70" rx="12" class="host"/>
+      <text x="125" y="108" text-anchor="middle" class="txt">Host weights</text>
+      <text x="125" y="130" text-anchor="middle" class="sm">ModelWeights</text>
+      <rect x="250" y="80" width="150" height="70" rx="12" class="host"/>
+      <text x="325" y="108" text-anchor="middle" class="txt">UploadHeap</text>
+      <text x="325" y="130" text-anchor="middle" class="sm">persistently mapped</text>
+      <rect x="450" y="80" width="150" height="70" rx="12" class="gpu"/>
+      <text x="525" y="108" text-anchor="middle" class="txt">Copy queue</text>
+      <text x="525" y="130" text-anchor="middle" class="sm">CopyBufferRegion</text>
+      <rect x="650" y="80" width="130" height="70" rx="12" class="gpu"/>
+      <text x="715" y="108" text-anchor="middle" class="txt">Layer slot</text>
+      <text x="715" y="130" text-anchor="middle" class="sm">default heap</text>
+      <line x1="200" y1="115" x2="247" y2="115" class="edge"/>
+      <line x1="400" y1="115" x2="447" y2="115" class="edge"/>
+      <line x1="600" y1="115" x2="647" y2="115" class="edge"/>
+      <rect x="450" y="210" width="150" height="58" rx="12" class="box"/>
+      <text x="525" y="234" text-anchor="middle" class="txt">Fence target</text>
+      <text x="525" y="254" text-anchor="middle" class="sm">wait before use</text>
+      <path d="M525 150 L525 207" class="edge"/>
+    </svg>`}
+/>
+
+<h2><span className="num">14.4</span>Double-buffering：上传与计算重叠</h2>
+
+如果每一层都“上传 → 等待 → 计算 → 下一层”，性能会很差。Double-buffering 的思想是： 计算当前层时，copy queue 同时上传未来会用到的层。
+
+如果 GPU 有 $N$ 个 slots，那么执行完第 $i$ 层后，就可以让 slot $(i\bmod N)$ 开始上传第 $i+N$ 层：
+
+$$
+\text{prefetch target}=i+N_{\text{slots}}
+$$
+
+当执行推进到第 $i+N$ 层时，该层权重很可能已经上传完毕，只需要等待对应 fence（理想情况下等待时间很短）。
+
+<Diagram
+  caption={<><b>图 14-4：</b>Double-buffering 的目标是让权重上传隐藏在计算时间里。</>}
+  svg={`<svg width="820" height="300" viewBox="0 0 820 300" role="img" aria-label="double buffering timeline">
+      <style>
+        .compute{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.4}
+        .copy{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.4}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+      </style>
+      <text x="410" y="35" text-anchor="middle" class="txt">计算队列与拷贝队列的时间线（示意）</text>
+      <text x="70" y="90" class="txt">Direct queue</text>
+      <rect x="170" y="65" width="110" height="42" rx="8" class="compute"/><text x="225" y="91" text-anchor="middle" class="sm">compute L0</text>
+      <rect x="285" y="65" width="110" height="42" rx="8" class="compute"/><text x="340" y="91" text-anchor="middle" class="sm">compute L1</text>
+      <rect x="400" y="65" width="110" height="42" rx="8" class="compute"/><text x="455" y="91" text-anchor="middle" class="sm">compute L2</text>
+      <rect x="515" y="65" width="110" height="42" rx="8" class="compute"/><text x="570" y="91" text-anchor="middle" class="sm">compute L3</text>
+
+      <text x="70" y="170" class="txt">Copy queue</text>
+      <rect x="170" y="145" width="110" height="42" rx="8" class="copy"/><text x="225" y="171" text-anchor="middle" class="sm">upload L4</text>
+      <rect x="285" y="145" width="110" height="42" rx="8" class="copy"/><text x="340" y="171" text-anchor="middle" class="sm">upload L5</text>
+      <rect x="400" y="145" width="110" height="42" rx="8" class="copy"/><text x="455" y="171" text-anchor="middle" class="sm">upload L6</text>
+      <rect x="515" y="145" width="110" height="42" rx="8" class="copy"/><text x="570" y="171" text-anchor="middle" class="sm">upload L7</text>
+      <text x="410" y="245" text-anchor="middle" class="sm">slot 0..3 正在计算 L0..L3；同时为下一轮 slot 0..3 上传 L4..L7。</text>
+    </svg>`}
+/>
+
+<h2><span className="num">14.5</span>Cross-queue resource-state correctness</h2>
+
+D3D12 中 copy queue 和 direct queue 是不同队列。copy queue 写完 layer slot 后，direct queue 才能读这些权重。 因此需要两个层面的正确性：
+
+- **同步正确：**direct queue 使用 slot 前，必须等待 copy queue signal 的 fence。
+- **状态正确：**copy queue 写入后，buffer 的 tracked state 要回到合适的基础状态，后续 direct queue 再 transition 到 SRV。
+
+xinfer 中 `DmlBuffer::assume_common()` 的作用就是：copy queue 写完后，让状态跟踪器知道“下一次 direct queue 使用时应从 COMMON 开始 transition”。
+
+<Callout kind="warn" tag="常见 bug">
+
+streaming 结果和 resident 结果不一致时，除了怀疑上传数据错，还要检查：slot 是否被过早覆盖、fence 是否等待、buffer state 是否被错误假设。
+
+</Callout>
+
+<h2><span className="num">Lab 14</span>用小 slot pool 证明 streaming == resident</h2>
+
+本实验不要求真的加载超大模型。我们用一个 synthetic 6-layer Qwen2 checkpoint，并只给 2 个 resident slots。 这样必然发生 slot reuse，从而真正测试 streaming 逻辑。
+
+```bash
+# 关键验收测试
+cargo test -p xinfer-model --test forward_parity -- --nocapture
+
+# 重点观察：
+streaming_matches_resident ... ok
+streaming vs resident max abs diff = 0
+```
+
+正确性目标：
+
+$$
+\operatorname{logits}_{\text{streaming}}
+      =
+    \operatorname{logits}_{\text{resident}}
+$$
+
+如果两者完全一致，说明 streaming 只改变权重驻留策略，没有改变模型数学。
+
+<QAGroup>
+
+### 思考与练习
+
+<QA question={<><span className="diff easy">基础</span>为什么 streaming 可以复用 layer slot？</>}>
+
+因为前向是逐层顺序进行的：算完第 $\ell$ 层后，它的权重就不再需要，可被后续层覆盖。于是只需一个小的 GPU slot 池轮流装载不同层的权重，而不必为全部 24 层各留一份显存。这让显存占用与池大小（而非层数）成正比，从而能跑下大于 VRAM 的模型。
+
+</QA>
+
+<QA question={<><span className="diff easy">基础</span>若模型有 24 层，slot 数为 4，第 17 层使用哪个 slot？</>}>
+
+slot index = $17 \bmod 4 = 1$。即第 17 层装入 slot 1。一般地 slot $j$ 承载层 $j, j+4, j+8,\dots$（这里 slot 1 承载层 1,5,9,13,17,21）。
+
+</QA>
+
+<details className="qa">
+<summary><span className="diff mid">进阶</span>解释为什么 prefetch target 是 $i+N_{\text{slots}}$。</summary>
+<div className="answer">
+
+因为层 $i$ 与层 $i+N_{\text{slots}}$ 共用同一个 slot（$\bmod N$ 相同）。在层 $i$ 开始 compute 后，它占用的那个 slot 一旦计算完成就可以被下一个用同一 slot 的层（即 $i+N$）覆盖。所以恰好预取 $i+N$：它是下一个需要这个 slot 的层，提前在 copy 队列上传，等轮到它时数据已就绪，实现上传与计算重叠。预取更远的层会覆盖还在用的 slot，预取更近的层 slot 还没空。
+
+</div>
+</details>
+
+<QA question={<><span className="diff mid">进阶</span>如果忘记等待 copy queue fence，可能出现什么现象？</>}>
+
+compute 队列可能在权重还没上传完时就开始读该 slot，读到上一层的旧权重或半写入的数据，导致结果错误且不确定（race）。表现为输出乱码、与 resident 路径 diff 很大、或时好时坏（取决于上传与计算的相对快慢）。正确做法是 compute 该层前等待对应 copy fence，确保该 slot 的上传已完成。
+
+</QA>
+
+<QA question={<><span className="diff hard">挑战</span>设计一个测试来故意把 slot 数设为 1，分析它是否仍然正确、是否还能 overlap。</>}>
+
+测试：用 `load_streaming(.., max_resident_layers=1)` 跑一遍，与 resident 路径比较输出，断言 diff=0（或 f16 容差内）。
+
+<span className="label">正确性：</span>仍然正确。slot=1 时所有层串行复用唯一 slot，只要每层 compute 前等待其上传 fence，结果与 resident 一致。
+
+<span className="label">overlap：</span>基本无法重叠。slot=1 意味着层 $i+1$ 要用的 slot 正是层 $i$ 正在用的那个，必须等层 $i$ compute 完才能开始上传层 $i+1$，于是上传与计算被强制串行，吞吐退化为“上传时间+计算时间”之和。至少需要 2 个 slot（双缓冲）才能让层 $i$ 计算时并行预取层 $i+1$。这个测试既验证了正确性下限，又揭示了 overlap 对池大小 ≥2 的依赖。
+
+</QA>
+
+</QAGroup>

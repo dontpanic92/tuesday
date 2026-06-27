@@ -1,0 +1,276 @@
+import Layout from "../../components/xinfer/Layout";
+
+export default function Page(props) {
+  return <Layout slug="module18">{props.children}</Layout>;
+}
+
+<h1>Module 18：面向 Xbox GDK</h1>
+
+<p className="subtitle">没有官方 Rust Xbox target 时，如何把 Rust 推理核心包装成 C ABI static library，并由 C++ GDK host 创建 D3D12 device 后注入。</p>
+
+<Objectives>
+<ul>
+<li>理解为什么 Xbox console 不能简单地作为普通 Rust target 处理。</li>
+<li>掌握 C ABI 边界设计：opaque handle、错误码、no unwinding、回调。</li>
+<li>理解 device injection：host 创建 D3D12 device，Rust core 在其上创建 DirectML device。</li>
+<li>了解 C++ GDK host 如何链接 Rust staticlib，以及 CRT / system libs 的注意事项。</li>
+<li>使用 GDK desktop toolchain 验证同一 FFI/device-injection 路径。</li>
+</ul>
+</Objectives>
+
+<h2><span className="num">18.1</span>问题：没有官方 Rust Xbox console target</h2>
+
+Windows PC 上，Rust 的`x86_64-pc-windows-msvc`target 可以直接构建可执行程序。但 Xbox console 是 GDK 平台： process entry、应用打包、设备创建、运行时库都由 GDK 管理。Rust 官方并不提供一个开箱即用的 Xbox console target。
+
+因此我们采用工程上常见的折中方案：**Rust core 做成 C ABI library，C++ GDK host 负责平台入口和 device creation**。
+
+<Diagram
+  caption={<><b>图 18-1：</b>Xbox 路径的核心：C++ host 负责平台，Rust core 负责推理。</>}
+  svg={`<svg width="820" height="310" viewBox="0 0 820 310" role="img" aria-label="Rust core embedded in C++ GDK host">
+      <defs>
+        <marker id="m18a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .cpp{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.6}
+        .rust{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.4}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#m18a)}
+      </style>
+      <rect x="65" y="70" width="250" height="150" rx="14" class="cpp"/>
+      <text x="190" y="102" text-anchor="middle" class="txt">C++ GDK Host</text>
+      <text x="190" y="130" text-anchor="middle" class="sm">main / WinMain</text>
+      <text x="190" y="152" text-anchor="middle" class="sm">D3D12XboxCreateDevice</text>
+      <text x="190" y="174" text-anchor="middle" class="sm">command queue</text>
+      <text x="190" y="196" text-anchor="middle" class="sm">calls C ABI</text>
+
+      <rect x="505" y="70" width="250" height="150" rx="14" class="rust"/>
+      <text x="630" y="102" text-anchor="middle" class="txt">Rust Core</text>
+      <text x="630" y="130" text-anchor="middle" class="sm">xinfer-ffi staticlib</text>
+      <text x="630" y="152" text-anchor="middle" class="sm">DirectML on injected D3D12 device</text>
+      <text x="630" y="174" text-anchor="middle" class="sm">Qwen2 model + KV cache</text>
+      <text x="630" y="196" text-anchor="middle" class="sm">token callback</text>
+
+      <line x1="315" y1="145" x2="502" y2="145" class="edge"/>
+      <text x="410" y="132" text-anchor="middle" class="sm">xinfer_create_with_device</text>
+      <text x="410" y="178" text-anchor="middle" class="sm">xinfer_generate callback</text>
+    </svg>`}
+/>
+
+<h2><span className="num">18.2</span>FFI 边界：Rust core 作为 C ABI library</h2>
+
+`xinfer-ffi`同时构建为：
+
+- `staticlib`：供 C++ GDK host 链接；
+- `cdylib`：供 PC 工具 / Python ctypes 测试加载。
+
+C ABI 中暴露的核心函数：
+
+```cpp
+int xinfer_create(const char* model_dir, int stream_layers, XinferContext** out);
+int xinfer_create_with_device(void* d3d12_device, void* queue,
+                              const char* model_dir, int stream_layers,
+                              XinferContext** out);
+int xinfer_generate(XinferContext* ctx, const char* prompt, ...,
+                    XinferTokenCallback callback, void* user);
+const char* xinfer_last_error(const XinferContext* ctx);
+void xinfer_free(XinferContext* ctx);
+```
+
+这里`XinferContext`是 opaque handle：C++ 只拿到一个指针，不知道内部 Rust 结构。 这样可以保持 ABI 稳定，也避免 C++ 直接管理 Rust 对象布局。
+
+<h2><span className="num">18.3</span>安全 C ABI：错误码、opaque handle、no unwinding</h2>
+
+跨语言边界最重要的规则是：**不要让 Rust panic 跨过 C ABI**。因此 FFI 函数需要捕获 panic，并返回错误码。 错误详情存在 context 内部，由`xinfer_last_error`查询。
+
+<table className="tbl">
+<thead><tr><th>设计点</th><th>原因</th></tr></thead>
+<tbody>
+<tr><td>Opaque <code>XinferContext*</code></td><td>隐藏 Rust 内部布局，C++ 只负责持有和释放</td></tr>
+<tr><td>负数错误码</td><td>C ABI 简单稳定，不抛异常</td></tr>
+<tr><td><code>xinfer_last_error</code></td><td>提供可读错误消息</td></tr>
+<tr><td>Token callback</td><td>流式输出，不必等完整生成结束</td></tr>
+<tr><td><code>xinfer_free</code></td><td>由 Rust 释放 Rust 分配的对象</td></tr>
+</tbody>
+</table>
+
+<h2><span className="num">18.4</span>Device injection：为什么不能用 DXGI？</h2>
+
+Windows PC 上我们可以用 DXGI 枚举 adapter；但 Xbox console 上 DXGI 不可用。GDK host 使用`D3D12XboxCreateDevice`创建 device。Rust core 不能自己走 DXGI 路径，而应该接受 host 已经创建好的 device。
+
+因此`DmlDevice::from_raw_pointers`接收：
+
+- `ID3D12Device*`
+- `ID3D12CommandQueue*`
+
+然后在这个 device 上创建 DirectML device：
+
+$$
+\text{ID3D12Device}_{host}
+\longrightarrow
+\text{IDMLDevice}_{rust}
+\longrightarrow
+\text{Qwen2 inference}
+$$
+
+<Diagram
+  caption={<><b>图 18-2：</b>Device injection 避免 Rust core 依赖 DXGI，从而适配 Xbox GDK。</>}
+  svg={`<svg width="820" height="310" viewBox="0 0 820 310" role="img" aria-label="device injection path">
+      <defs>
+        <marker id="m18b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.4}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#m18b)}
+      </style>
+      <rect x="45" y="90" width="170" height="72" rx="12" class="hot"/>
+      <text x="130" y="118" text-anchor="middle" class="txt">C++ GDK Host</text>
+      <text x="130" y="140" text-anchor="middle" class="sm">D3D12XboxCreateDevice</text>
+      <rect x="285" y="90" width="170" height="72" rx="12" class="box"/>
+      <text x="370" y="118" text-anchor="middle" class="txt">Raw COM pointers</text>
+      <text x="370" y="140" text-anchor="middle" class="sm">device + queue</text>
+      <rect x="525" y="90" width="170" height="72" rx="12" class="hi"/>
+      <text x="610" y="118" text-anchor="middle" class="txt">Rust DmlDevice</text>
+      <text x="610" y="140" text-anchor="middle" class="sm">DirectML on top</text>
+      <line x1="215" y1="126" x2="282" y2="126" class="edge"/>
+      <line x1="455" y1="126" x2="522" y2="126" class="edge"/>
+      <text x="410" y="230" text-anchor="middle" class="sm">同一 Rust core：PC 可自己创建设备；Xbox 由 host 注入设备。</text>
+    </svg>`}
+/>
+
+<h2><span className="num">18.5</span>C++ GDK host：链接 Rust lib</h2>
+
+C++ host 的职责很薄：
+
+1. 创建 D3D12 device 和 command queue；
+2. 调用`xinfer_create_with_device`创建推理 context；
+3. 调用`xinfer_generate`，用 callback 接收 token 文本；
+4. 退出时调用`xinfer_free`。
+
+```cpp
+XinferContext* ctx = nullptr;
+int rc = xinfer_create_with_device(device.Get(), queue.Get(),
+                                   model_dir, stream_layers, &ctx);
+
+rc = xinfer_generate(ctx, prompt, nullptr, 1, 64,
+                     0.0f, 0, 1.0f, 42,
+                     &OnToken, nullptr);
+
+xinfer_free(ctx);
+```
+
+链接时需要注意 CRT 和 Rust staticlib 的系统依赖。当前验证路径使用`/MD`匹配 Rust 的动态 CRT， 并链接`bcrypt`、`advapi32`、`userenv`、`ws2_32`、`dbghelp`等库。
+
+<Callout kind="warn" tag="GDK 现实">
+
+本机已验证 GRDK / Gaming Desktop toolchain 路径；真正 Xbox console 分支需要 GXDK console SDK 和 dev kit。 但二者使用同一个 FFI/device-injection 设计。
+
+</Callout>
+
+<h2><span className="num">18.6</span>用 GDK desktop toolchain 验证</h2>
+
+即使没有 console dev kit，也可以用 GDK desktop toolchain 验证 C++ host → Rust staticlib → device injection → real inference 的路径：
+
+```bash
+# 构建 Rust staticlib + C++ host
+.\xbox\build_host.ps1
+
+# 运行 host，创建 D3D12 device 并注入 Rust core
+.\xbox\xinfer_host.exe models\Qwen2.5-0.5B-Instruct "What is 2 plus 2?"
+```
+
+验证输出示例：
+
+```bash
+xinfer (Xbox host) version 0.1.0
+--- output ---
+2 plus 2 is 4.
+--------------
+```
+
+<Figure caption={<><b>图 18-3：</b>Xbox 路径的验证层级：从 cdylib 到 C++ host，再到真正 console。</>}>
+  <Chart
+    type={"bar"}
+    data={{
+      labels: ["ctypes cdylib", "C++ GDK desktop host", "Xbox console (GXDK)"],
+      datasets: [{
+        label: "验证状态",
+        data: [1, 1, 0.4],
+        backgroundColor: ["#1f6f78", "#2e7d4f", "#b8531a"]
+      }]
+    }}
+    options={{
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 1, title: { display: true, text: "validated" }, grid: { color: "#e3e1da" } },
+        x: { grid: { display: false } }
+      }
+    }}
+  />
+</Figure>
+
+<h2><span className="num">Lab 18</span>从 C 调用引擎，再从 C++ host 调用</h2>
+
+本实验分两步：
+
+1. 用 Python`ctypes`加载`xinfer_ffi.dll`，调用`xinfer_create`和`xinfer_generate`。
+2. 构建`xbox/xinfer_host.exe`，验证 C++ host 调用`xinfer_create_with_device`。
+
+```bash
+python crates\xinfer-ffi\tests\ctypes_smoke.py \
+  target\release\xinfer_ffi.dll \
+  models\Qwen2.5-0.5B-Instruct \
+  "What is the capital of France?"
+
+.\xbox\build_host.ps1
+.\xbox\xinfer_host.exe models\Qwen2.5-0.5B-Instruct "Name three primary colors."
+```
+
+<QAGroup>
+
+### 思考与练习
+
+<QA question={<><span className="diff easy">基础</span>为什么 Rust panic 不能跨 C ABI 边界？</>}>
+
+panic 是 Rust 特有的栈展开（或 abort）机制，C/C++ 不认识它。让 panic 展开穿过`extern "C"`边界进入 C++ 栈是未定义行为（可能破坏栈、跳过析构、直接崩溃）。所以 FFI 函数必须在边界内用`catch_unwind`捕获 panic，转换成错误码/错误消息返回。xinfer-ffi 正是在每个导出函数里 catch panic，再通过`xinfer_last_error`暴露原因。
+
+</QA>
+
+<QA question={<><span className="diff easy">基础</span>opaque handle 有什么好处？</>}>
+
+opaque handle（如`void*`/ 不透明指针）把 Rust 内部结构对 C 隐藏：C 端不需要知道也不能依赖其内存布局，只把它当令牌传回 Rust。好处：①ABI 稳定，Rust 侧结构可自由演进而不破坏 C 头；②封装/安全，C 不能误碰内部字段；③生命周期清晰，由 create/free 配对管理。xinfer 用它表示引擎实例（`xinfer_create`返回，`xinfer_free`释放）。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>解释为什么 Xbox console 上不能依赖 DXGI 枚举 adapter。</>}>
+
+因为 Xbox 主机不提供桌面 DXGI 的 adapter 枚举模型——它是固定单一 GPU 的封闭平台，用专用入口`D3D12XboxCreateDevice`（带主机特定参数）直接创建设备，而非`CreateDXGIFactory`+ 枚举 +`D3D12CreateDevice`。所以可移植设计要把设备创建外置：让宿主按平台各自创建 device/queue，再注入 Rust 核心（`DmlDevice::from_existing/from_raw_pointers`），核心不直接调 DXGI。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>如果 C++ host 提前释放 device，会对 Rust core 造成什么风险？为什么需要 COM ref-count？</>}>
+
+风险：Rust core 仍持有指向该`ID3D12Device`（及 queue/资源）的指针，host 提前释放会造成悬垂指针——后续 GPU 调用访问已释放对象，导致崩溃或未定义行为（use-after-free）。COM 的引用计数解决此问题：当 Rust 适配既有 device（`from_existing`）时应`AddRef`，使对象的存活与所有持有者绑定；各方释放时`Release`，引用归零才真正销毁。这样无论 host 还是 core 谁先“放手”，只要还有人引用，device 就不会被过早销毁。
+
+</QA>
+
+<QA question={<><span className="diff hard">挑战</span>设计一个 C ABI 函数，让 host 查询模型的 resident weight bytes 和 decode tok/s。</>}>
+
+用输出参数 + 错误码返回，避免跨边界返回复杂类型：
+
+`int xinfer_get_stats(void* handle, uint64_t* resident_weight_bytes, double* decode_tok_s);`
+
+约定：返回 0 表示成功，非 0 表示出错（细节经`xinfer_last_error`取）；handle 为空或无最近一次生成统计时返回错误。Rust 侧在`catch_unwind`内把内部的`resident_weight_bytes`与最近一次`GenerateStats.decode_tok_s`写入两个出参指针（先判空）。也可定义一个`XinferStats`POD struct 一次性填充。要点：所有数值用固定宽度类型（u64/f64），指针出参，错误用返回码——保证 ABI 稳定且 panic 安全。
+
+</QA>
+
+</QAGroup>

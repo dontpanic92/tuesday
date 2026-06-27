@@ -1,0 +1,470 @@
+/* Auto-scoped port of the original textbook.css for the /xinfer series.
+   Every rule is scoped under .xinfer-page so the textbook theme is fully
+   isolated from the global gatsby-theme-apollo styles. Generated from
+   static/build-an-llm-inference-engine-from-scratch/assets/textbook.css.
+   Edit this file directly going forward (the static source is removed). */
+
+/* xinfer 教程教材 — 共享样式表
+   Shared textbook stylesheet for the "从零构建 LLM 推理引擎" tutorial. */
+
+.xinfer-page {
+  --ink: #1a1a1a;
+  --ink-soft: #444;
+  --paper: #fbfbf9;
+  --paper-2: #ffffff;
+  --accent: #1f6f78;       /* teal */
+  --accent-2: #b8531a;     /* burnt orange */
+  --rule: #e3e1da;
+  --code-bg: #f4f3ee;
+  --note-bg: #eef6f6;
+  --note-border: #1f6f78;
+  --warn-bg: #fdf2e9;
+  --warn-border: #b8531a;
+  --def-bg: #f3f0fb;
+  --def-border: #6b4fbb;
+  --max-width: 860px;
+}
+
+
+.xinfer-page * { box-sizing: border-box; }
+
+
+.xinfer-page { scroll-behavior: smooth; }
+
+
+.xinfer-page {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC",
+    "SimSun", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+
+.xinfer-page .page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 48px 28px 120px;
+}
+
+
+/* ---------- 页眉 / 教程标识 ---------- */
+.xinfer-page .coursemark {
+  font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC",
+    "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-bottom: 2px solid var(--rule);
+  padding-bottom: 10px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+
+.xinfer-page .part-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+
+.xinfer-page h1,
+.xinfer-page h2,
+.xinfer-page h3,
+.xinfer-page h4 {
+  font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC",
+    "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+
+.xinfer-page h1 { font-size: 34px; margin: 6px 0 8px; font-weight: 800; }
+
+.xinfer-page .subtitle { color: var(--ink-soft); font-size: 18px; margin: 0 0 28px;
+  font-family: "Noto Sans SC", system-ui, sans-serif; }
+
+
+.xinfer-page h2 {
+  font-size: 25px;
+  margin: 56px 0 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font-weight: 700;
+}
+
+.xinfer-page h2 .num { color: var(--accent); margin-right: 10px; }
+
+
+.xinfer-page h3 { font-size: 20px; margin: 34px 0 12px; color: var(--accent); }
+
+
+.xinfer-page p { margin: 14px 0; }
+
+.xinfer-page strong { color: var(--accent-2); font-weight: 700; }
+
+.xinfer-page em { color: var(--ink); }
+
+
+.xinfer-page a { color: var(--accent); }
+
+
+/* ---------- 行内代码 / 代码块 ---------- */
+.xinfer-page code,
+.xinfer-page kbd,
+.xinfer-page pre,
+.xinfer-page .mono {
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas,
+    "Courier New", monospace;
+}
+
+.xinfer-page :not(pre) > code {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.86em;
+  color: #8a3b12;
+}
+
+.xinfer-page pre {
+  background: #20242b;
+  color: #e6e6e6;
+  padding: 16px 18px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 14.5px;
+  line-height: 1.6;
+  border: 1px solid #11141a;
+}
+
+.xinfer-page pre code { color: inherit; background: none; padding: 0; }
+
+.xinfer-page .tok-c { color: #7f8c9a; }
+   /* 注释 */
+.xinfer-page .tok-k { color: #c792ea; }
+   /* 关键字 */
+.xinfer-page .tok-s { color: #c3e88d; }
+   /* 字符串 */
+.xinfer-page .tok-f { color: #82aaff; }
+   /* 函数/路径 */
+
+/* ---------- 提示框 ---------- */
+.xinfer-page .callout {
+  border-left: 4px solid var(--note-border);
+  background: var(--note-bg);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  margin: 22px 0;
+  font-size: 16.5px;
+}
+
+.xinfer-page .callout .tag {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.xinfer-page .callout.note { border-color: var(--note-border); background: var(--note-bg); }
+
+.xinfer-page .callout.note .tag { color: var(--accent); }
+
+.xinfer-page .callout.warn { border-color: var(--warn-border); background: var(--warn-bg); }
+
+.xinfer-page .callout.warn .tag { color: var(--accent-2); }
+
+.xinfer-page .callout.def { border-color: var(--def-border); background: var(--def-bg); }
+
+.xinfer-page .callout.def  .tag { color: var(--def-border); }
+
+
+/* ---------- 图 / 表 ---------- */
+.xinfer-page figure { margin: 28px 0; text-align: center; }
+
+.xinfer-page figure svg,
+.xinfer-page figure .chart-wrap { max-width: 100%; }
+
+.xinfer-page figcaption {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+}
+
+.xinfer-page figcaption b { color: var(--accent); }
+
+.xinfer-page .fig-card {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.xinfer-page .chart-wrap { position: relative; height: 340px; }
+
+
+.xinfer-page table.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 22px 0;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 15.5px;
+}
+
+.xinfer-page table.tbl th,
+.xinfer-page table.tbl td {
+  border: 1px solid var(--rule);
+  padding: 9px 12px;
+  text-align: left;
+}
+
+.xinfer-page table.tbl th { background: var(--note-bg); color: var(--accent); }
+
+.xinfer-page table.tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.xinfer-page table.tbl tr:nth-child(even) td { background: #faf9f5; }
+
+
+/* ---------- 学习目标盒 ---------- */
+.xinfer-page .objectives {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-top: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 26px 0 36px;
+}
+
+.xinfer-page .objectives h4 {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+.xinfer-page .objectives ul { margin: 6px 0 0; padding-left: 22px; }
+
+.xinfer-page .objectives li { margin: 6px 0; }
+
+
+/* ---------- 习题 ---------- */
+.xinfer-page .exercises { margin-top: 18px; counter-reset: qa; }
+
+.xinfer-page .exercises ol { padding-left: 24px; }
+
+.xinfer-page .exercises li { margin: 10px 0; }
+
+.xinfer-page .diff {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 12px; font-weight: 700;
+  padding: 1px 7px; border-radius: 4px; margin-right: 8px;
+  vertical-align: 2px;
+}
+
+.xinfer-page .diff.easy { background: #e3f3e8; color: #2e7d4f; }
+
+.xinfer-page .diff.mid { background: #fff2d6; color: #9a6b00; }
+
+.xinfer-page .diff.hard { background: #fbe0d8; color: #b8351a; }
+
+
+/* ---------- 可折叠问答 ---------- */
+.xinfer-page .qa {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  margin: 12px 0;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.xinfer-page .qa[open] { box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+
+.xinfer-page .qa > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 13px 18px 13px 44px;
+  position: relative;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  counter-increment: qa;
+}
+
+.xinfer-page .qa > summary::-webkit-details-marker { display: none; }
+
+.xinfer-page .qa > summary::before {
+  content: "Q" counter(qa);
+  position: absolute;
+  left: 14px; top: 13px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.xinfer-page .qa > summary::after {
+  content: "▸";
+  position: absolute;
+  right: 16px; top: 13px;
+  color: var(--accent);
+  transition: transform 0.18s ease;
+}
+
+.xinfer-page .qa[open] > summary::after { transform: rotate(90deg); }
+
+.xinfer-page .qa > summary:hover { background: var(--note-bg); }
+
+.xinfer-page .qa .answer {
+  padding: 4px 18px 16px 44px;
+  border-top: 1px dashed var(--rule);
+  margin-top: 2px;
+  font-size: 15.5px;
+  color: var(--ink-soft);
+  line-height: 1.8;
+}
+
+.xinfer-page .qa .answer p { margin: 10px 0; }
+
+.xinfer-page .qa .answer .label {
+  display: inline-block;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  margin: 8px 0 2px;
+}
+
+.xinfer-page .qa .answer code { font-size: 0.85em; }
+
+
+/* ---------- 页脚导航 ---------- */
+.xinfer-page .pager {
+  display: flex; justify-content: space-between;
+  margin-top: 64px; padding-top: 18px;
+  border-top: 2px solid var(--rule);
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 15px;
+}
+
+.xinfer-page .pager a { text-decoration: none; color: var(--accent); }
+
+.xinfer-page .pager .disabled { color: #bbb; }
+
+
+.xinfer-page hr.soft { border: none; border-top: 1px dashed var(--rule); margin: 40px 0; }
+
+
+/* MathJax 显示公式留白 */
+.xinfer-page mjx-container[display="true"] { margin: 18px 0 !important; }
+
+
+@media (max-width: 620px) {
+
+  .xinfer-page { font-size: 16.5px; }
+
+  .xinfer-page h1 { font-size: 27px; }
+
+  .xinfer-page h2 { font-size: 21px; }
+
+  .xinfer-page .chart-wrap { height: 280px; }
+
+
+}
+
+
+
+/* ---------- Full-viewport background + index (TOC) page styles ---------- */
+.xinfer-page { min-height: 100vh; }
+
+.xinfer-page .hero {
+  background: linear-gradient(135deg, #eef6f6 0%, #fff 55%, #fdf2e9 100%);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 30px 34px;
+  margin: 20px 0 36px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.xinfer-page .hero h1 { margin-top: 0; }
+.xinfer-page .toc-part {
+  margin: 34px 0;
+  padding: 18px 20px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+.xinfer-page .toc-part h2 {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  font-size: 21px;
+}
+.xinfer-page .toc-list { list-style: none; padding: 0; margin: 0; }
+.xinfer-page .toc-list li {
+  border-top: 1px dashed var(--rule);
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+.xinfer-page .toc-list li:first-child { border-top: 0; }
+.xinfer-page .modno {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 13px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.xinfer-page .toc-list a {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  text-decoration: none;
+  font-weight: 650;
+}
+.xinfer-page .toc-list p {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.xinfer-page .quick {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 22px 0;
+}
+.xinfer-page .quick a {
+  display: block;
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 650;
+}
+.xinfer-page .quick span {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin-top: 4px;
+}

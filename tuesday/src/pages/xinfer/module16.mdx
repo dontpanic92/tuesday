@@ -1,0 +1,258 @@
+import Layout from "../../components/xinfer/Layout";
+
+export default function Page(props) {
+  return <Layout slug="module16">{props.children}</Layout>;
+}
+
+<h1>Module 16：优化案例研究 — 六层优化</h1>
+
+<p className="subtitle">一次真实优化旅程：从 3.6 tok/s 到 30.9 tok/s，从 f32 到 f16，从 per-op submit 到 GPU argmax。</p>
+
+<Objectives>
+<ul>
+<li>理解每个优化 tier 对应的瓶颈、修改和收益。</li>
+<li>区分同步优化、带宽优化、kernel 访问模式优化、readback 优化。</li>
+<li>理解为什么某些优化在短上下文下收益不明显，但仍然有长期价值。</li>
+<li>学习如何写优化报告：baseline、假设、改动、验证、收益、风险。</li>
+<li>完成 Lab 16：实现两个优化 tier，并报告自己的 before/after 数据。</li>
+</ul>
+</Objectives>
+
+<h2><span className="num">16.1</span>总览：从 3.6 到 30.9 tok/s</h2>
+
+本项目的优化不是一次“神奇加速”，而是分层排除瓶颈。每一层都解决一个明确问题，并用 parity tests 保证输出没有变。
+
+<table className="tbl">
+<thead><tr><th>阶段</th><th>优化</th><th>decode tok/s</th><th>主要瓶颈</th></tr></thead>
+<tbody>
+<tr><td>Baseline</td><td>per-op submit, f32 weights</td><td className="num">3.6</td><td>同步 + 带宽 + readback</td></tr>
+<tr><td>Tier 1</td><td>每层一个 command list</td><td className="num">8.5</td><td>GPU submission overhead</td></tr>
+<tr><td>Tier 2</td><td>f16 weights</td><td className="num">10.3</td><td>显存带宽 / VRAM</td></tr>
+<tr><td>Tier 3</td><td>coalesced GEMV</td><td className="num">12.3</td><td>非合并权重读取</td></tr>
+<tr><td>Tier 4</td><td>single-pass attention</td><td className="num">~12</td><td>attention K/V 读带宽</td></tr>
+<tr><td>Tier 5</td><td>cooperative RMSNorm</td><td className="num">—</td><td>串行 row reduction</td></tr>
+<tr><td>Tier 6</td><td>GPU greedy argmax</td><td className="num">30.9</td><td>完整 logits readback</td></tr>
+</tbody>
+</table>
+
+<Figure caption={<><b>图 16-1：</b>优化是逐层消除瓶颈；最大两次收益来自减少 GPU submission 和消除 logits readback。</>}>
+  <Chart
+    type={"bar"}
+    data={{
+      labels: ["baseline", "batch", "f16", "GEMV", "argmax"],
+      datasets: [{
+        label: "decode tok/s",
+        data: [3.6, 8.5, 10.3, 12.3, 30.9],
+        backgroundColor: ["#b8531a", "#1f6f78", "#6b4fbb", "#2e7d4f", "#222"]
+      }]
+    }}
+    options={{
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: "tokens / second" }, grid: { color: "#e3e1da" } },
+        x: { grid: { display: false } }
+      }
+    }}
+  />
+</Figure>
+
+<h2><span className="num">16.2</span>Tier 1：把 dispatch 批到一个 command list</h2>
+
+Baseline 的 decode 在每个小算子后都`submit_and_wait`。一个 token 大约有：
+
+$$
+22\;\text{ops/layer}\times24\;\text{layers}\approx528
+$$
+
+次 GPU submission。每次 submission 都有 CPU/GPU 同步成本。Tier 1 的做法是：一个 layer 内连续记录所有 dispatch， 用 UAV barrier 保证依赖顺序，最后只 submit 一次。
+
+$$
+528\;\text{submits/token}\quad\longrightarrow\quad 24\;\text{submits/token}
+$$
+
+这不改变任何数学，只改变命令提交方式，因此输出 bit-identical。收益：3.6 → 8.5 tok/s。
+
+<h2><span className="num">16.3</span>Tier 2：f16 weights，带宽与显存减半</h2>
+
+Decode 的 matmul/GEMV 多数是 memory-bound。把权重从 f32 改成 f16 后，每个权重从 4 bytes 变成 2 bytes：
+
+$$
+\operatorname{bytes}_{f16}(W)
+= \frac{1}{2}\operatorname{bytes}_{f32}(W)
+$$
+
+xinfer 使用`ByteAddressBuffer`+`f16tof32`解包权重，activation 仍保持 f32。 权重显存从 1885 MiB 降到 942 MiB，decode 从 8.5 → 10.3 tok/s。
+
+<Callout kind="note" tag="数值注意">
+
+f16 权重会带来舍入误差，因此 parity test 需要合理容差，并检查 argmax 是否稳定。
+
+</Callout>
+
+<h2><span className="num">16.4</span>Tier 3：Coalesced GEMV + groupshared reduction</h2>
+
+Naive GEMV 是“一个线程算一个输出元素”。这样相邻线程读取的权重地址相隔 $K$，不利于 coalescing。 Tier 3 改成“一个 threadgroup 算一个输出元素”：组内线程沿 $K$ 方向读取相邻权重，然后在 groupshared 中归约。
+
+$$
+y_j=\sum_{p=0}^{K-1}x_pW_{j,p}
+$$
+
+每个线程负责 $p=t,t+TG,t+2TG,\ldots$ 的部分和。这样同一 wave 中的线程更可能读取连续权重。 LM head 输出维度超过 65535，因此还需要 2D dispatch grid。
+
+<Diagram
+  caption={<><b>图 16-2：</b>Coalesced GEMV 改善权重读取模式，并用 groupshared 做部分和归约。</>}
+  svg={`<svg width="820" height="310" viewBox="0 0 820 310" role="img" aria-label="coalesced GEMV group reduction">
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.4}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.5}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+      </style>
+      <text x="410" y="32" text-anchor="middle" class="txt">一个 threadgroup 计算一个输出 y[j]</text>
+      <rect x="70" y="80" width="180" height="72" rx="12" class="hi"/>
+      <text x="160" y="110" text-anchor="middle" class="txt">Activation x</text>
+      <text x="160" y="132" text-anchor="middle" class="sm">被所有输出复用</text>
+      <rect x="320" y="70" width="210" height="92" rx="12" class="hot"/>
+      <text x="425" y="100" text-anchor="middle" class="txt">W[j, p]</text>
+      <text x="425" y="124" text-anchor="middle" class="sm">线程沿 K 方向 coalesced 读取</text>
+      <rect x="600" y="80" width="150" height="72" rx="12" class="box"/>
+      <text x="675" y="110" text-anchor="middle" class="txt">groupshared reduce</text>
+      <text x="675" y="132" text-anchor="middle" class="sm">partial sums → y[j]</text>
+      <text x="410" y="235" text-anchor="middle" class="sm">收益：10.3 → 12.3 tok/s；prefill 也明显加速。</text>
+    </svg>`}
+/>
+
+<h2><span className="num">16.5</span>Tier 4：Flash-style single-pass attention</h2>
+
+传统稳定 softmax 会先扫一遍 key 找最大值，再扫一遍计算权重与加权 V。Tier 4 使用 online softmax： 一次遍历维护 running max、denominator 和 accumulator。
+
+$$
+m'=\max(m,s),\qquad
+d'=d\cdot e^{m-m'}+e^{s-m'}
+$$
+
+accumulator 同样乘以 $e^{m-m'}$ 做 rescale，然后加上当前 $e^{s-m'}v$。 对短上下文收益不大，因为 attention 不是瓶颈；但长上下文时它减少 K 读取，价值会更明显。
+
+<h2><span className="num">16.6</span>Tier 5：Cooperative RMSNorm</h2>
+
+原始 RMSNorm 如果一个线程处理一整行，decode 时每层有两个串行 896 元素 reduction。Tier 5 改成一个 threadgroup 处理一行： 线程分摊平方和，再用 groupshared reduction 合并。
+
+$$
+\sum_{j=1}^{H}x_j^2
+= \sum_{\text{threads }t}\left(\sum_{j\in \mathcal{J}_t}x_j^2\right)
+$$
+
+这类优化收益不如 Tier 1 / Tier 6 显眼，但它消除了明显的串行热点，也为后续 fused norm kernel 打基础。
+
+<h2><span className="num">16.7</span>Tier 6：GPU-side argmax</h2>
+
+这是最出乎意料的瓶颈之一。Qwen2.5 的词表大小是 151936。若 logits 是 f32，每步读回：
+
+$$
+151936\times4\approx608\text{ KB}
+$$
+
+Greedy decoding 其实只需要最大 logit 的 index。Tier 6 增加 GPU argmax kernel，把最后一行 logits 在 GPU 上归约成一个`u32`token id，只读回 4 bytes。
+
+$$
+608\text{ KB/token}\quad\longrightarrow\quad4\text{ bytes/token}
+$$
+
+结果 decode 从 12.3 → 30.9 tok/s。这个优化不减少模型计算量，却显著减少 CPU/GPU 传输和 CPU 扫描成本。
+
+<Figure caption={<><b>图 16-3：</b>GPU argmax 把每 token readback 从 608 KB 降到 4 bytes。</>}>
+  <Chart
+    type={"bar"}
+    data={{
+      labels: ["full logits readback", "GPU argmax readback"],
+      datasets: [{
+        label: "bytes/token",
+        data: [151936 * 4, 4],
+        backgroundColor: ["#b8531a", "#1f6f78"]
+      }]
+    }}
+    options={{
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { type: "logarithmic", title: { display: true, text: "bytes/token (log scale)" }, grid: { color: "#e3e1da" } },
+        x: { grid: { display: false } }
+      }
+    }}
+  />
+</Figure>
+
+<h2><span className="num">16.8</span>如何阅读结果：速度、显存、正确性一起看</h2>
+
+最终结果：
+
+<table className="tbl">
+<thead><tr><th>指标</th><th>优化前</th><th>优化后</th><th>变化</th></tr></thead>
+<tbody>
+<tr><td>decode tok/s</td><td className="num">3.6</td><td className="num">30.9</td><td>8.6×</td></tr>
+<tr><td>prefill tok/s</td><td className="num">~16</td><td className="num">~378</td><td>~24×</td></tr>
+<tr><td>weight VRAM</td><td className="num">1885 MiB</td><td className="num">942 MiB</td><td>-50%</td></tr>
+<tr><td>输出</td><td>Paris</td><td>Paris</td><td>不变</td></tr>
+</tbody>
+</table>
+
+这张表说明：好的优化报告必须同时回答三个问题：
+
+1. 快了多少？
+2. 资源占用变了吗？
+3. 正确性是否保持？
+
+<h2><span className="num">Lab 16</span>实现两个 tier，并写优化报告</h2>
+
+从六个 tier 中选择两个实现。每个 tier 必须包含：
+
+- baseline 数字；
+- 你认为的瓶颈；
+- 代码改动摘要；
+- 正确性测试结果；
+- before/after 性能表；
+- 如果没有提升，解释为什么。
+
+参考格式见：
+
+```text
+generated/optimization_report.md
+```
+
+<QAGroup>
+
+### 思考与练习
+
+<QA question={<><span className="diff easy">基础</span>哪一个 tier 主要减少 GPU submission？哪一个主要减少 readback？</>}>
+
+T1（把整层前向录进一个命令列表、每层提交一次）主要减少 GPU submission——从约 530 submits/token 降到约 24。T6（GPU 端 greedy argmax）主要减少 readback——从 608 KB/token 降到 4 字节。
+
+</QA>
+
+<QA question={<><span className="diff easy">基础</span>为什么 f16 权重能同时降低显存和带宽？</>}>
+
+f16 每个权重 2 字节，是 f32 的一半。存储减半 → 显存从 1885 降到 942 MiB；而 decode 是带宽受限的，每次都要把整组权重从显存读进计算单元，读取字节减半 → 有效带宽翻倍，matmul 更快。一举两得，代价是少量精度损失（用 fp32 累加 + 放宽容差，argmax 仍稳定）。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>为什么 attention 优化在短上下文下收益不明显？</>}>
+
+因为 attention 的成本随上下文长度 $T$ 增长，而短上下文时 K/V 很少，attention 在总耗时中占比很小——瓶颈是各 matmul（QKV/MLP/LM head）。flash-style 单遍 attention 省的是对 K/V 的重复扫描带宽，$T$ 小时这点带宽微不足道。只有上下文变长（成百上千 token）后，attention 占比上升，单遍 + online softmax 的收益才显著。所以 xinfer 在短 ctx 下测得 T4≈中性。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>如果使用 temperature sampling，GPU argmax fast path 还能用吗？为什么？</>}>
+
+不能直接用。temperature/top-k/top-p 需要完整（或至少 top-k 的）概率分布来做带随机性的采样，而 GPU argmax 只返回单个最大下标，丢掉了分布信息。所以带温度采样时要么读回完整 logits 在 CPU 采样，要么实现 GPU 端 top-k 只回传少量候选。greedy（等价 temperature=0）才只需 argmax，能走 4 字节 fast path。
+
+</QA>
+
+<QA question={<><span className="diff hard">挑战</span>设计一个 GPU top-k 方案，估计它能减少多少 readback。</>}>
+
+方案：在 GPU 上对 151936 个 logits 做并行 top-k。①每个 threadgroup 处理一段 logits，用局部堆/排序网络维护本段 top-k；②跨组归约合并各段的 top-k 得到全局 top-k（k 很小，可用一轮 LDS 归约或第二个 kernel）；③只把 k 对 (logit, index) 拷回 CPU，在 CPU 做温度缩放 + 归一化 + 采样。
+
+readback 估计：原来回传全部 logits = $151936\times4\approx608$ KB。top-k 只回传 $k$ 个 (f32 logit + u32 index) = $k\times8$ 字节。取 $k=50$：约 400 字节，相比 608 KB 减少约 1500×（与 argmax 的 4 字节同量级）。代价是 top-k kernel 本身的复杂度与一点额外计算，但对带宽/PCIe 受限的 decode 是大赢。
+
+</QA>
+
+</QAGroup>

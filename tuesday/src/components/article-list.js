@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { badges } from '../badges';
 import { getMdCommon, makeSlug, trimSlash } from '../utils';
+import { pages as xinferPages, pageHref } from './xinfer/manifest';
 
 const ArticleListWrapper = styled.div({
   'a[href]:not([class])': {
@@ -57,6 +58,21 @@ function renderContent(md) {
   } else {
     return <></>;
   }
+}
+
+function renderXinferSeries() {
+  return <React.Fragment key="xinfer-series">
+    <TitleLine>
+      <Title>从零构建 LLM 推理引擎</Title>
+    </TitleLine>
+    <ShortIntro>
+      <p>项目式教程：用 Rust + DirectML / D3D12 从零实现一个运行 Qwen2.5 的 LLM 推理引擎，覆盖 GPU kernel、KV cache、采样、优化与 Xbox GDK 部署。</p>
+    </ShortIntro>
+    <ul>
+      <li><a href="/xinfer/">教程首页与目录</a></li>
+      {xinferPages.map(p => <li key={p.slug}><a href={pageHref(p.slug)}>{p.title}</a></li>)}
+    </ul>
+  </React.Fragment>;
 }
 
 export default function ArticleList(props) {
@@ -135,7 +151,7 @@ export default function ArticleList(props) {
             </ul>
           </>
         }
-        return <ArticleListWrapper>{fragments}</ArticleListWrapper>;
+        return <ArticleListWrapper>{renderXinferSeries()}{fragments}</ArticleListWrapper>;
       }}
   />
 }

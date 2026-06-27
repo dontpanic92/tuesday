@@ -1,0 +1,187 @@
+import Layout from "../../components/xinfer/Layout";
+
+export default function Page(props) {
+  return <Layout slug="appendices">{props.children}</Layout>;
+}
+
+<h1>附录：数学、Rust、浮点、调试、术语与阅读清单</h1>
+
+<p className="subtitle">这一页不是线性章节，而是学习和做实验时随时查阅的参考资料。</p>
+
+<h2><span className="num">A</span>数学速查：点积、矩阵乘、softmax 稳定性</h2>
+
+<h3>点积</h3>
+
+$$
+a\cdot b = \sum_{i=0}^{d-1} a_i b_i
+$$
+
+点积衡量两个向量方向的相似度。Attention 的 score 就是 query 与 key 的缩放点积。
+
+<h3>矩阵乘 shape</h3>
+
+$$
+A\in\mathbb{R}^{M\times K},\quad
+B\in\mathbb{R}^{K\times N}
+\quad\Rightarrow\quad
+C=AB\in\mathbb{R}^{M\times N}
+$$
+
+$$
+C_{i,j}=\sum_{p=0}^{K-1}A_{i,p}B_{p,j}
+$$
+
+<h3>HuggingFace transposed-weight linear</h3>
+
+权重常存为`[out_features, in_features]`：
+
+$$
+Y = XW^\top,\qquad
+X\in\mathbb{R}^{S\times K},\quad
+W\in\mathbb{R}^{N\times K},\quad
+Y\in\mathbb{R}^{S\times N}
+$$
+
+<h3>稳定 softmax</h3>
+
+$$
+p_i = \frac{\exp(z_i-m)}{\sum_j\exp(z_j-m)},\qquad
+m=\max_j z_j
+$$
+
+减去最大值不改变结果，但能避免指数溢出。
+
+<h2><span className="num">B</span>Rust 系统编程与 FFI 速查</h2>
+
+<h3>Ownership 与 GPU 资源</h3>
+
+Rust ownership 很适合包装 GPU 资源：一个`DmlBuffer`可以拥有一个 COM resource handle； 当对象 drop 时，引用计数释放。需要注意的是 GPU 命令是异步的，不能在 GPU 尚未使用完资源时提前释放或重用。
+
+<h3><code>unsafe</code></h3>
+
+调用 D3D12 / DirectML / FFI 都会遇到`unsafe`。本教程的原则是：把`unsafe`封装在小范围内， 对外提供安全函数，并在注释中说明前置条件。
+
+<h3>C ABI</h3>
+
+```rust
+#[no_mangle]
+pub extern "C" fn xinfer_version() -> *const c_char {
+    ...
+}
+```
+
+C ABI 规则：
+
+- 不要让 panic 跨过 FFI 边界；
+- 用 opaque handle 隐藏 Rust 内部结构；
+- 用错误码返回状态，用`last_error`提供消息；
+- 谁分配，谁释放。
+
+<h3><code>bytemuck</code> 与 <code>half</code></h3>
+
+`bytemuck::cast_slice`用于把`&[f32]`视为`&[u8]`上传到 GPU。`half::f16`/`half::bf16`用于加载或转换半精度权重。
+
+<h2><span className="num">C</span>浮点：f32 / f16 / bf16、舍入与容差</h2>
+
+<table className="tbl">
+<thead><tr><th>格式</th><th>字节</th><th>特点</th><th>本项目用途</th></tr></thead>
+<tbody>
+<tr><td>f32</td><td className="num">4</td><td>精度较高，带宽占用大</td><td>CPU reference、activation</td></tr>
+<tr><td>f16</td><td className="num">2</td><td>尾数较少，显存减半</td><td>GPU weights</td></tr>
+<tr><td>bf16</td><td className="num">2</td><td>指数范围接近 f32，尾数更少</td><td>checkpoint dtype，加载时转换</td></tr>
+</tbody>
+</table>
+
+浮点加法不满足严格结合律：
+
+$$
+(a+b)+c \ne a+(b+c)\quad\text{in floating point}
+$$
+
+因此 CPU 与 GPU 归约顺序不同会导致微小差异。测试通常使用：
+
+$$
+\max_i |y_i^{gpu}-y_i^{cpu}| < \varepsilon
+$$
+
+<h2><span className="num">D</span>GPU 调试：PIX、D3D12 debug layer、device removed</h2>
+
+<h3>D3D12 debug layer</h3>
+
+Debug layer 可以发现资源状态错误、非法绑定、命令列表使用错误。开发 GPU backend 时应尽早打开。
+
+<h3>Device removed</h3>
+
+如果 GPU device 被移除或重置，D3D12 调用可能返回类似`0x887A0005`的 HRESULT。 调试步骤：
+
+1. 打开 debug layer；
+2. 调用`GetDeviceRemovedReason`；
+3. 隔离到最小 shape / 最小 kernel；
+4. 检查 resource states 与 bindings；
+5. 必要时绕开有问题的库 operator，改写 custom kernel。
+
+<h3>PIX</h3>
+
+PIX 是 Windows / Xbox 上的 GPU 捕获与分析工具。它可以查看 command list、resource state、shader、timing。 本教程正文不依赖 PIX，但生产级调试非常推荐使用。
+
+<h2><span className="num">E</span>术语表</h2>
+
+<table className="tbl">
+<thead><tr><th>术语</th><th>解释</th></tr></thead>
+<tbody>
+<tr><td>GEMM</td><td>General Matrix-Matrix Multiplication，矩阵乘 $C=AB$。</td></tr>
+<tr><td>GEMV</td><td>Matrix-Vector multiplication，decode 中常见的 $M=1$ 线性层。</td></tr>
+<tr><td>GQA</td><td>Grouped-Query Attention，多个 query heads 共享较少 KV heads。</td></tr>
+<tr><td>RoPE</td><td>Rotary Position Embedding，用旋转把位置信息注入 Q/K。</td></tr>
+<tr><td>SwiGLU</td><td>门控 MLP 激活：$\operatorname{SiLU}(gate)\odot up$。</td></tr>
+<tr><td>KV cache</td><td>缓存每层历史 token 的 K/V，避免重复计算。</td></tr>
+<tr><td>SRV</td><td>Shader Resource View，shader 只读资源视图。</td></tr>
+<tr><td>UAV</td><td>Unordered Access View，shader 可读写资源视图。</td></tr>
+<tr><td>LDS / groupshared</td><td>同一 threadgroup 内共享的高速内存。</td></tr>
+<tr><td>HAL</td><td>Hardware Abstraction Layer，把模型层与具体 backend 解耦。</td></tr>
+<tr><td>DXIL</td><td>DirectX Intermediate Language，DXC 生成的现代 shader IR。</td></tr>
+</tbody>
+</table>
+
+<h2><span className="num">F</span>仓库地图</h2>
+
+<table className="tbl">
+<thead><tr><th>路径</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td><code>crates/xinfer-core</code></td><td>基础类型、Qwen config、CPU reference ops。</td></tr>
+<tr><td><code>crates/xinfer-backend</code></td><td>HAL traits。</td></tr>
+<tr><td><code>crates/xinfer-dml</code></td><td>D3D12/DirectML backend、buffers、kernels、copy queue、timer。</td></tr>
+<tr><td><code>crates/xinfer-loader</code></td><td>config 与 safetensors 加载。</td></tr>
+<tr><td><code>crates/xinfer-model</code></td><td>Qwen2 CPU/GPU forward、KV cache、streaming。</td></tr>
+<tr><td><code>crates/xinfer-runtime</code></td><td>generation loop、sampling、GenerateStats。</td></tr>
+<tr><td><code>crates/xinfer-tokenizer</code></td><td>HF tokenizer wrapper 与 Qwen chat template。</td></tr>
+<tr><td><code>crates/xinfer-ffi</code></td><td>C ABI：staticlib/cdylib。</td></tr>
+<tr><td><code>crates/xinfer-cli</code></td><td>命令行入口。</td></tr>
+<tr><td><code>shaders/</code></td><td>HLSL kernels。</td></tr>
+<tr><td><code>xbox/</code></td><td>C++ GDK host 与构建脚本。</td></tr>
+<tr><td><code>generated/</code></td><td>教程材料、报告、本地生成输出。</td></tr>
+</tbody>
+</table>
+
+<h2><span className="num">G</span>阅读清单</h2>
+
+<h3>Transformer 与 LLM</h3>
+
+- Vaswani et al., “Attention Is All You Need”.
+- RoPE: “RoFormer: Enhanced Transformer with Rotary Position Embedding”.
+- Grouped-Query Attention / Multi-Query Attention 相关论文。
+- FlashAttention 系列论文。
+
+<h3>量化与推理系统</h3>
+
+- GGUF / llama.cpp quantization 文档。
+- weight-only quantization / GPTQ / AWQ 相关资料。
+- vLLM / paged attention 论文与工程文章。
+
+<h3>GPU / DirectX</h3>
+
+- Microsoft Direct3D 12 documentation。
+- HLSL reference。
+- DirectML documentation。
+- PIX on Windows documentation。
+- Microsoft GDK documentation。

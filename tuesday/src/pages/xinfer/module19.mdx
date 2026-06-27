@@ -1,0 +1,236 @@
+import Layout from "../../components/xinfer/Layout";
+
+export default function Page(props) {
+  return <Layout slug="module19">{props.children}</Layout>;
+}
+
+<h1>Module 19：Productionizing — 让项目可用、可测、可解释</h1>
+
+<p className="subtitle">从“能跑”走向“别人也能用”：结构化日志、统计指标、干净 CLI、可复现性、文档与开发者体验。</p>
+
+<Objectives>
+<ul>
+<li>理解 logging / tracing 在 GPU 推理系统中的作用。</li>
+<li>设计结构化 stats：prefill/decode 时间、tok/s、显存、KV cache。</li>
+<li>设计清晰 CLI：参数语义、默认值、错误信息、可复现 seed。</li>
+<li>理解 deterministic greedy 与随机采样的可复现性边界。</li>
+<li>知道一份 developer-facing README 应该包含哪些信息。</li>
+<li>完成 Lab 19：新增一个 metric 和一个 CLI flag，并写文档。</li>
+</ul>
+</Objectives>
+
+<h2><span className="num">19.1</span>Logging / tracing：让系统说话</h2>
+
+推理系统出现问题时，不能只靠“输出不对”来猜。你需要日志告诉你：模型加载了多久、用了多少显存、prompt 有多少 token、 prefill 多久、decode 多久、是否 hit EOS、是否使用 streaming。
+
+xinfer 使用 Rust 的`log`+`env_logger`。用户可以通过环境变量控制日志级别：
+
+```bash
+$env:RUST_LOG="info"
+xinfer generate --model models\Qwen2.5-0.5B-Instruct --prompt "Hello"
+```
+
+一个好的日志应满足：
+
+- 关键事件可见：load、prefill、decode、EOS；
+- 指标结构化：token 数、ms、tok/s、MiB；
+- 不泄漏敏感数据；
+- debug 级别能帮助开发，info 级别能帮助用户。
+
+<Diagram
+  caption={<><b>图 19-1：</b>日志和指标把内部状态暴露出来，帮助调试和比较。</>}
+  svg={`<svg width="820" height="310" viewBox="0 0 820 310" role="img" aria-label="logging and metrics pipeline">
+      <defs>
+        <marker id="m19a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.6}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#m19a)}
+      </style>
+      <rect x="55" y="85" width="145" height="65" rx="12" class="hi"/><text x="128" y="112" text-anchor="middle" class="txt">Runtime events</text><text x="128" y="133" text-anchor="middle" class="sm">load / prefill / decode</text>
+      <rect x="250" y="85" width="145" height="65" rx="12" class="box"/><text x="322" y="112" text-anchor="middle" class="txt">GenerateStats</text><text x="322" y="133" text-anchor="middle" class="sm">ms / tok/s</text>
+      <rect x="445" y="85" width="145" height="65" rx="12" class="box"/><text x="518" y="112" text-anchor="middle" class="txt">Memory stats</text><text x="518" y="133" text-anchor="middle" class="sm">weights / KV cache</text>
+      <rect x="640" y="85" width="125" height="65" rx="12" class="hot"/><text x="702" y="112" text-anchor="middle" class="txt">User output</text><text x="702" y="133" text-anchor="middle" class="sm">logs + summary</text>
+      <line x1="200" y1="118" x2="247" y2="118" class="edge"/>
+      <line x1="395" y1="118" x2="442" y2="118" class="edge"/>
+      <line x1="590" y1="118" x2="637" y2="118" class="edge"/>
+      <text x="410" y="230" text-anchor="middle" class="sm">Productionizing 的第一步：把不可见的状态变成可观察的指标。</text>
+    </svg>`}
+/>
+
+<h2><span className="num">19.2</span>结构化统计：GenerateStats 与 memory reporting</h2>
+
+xinfer 的 runtime 返回`GenerateStats`，记录：
+
+<table className="tbl">
+<thead><tr><th>字段</th><th>含义</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><code>prompt_tokens</code></td><td>prompt token 数</td><td>prefill 分母</td></tr>
+<tr><td><code>generated_tokens</code></td><td>生成 token 数</td><td>decode 分母</td></tr>
+<tr><td><code>prefill_ms</code></td><td>prefill 耗时</td><td>首 token 等待分析</td></tr>
+<tr><td><code>decode_ms</code></td><td>decode 循环耗时</td><td>持续生成速度</td></tr>
+</tbody>
+</table>
+
+CLI 根据这些字段计算：
+
+$$
+\text{prefill tok/s} = \frac{\text{prompt\_tokens}}{\text{prefill\_ms}/1000},
+\qquad
+\text{decode tok/s} = \frac{\text{generated\_tokens}}{\text{decode\_ms}/1000}
+$$
+
+模型侧还提供：
+
+- `resident_weight_bytes()`
+- `kv_cache_bytes(capacity)`
+- `is_streaming()`
+
+这些指标让用户能看到：当前运行到底占多少显存、是否在 streaming、decode 慢是模型计算还是 cache 变大。
+
+<h2><span className="num">19.3</span>干净 CLI：默认值、参数与错误信息</h2>
+
+一个教学项目也需要好用的 CLI。`xinfer generate`支持：
+
+```bash
+xinfer generate \
+  --model models\Qwen2.5-0.5B-Instruct \
+  --prompt "Explain gravity in one sentence." \
+  --max-tokens 64 \
+  --temperature 0.8 \
+  --top-k 40 \
+  --top-p 0.95 \
+  --seed 7 \
+  --stream-layers 4
+```
+
+好的 CLI 参数应满足：
+
+- 名字直接表达含义；
+- 默认值安全且有用；
+- 错误信息说明缺少哪个参数；
+- 可复现参数（seed、greedy）明确；
+- 性能/内存信息写到 stderr，生成文本写到 stdout，便于脚本处理。
+
+<Callout kind="note" tag="stdout / stderr 分离">
+
+生成文本属于程序“结果”，适合 stdout；日志、耗时、显存统计属于诊断信息，适合 stderr。 这样用户可以把生成文本重定向到文件，而不会混入 benchmark 信息。
+
+</Callout>
+
+<h2><span className="num">19.4</span>可复现性：seed 与 deterministic greedy</h2>
+
+Greedy decoding 是确定性的：同一模型、同一 prompt、同一实现，argmax 应该得到相同 token。 随机采样则需要 seed 才能复现。xinfer 使用一个简单 xorshift RNG，使 temperature/top-k/top-p 的实验可重复。
+
+但要注意：GPU 浮点计算在不同硬件、不同优化路径上可能有微小差异。对于生成任务，微小 logit 差异有时会改变采样结果。 因此性能报告应说明：
+
+- 硬件；
+- 模型；
+- 采样参数；
+- 是否 greedy；
+- commit / 版本。
+
+<h2><span className="num">19.5</span>Developer-facing README</h2>
+
+README 的目标不是“宣传”，而是让下一个开发者能快速判断：这个项目能做什么、怎么跑、怎么测、有什么限制。 xinfer 的 README 包含：
+
+- 项目目标和 highlights；
+- workspace layout；
+- requirements；
+- build / run / test 命令；
+- CLI 参数；
+- 性能与优化摘要；
+- Xbox GDK 路径；
+- limitations / future work。
+
+<Figure caption={<><b>图 19-2：</b>Productionizing 不是单一功能，而是一组让项目可用、可维护、可解释的工程能力。</>}>
+  <Chart
+    type={"radar"}
+    data={{
+      labels: ["Correctness", "Benchmark", "Logging", "CLI", "Docs", "Portability"],
+      datasets: [{
+        label: "production readiness",
+        data: [5, 4, 4, 4, 5, 4],
+        borderColor: "#1f6f78",
+        backgroundColor: "rgba(31,111,120,0.15)"
+      }]
+    }}
+    options={{
+      scales: {
+        r: {
+          min: 0,
+          max: 5,
+          ticks: { stepSize: 1 },
+          grid: { color: "#e3e1da" },
+          angleLines: { color: "#e3e1da" }
+        }
+      }
+    }}
+  />
+</Figure>
+
+<h2><span className="num">Lab 19</span>新增一个 metric 和一个 CLI flag</h2>
+
+选择一个你认为有价值的 metric 和一个 CLI flag，实现并写文档。例子：
+
+- metric：每 token 平均 decode ms；
+- metric：readback bytes/token；
+- metric：streaming slot count；
+- flag：`--json-stats`输出机器可读统计；
+- flag：`--no-stream`强制 resident；
+- flag：`--bench-only`不打印 token，仅测性能。
+
+验收要求：
+
+1. CLI help / README 说明新 flag；
+2. 新增 metric 不破坏 stdout/stderr 分离；
+3. 至少一个测试或手动验证命令；
+4. 说明这个 metric 对定位哪类问题有帮助。
+
+<QAGroup>
+
+### 思考与练习
+
+<QA question={<><span className="diff easy">基础</span>为什么日志和生成文本应该分流到 stderr / stdout？</>}>
+
+因为两者用途不同。生成的 token 文本是程序的“正式输出”，应走 stdout，便于管道传递、重定向到文件、被其他程序消费。日志/进度/调试信息是辅助信息，走 stderr，这样不会污染 stdout 的纯净输出。分流后用户可以`xinfer ... > out.txt`只保存文本，同时仍在终端看到日志。
+
+</QA>
+
+<QA question={<><span className="diff easy">基础</span>列出一个性能报告至少应包含的 5 个字段。</>}>
+
+①prefill 时间（ms）；②prefill token 数 / prefill tok/s；③decode tok/s（或每 token 平均延迟）；④生成 token 数；⑤显存占用（resident weight bytes，可加 KV cache bytes）。再加上模型名/精度、采样设置作为上下文更完整。xinfer 的`GenerateStats`即覆盖前几项。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>为什么同一个 seed 在非 greedy 采样下仍可能因硬件浮点差异导致输出不同？</>}>
+
+非 greedy 采样按概率分布抽样，而分布来自 logits → softmax。不同硬件/驱动/kernel 的浮点累加顺序不同，会让 logits 有微小差异；经过 softmax 与阈值（top-k/top-p 边界）放大后，某个 token 可能恰好被纳入或排除，或抽样时落在不同区间。即使 RNG seed 相同（消费的随机数序列一致），被作用的概率分布略有不同，就可能选出不同 token，并在自回归中逐步放大分歧。greedy 取 argmax 时只要不出现并列就更鲁棒。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>设计<code>--json-stats</code>的输出 schema。</>}>
+
+输出一行 JSON，便于机器解析，例如：
+
+`{ "model": "Qwen2.5-0.5B", "dtype": "f16", "prompt_tokens": 23, "generated_tokens": 64, "prefill_ms": 41.2, "prefill_tok_s": 558.0, "decode_tok_s": 30.9, "decode_ms_per_token": 32.4, "resident_weight_bytes": 988282880, "kv_cache_bytes": 1572864, "sampling": {"mode":"greedy","temperature":0.0,"top_k":0,"top_p":1.0}, "seed": 42 }`
+
+要点：字段名稳定、用数值类型而非字符串、把采样设置嵌套成对象、字节用整数、时间/吞吐分开。这样可直接喂给基准脚本聚合 mean/p95，或在 CI 里对回归告警。
+
+</QA>
+
+<QA question={<><span className="diff hard">挑战</span>实现一个 benchmark 模式，运行 N 次并报告 mean / p50 / p95 decode latency。</>}>
+
+实现：加`--bench N`标志。①先做 1–2 次 warmup（排除首次 kernel 编译/权重上传/缓存冷启动），不计入；②循环 N 次，每次用 GPU timestamp 或稳定计时器记录每个 decode token 的耗时，收集成一个延迟数组（可记录所有 token，或每次运行的平均 decode 延迟）；③统计：mean = 总和/数；p50/p95 = 把数组升序排序后取第 $\lceil0.50\cdot n\rceil$ 与 $\lceil0.95\cdot n\rceil$ 个分位值；④打印 mean、p50、p95（ms/token）及对应 tok/s。
+
+注意：固定 prompt、生成长度、采样设置与 seed；报告分位数而非仅均值，能揭示偶发卡顿（如提交/调度抖动）。可顺带输出 min/max 与样本数。这与 Module 15“先测量再优化”的方法论一致。
+
+</QA>
+
+</QAGroup>

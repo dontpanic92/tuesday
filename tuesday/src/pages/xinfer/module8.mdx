@@ -1,0 +1,283 @@
+import Layout from "../../components/xinfer/Layout";
+
+export default function Page(props) {
+  return <Layout slug="module8">{props.children}</Layout>;
+}
+
+<h1>Module 8：Backend 选择 — DirectML 与 Direct3D 12</h1>
+
+<p className="subtitle">理解 DirectML 能给我们什么、D3D12 要我们自己管理什么，以及为什么 xinfer 最终把核心 matmul 改成自写 HLSL kernel。</p>
+
+<Objectives>
+  <ul>
+        <li>区分 DirectML operator 与自写 HLSL compute kernel 的职责。</li>
+        <li>理解 DirectML operator 的生命周期：create → compile → initialize → bind → dispatch。</li>
+        <li>知道什么时候应该使用库算子，什么时候应写 custom kernel。</li>
+        <li>理解 RDNA4 / DirectML GEMM device-removal 案例对工程决策的启发。</li>
+        <li>理解 PC 上 DXGI device creation 与 Xbox 上 <code>D3D12XboxCreateDevice</code> 的区别。</li>
+      </ul>
+</Objectives>
+
+<h2><span className="num">8.1</span>DirectML 提供什么，我们自己写什么？</h2>
+
+DirectML 是 Windows / Xbox 生态中的机器学习算子 API。它提供诸如 GEMM、卷积、softmax、elementwise 等 operator。
+    但 DirectML 不是一个完整 LLM runtime：它不会帮你处理 tokenizer、Qwen2 tensor naming、KV cache、采样、layer streaming、
+    或者自定义 fused kernel。
+
+<table className="tbl">
+    <thead><tr><th>能力</th><th>DirectML operator</th><th>自写 HLSL kernel</th></tr></thead>
+    <tbody>
+      <tr><td>通用矩阵乘 / softmax</td><td>有现成 operator</td><td>可针对 shape 定制</td></tr>
+      <tr><td>RMSNorm / RoPE / SwiGLU</td><td>通常需要组合多个 operator</td><td>一个 kernel 直接实现</td></tr>
+      <tr><td>KV cache append</td><td>不是典型 ML operator</td><td>CopyBufferRegion 或专用 kernel</td></tr>
+      <tr><td>GPU argmax</td><td>可用 reduce 类 operator 或自写</td><td>简单、可控、少 readback</td></tr>
+      <tr><td>异常 shape / driver quirk</td><td>可能遇到黑盒问题</td><td>可绕开并调试</td></tr>
+    </tbody>
+  </table>
+
+xinfer 的策略是：使用 D3D12 作为资源和执行基础；DirectML 用于研究 operator 生命周期和部分实验；
+    关键 transformer 路径（linear、RMSNorm、RoPE、attention、SwiGLU、argmax）则使用自写 HLSL kernel。
+
+<Diagram
+  caption={<><b>图 8-1：</b>xinfer 的 backend 混合策略：D3D12 是底座，DirectML 与自写 HLSL 都是其上的执行路径。</>}
+  svg={`<svg width="820" height="340" viewBox="0 0 820 340" role="img" aria-label="DirectML vs HLSL custom kernels">
+      <defs>
+        <marker id="m8a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .dml{fill:#f3f0fb;stroke:#6b4fbb;stroke-width:1.6}
+        .hlsl{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.6}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#m8a)}
+      </style>
+      <rect x="45" y="52" width="165" height="70" rx="12" class="hot"/>
+      <text x="128" y="82" text-anchor="middle" class="txt">Qwen2 layer graph</text>
+      <text x="128" y="104" text-anchor="middle" class="sm">model/runtime</text>
+      <rect x="320" y="32" width="170" height="75" rx="12" class="dml"/>
+      <text x="405" y="62" text-anchor="middle" class="txt">DirectML operators</text>
+      <text x="405" y="84" text-anchor="middle" class="sm">create/compile/bind/dispatch</text>
+      <rect x="320" y="135" width="170" height="75" rx="12" class="hlsl"/>
+      <text x="405" y="165" text-anchor="middle" class="txt">Custom HLSL kernels</text>
+      <text x="405" y="187" text-anchor="middle" class="sm">linear/rms/rope/attn/argmax</text>
+      <rect x="610" y="85" width="150" height="84" rx="12" class="box"/>
+      <text x="685" y="116" text-anchor="middle" class="txt">D3D12 resources</text>
+      <text x="685" y="138" text-anchor="middle" class="sm">buffers, queues, fences</text>
+      <text x="685" y="156" text-anchor="middle" class="sm">barriers, root signatures</text>
+      <path d="M210 87 C260 70 275 68 317 68" class="edge"/>
+      <path d="M210 87 C260 145 275 170 317 172" class="edge"/>
+      <path d="M490 70 C545 75 562 105 607 112" class="edge"/>
+      <path d="M490 172 C545 165 562 145 607 138" class="edge"/>
+      <text x="410" y="275" text-anchor="middle" class="sm">DirectML 与 HLSL 都运行在 D3D12 资源和命令队列之上。</text>
+    </svg>`}
+/>
+
+<h2><span className="num">8.2</span>DirectML operator 生命周期</h2>
+
+DirectML operator 不是创建后立刻 dispatch。它有一个比较严格的生命周期：
+
+1. **Create：**用 operator descriptor 描述输入/输出 tensor shape、dtype、参数。
+2. **Compile：**把 operator 编译成可执行的 dispatchable。
+3. **Initialize：**有些 operator 需要 persistent / temporary resource 初始化。
+4. **Bind：**创建 binding table，把 input/output/temp/persistent buffer 绑定进去。
+5. **Dispatch：**通过 DML command recorder 把 operator 记录到 D3D12 command list。
+
+<Diagram
+  caption={<><b>图 8-2：</b>DirectML operator 的生命周期比普通 HLSL dispatch 更重。</>}
+  svg={`<svg width="820" height="270" viewBox="0 0 820 270" role="img" aria-label="DirectML operator lifecycle">
+      <defs>
+        <marker id="m8b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#m8b)}
+      </style>
+      <rect x="40" y="82" width="110" height="62" rx="12" class="box"/><text x="95" y="107" text-anchor="middle" class="txt">Create</text><text x="95" y="128" text-anchor="middle" class="sm">operator desc</text>
+      <rect x="190" y="82" width="110" height="62" rx="12" class="box"/><text x="245" y="107" text-anchor="middle" class="txt">Compile</text><text x="245" y="128" text-anchor="middle" class="sm">compiled op</text>
+      <rect x="340" y="82" width="120" height="62" rx="12" class="box"/><text x="400" y="107" text-anchor="middle" class="txt">Initialize</text><text x="400" y="128" text-anchor="middle" class="sm">persistent/temp</text>
+      <rect x="505" y="82" width="110" height="62" rx="12" class="box"/><text x="560" y="107" text-anchor="middle" class="txt">Bind</text><text x="560" y="128" text-anchor="middle" class="sm">binding table</text>
+      <rect x="655" y="82" width="120" height="62" rx="12" class="hi"/><text x="715" y="107" text-anchor="middle" class="txt">Dispatch</text><text x="715" y="128" text-anchor="middle" class="sm">command list</text>
+      <line x1="150" y1="113" x2="187" y2="113" class="edge"/>
+      <line x1="300" y1="113" x2="337" y2="113" class="edge"/>
+      <line x1="460" y1="113" x2="502" y2="113" class="edge"/>
+      <line x1="615" y1="113" x2="652" y2="113" class="edge"/>
+      <text x="410" y="205" text-anchor="middle" class="sm">xinfer 的 DmlOperator 把这些步骤封装起来，便于复用和测试。</text>
+    </svg>`}
+/>
+
+这套流程适合“成熟的通用 operator”。但如果你需要 fuse 多个小算子，或处理特殊 layout，自写 HLSL 往往更直接。
+
+<h2><span className="num">8.3</span>什么时候用 DML operator，什么时候写 custom kernel？</h2>
+
+一个实用判断标准是：如果 operator 足够通用、shape 大、库实现可靠，优先考虑库；如果需要特殊布局、融合、轻量控制或绕开 driver 问题，
+    就写自定义 kernel。
+
+<table className="tbl">
+    <thead><tr><th>情况</th><th>倾向</th><th>原因</th></tr></thead>
+    <tbody>
+      <tr><td>大 GEMM，库实现稳定</td><td>DML / vendor lib</td><td>库可能有高度优化的 tiling</td></tr>
+      <tr><td>RMSNorm / RoPE</td><td>HLSL</td><td>组合 DML operator 会产生多次 dispatch / 中间 buffer</td></tr>
+      <tr><td>KV cache append</td><td>D3D12 copy 或 HLSL</td><td>更像内存操作，不是典型 ML op</td></tr>
+      <tr><td>f16 packed weights / custom layout</td><td>HLSL</td><td>需要手动解包和 coalesced 访问</td></tr>
+      <tr><td>driver / device removed</td><td>HLSL</td><td>黑盒 operator 不可控，自写路径可调试</td></tr>
+    </tbody>
+  </table>
+
+<h2><span className="num">8.4</span>案例：DirectML GEMM 与 RDNA4 device-removal</h2>
+
+本项目最重要的 backend 决策来自一个真实问题：在 AMD RX 9070 XT（RDNA4）上，DirectML 的 GEMM operator
+    对某些 shape 会触发 device removed（HRESULT `0x887A0005`）。例如 $M=5,K=64,N=32$ 的 GEMM 会失败。
+
+<Callout kind="warn" tag="调试观察">
+
+D3D12 debug layer 输出过 “CreateMetaCommand parameters are not supported” 警告，说明 DirectML 的 metacommand 路径不可用，
+    回退路径在该驱动/shape 上有问题。自写 HLSL matmul 则正常工作。
+
+</Callout>
+
+这迫使我们把 matmul 改成 custom HLSL kernel。后来我们进一步优化它：f16 权重、coalesced GEMV、groupshared reduction、
+    2D dispatch grid、GPU argmax。这个案例有两个教学价值：
+
+1. 库 operator 不是“数学正确就一定可靠”；实际系统会受 driver、硬件、shape、dtype 影响。
+2. 拥有自写 kernel 能力后，你可以绕开黑盒故障，并做针对模型 shape 的优化。
+
+<Figure caption={<><b>图 8-3：</b>本项目从 DML GEMM 转向 custom HLSL matmul 后，最终获得了更高可靠性和更好性能。</>}>
+  <Chart
+    type="bar"
+    data={{
+          labels: ["DML GEMM baseline", "Custom HLSL matmul", "f16 + coalesced GEMV", "GPU argmax path"],
+          datasets: [
+            {
+              label: "可靠性 / 可控性（示意）",
+              data: [2, 4, 4.5, 5],
+              backgroundColor: ["#b8531a", "#1f6f78", "#6b4fbb", "#2e7d4f"]
+            }
+          ]
+        }}
+    options={{
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, max: 5, title: { display: true, text: "相对评分（示意）" }, grid: { color: "#e3e1da" } },
+            x: { grid: { display: false } }
+          }
+        }}
+  />
+</Figure>
+
+<h2><span className="num">8.5</span>Device creation：PC 上 DXGI，Xbox 上 GDK</h2>
+
+在 Windows PC 上，我们通常通过 DXGI 枚举 adapter，然后用 `D3D12CreateDevice` 创建设备。
+    在 Xbox console 上，DXGI 不可用，设备由 GDK host 通过 `D3D12XboxCreateDevice` 创建。
+
+因此 xinfer 的 Rust core 支持两条 device path：
+
+<table className="tbl">
+    <thead><tr><th>平台</th><th>设备来源</th><th>Rust core 如何获得 device</th></tr></thead>
+    <tbody>
+      <tr><td>Windows PC</td><td>DXGI adapter → <code>D3D12CreateDevice</code></td><td><code>DmlDevice::new(false)</code></td></tr>
+      <tr><td>Xbox GDK</td><td>C++ host → <code>D3D12XboxCreateDevice</code></td><td><code>xinfer_create_with_device</code> 注入 raw COM pointers</td></tr>
+    </tbody>
+  </table>
+
+<Diagram
+  caption={<><b>图 8-4：</b>PC 与 Xbox 的设备创建路径不同，但进入 Rust core 后都变成同一个 D3D12/DirectML backend。</>}
+  svg={`<svg width="820" height="300" viewBox="0 0 820 300" role="img" aria-label="PC vs Xbox device creation">
+      <defs>
+        <marker id="m8c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.6}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#m8c)}
+      </style>
+      <text x="205" y="34" text-anchor="middle" class="txt">Windows PC</text>
+      <rect x="55" y="70" width="120" height="58" rx="10" class="box"/><text x="115" y="95" text-anchor="middle" class="txt">DXGI</text><text x="115" y="116" text-anchor="middle" class="sm">adapter</text>
+      <rect x="220" y="70" width="140" height="58" rx="10" class="hi"/><text x="290" y="95" text-anchor="middle" class="txt">D3D12 device</text><text x="290" y="116" text-anchor="middle" class="sm">Rust creates</text>
+      <line x1="175" y1="99" x2="217" y2="99" class="edge"/>
+
+      <text x="615" y="34" text-anchor="middle" class="txt">Xbox GDK</text>
+      <rect x="470" y="70" width="145" height="58" rx="10" class="hot"/><text x="542" y="95" text-anchor="middle" class="txt">C++ GDK host</text><text x="542" y="116" text-anchor="middle" class="sm">D3D12XboxCreateDevice</text>
+      <rect x="660" y="70" width="120" height="58" rx="10" class="hi"/><text x="720" y="95" text-anchor="middle" class="txt">Rust core</text><text x="720" y="116" text-anchor="middle" class="sm">device injection</text>
+      <line x1="615" y1="99" x2="657" y2="99" class="edge"/>
+
+      <rect x="265" y="190" width="290" height="64" rx="12" class="box"/>
+      <text x="410" y="216" text-anchor="middle" class="txt">DirectML device on top of ID3D12Device</text>
+      <text x="410" y="238" text-anchor="middle" class="sm">模型 / runtime 不关心 device 来自 DXGI 还是 GDK</text>
+      <path d="M290 128 C290 160 355 170 390 187" class="edge"/>
+      <path d="M720 128 C720 160 500 170 430 187" class="edge"/>
+    </svg>`}
+/>
+
+<h2><span className="num">Lab 8</span>DirectML GEMM 与自写 kernel 的对比实验</h2>
+
+本实验建议分两步做。第一步：运行一个 DirectML GEMM，与 CPU reference 对比，理解 operator 生命周期。
+    第二步：尝试一个已知可能触发 device-removal 的 shape，观察错误，并用自写 HLSL matmul 路径绕开。
+
+```bash
+# 运行 DML / HLSL 相关测试
+cargo test -p xinfer-dml --test gemm_smoke
+cargo test -p xinfer-dml --test linear
+
+# 观察 D3D12 debug layer / device removed reason 的输出（如有）
+```
+
+实验报告应回答：
+
+1. DML GEMM operator 需要哪些 descriptor 和 binding？
+2. CPU reference 如何计算同一个结果？误差阈值应该怎么设？
+3. 如果 device removed，如何用 D3D12 debug layer 和 `GetDeviceRemovedReason` 缩小问题范围？
+4. 为什么自写 HLSL kernel 可以绕开该问题？它牺牲了什么，又获得了什么？
+
+<QAGroup>
+
+### 思考与练习
+
+<QA question={<><span className="diff easy">基础</span>列出 DirectML operator 的五个生命周期阶段。</>}>
+
+① create（按 desc 创建 operator）；② compile（编译成可执行的 compiled operator）；③ initialize（运行 initializer，分配/填充 persistent 资源）；④ bind（绑定输入/输出/temporary/persistent buffer 到 binding table）；⑤ execute（录制到命令列表并提交执行）。xinfer 的 `DmlOperator` 封装正是这五步。
+
+</QA>
+
+<QA question={<><span className="diff easy">基础</span>解释 SRV/UAV/temp/persistent buffer 在 DML binding 中的角色。</>}>
+
+SRV（只读输入，如权重/激活）；UAV（可写输出）；temporary buffer 是算子执行期间的临时工作区（execute 后内容无意义，可复用）；persistent buffer 在 initialize 时填充、execute 时反复读取（如某些算子预处理后的常量），生命周期跨多次 execute，需一直保留。绑定时要按算子要求的大小分别提供。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>为什么 RMSNorm 更适合写成 custom kernel，而不是组合多个 DML operator？</>}>
+
+用 DML 拼 RMSNorm 需要 square→reduce-mean→rsqrt→broadcast-mul→scale 等多个算子，每步都把整行激活写回显存再读出，产生大量中间往返与多次 dispatch。写成一个 custom HLSL kernel 可在 groupshared 内一次完成归约并就地缩放，省去中间 buffer 与多次提交，延迟更低；而且能和后续算子融合。对 decode（seq=1）这种延迟敏感场景收益尤其明显。
+
+</QA>
+
+<QA question={<><span className="diff mid">进阶</span>解释 PC 和 Xbox device creation 的关键差异。</>}>
+
+PC 走 DXGI：枚举 adapter，用 `D3D12CreateDevice` 创建设备。Xbox 主机没有 DXGI，用专用入口 `D3D12XboxCreateDevice`（带主机特定参数），并使用固定的主机 GPU。xinfer 的应对是把设备创建抽到外部，提供 `DmlDevice::from_existing/from_raw_pointers` 让宿主创建好 `ID3D12Device`+queue 后注入引擎，从而同一套 Rust 核心同时支持 PC 与 Xbox。
+
+</QA>
+
+<QA question={<><span className="diff hard">挑战</span>为一个新算子制定决策：用 DML 还是 HLSL？写出你考虑的 shape、dtype、融合、debug 风险。</>}>
+
+<span className="label">用 DML 当：</span>算子是标准操作（GEMM、softmax、卷积），shape 常规且 DML 有高度优化实现，dtype 受支持，无需特殊融合。省去手写与调试。
+
+<span className="label">用 HLSL 当：</span>① 算子 DML 没有或语义不符（RMSNorm、RoPE、SwiGLU、KV append）；② 需要算子融合减少往返（如 silu(gate)*up、bias 融入 matmul 尾段）；③ 某些 shape/dtype 在该硬件上触发 DML bug——本项目就遇到 DML GEMM 在 RDNA4 特定 shape 下移除设备（0x887A0005），只能改用 custom matmul。
+
+<span className="label">风险权衡：</span>shape（异常/小 batch 是否触发 DML 慢路径或 bug）、dtype（f16 解包是否需要自己处理）、融合（能否显著减少 dispatch）、debug（custom kernel 需自己写 CPU 参考 + parity 测试，成本更高但可控）。结论：能用 DML 就用，遇到缺失/融合/硬件 bug 才落到 HLSL，并配 parity 测试守护正确性。
+
+</QA>
+
+</QAGroup>
