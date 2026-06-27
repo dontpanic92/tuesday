@@ -5,5 +5,10 @@
     "gatsby-theme-apollo-core",
     "gatsby-theme-apollo-docs",
     "tuesday"
-  ]
+  ],
+  "resolutions": {
+    "lodash": "^4.18.1",
+    "immutable": "^3.8.3",
+    "path-to-regexp": "0.1.13"
+  }
 }

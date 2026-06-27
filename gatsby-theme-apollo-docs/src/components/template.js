@@ -1,7 +1,6 @@
 import CodeBlock from './code-block';
 import CustomSEO from './custom-seo';
 import Footer from './footer';
-import MDXRenderer from 'gatsby-plugin-mdx/mdx-renderer';
 import PageContent from './page-content';
 import PageHeader from './page-header';
 import PropTypes from 'prop-types';
@@ -11,7 +10,6 @@ import styled from '@emotion/styled';
 import {ContentWrapper, colors, smallCaps, NavHeight} from 'gatsby-theme-apollo-core';
 import {Global} from '@emotion/react';
 import {HEADER_HEIGHT} from '../utils';
-import {MDXProvider} from '@mdx-js/react';
 import {graphql, navigate} from 'gatsby';
 
 const StyledContentWrapper = styled(ContentWrapper)({
@@ -150,8 +148,7 @@ const renderAst = new rehypeReact({
 export default function Template(props) {
   const {hash, pathname} = props.location;
   const {file, site} = props.data;
-  const {frontmatter, headings, fields} =
-    file.childMarkdownRemark || file.childMdx;
+  const {frontmatter, headings, fields} = file.childMarkdownRemark;
   const {title, description} = site.siteMetadata;
   const {
     sidebarContents,
@@ -207,13 +204,7 @@ export default function Template(props) {
               baseUrl
             }}
           >
-            {file.childMdx ? (
-              <MDXProvider components={components}>
-                <MDXRenderer>{file.childMdx.body}</MDXRenderer>
-              </MDXProvider>
-            ) : (
-              renderAst(file.childMarkdownRemark.htmlAst)
-            )}
+            {renderAst(file.childMarkdownRemark.htmlAst)}
           </CustomLinkContext.Provider>
         </PageContent>
         <Footer />
@@ -258,26 +249,6 @@ export const pageQuery = graphql`
           apiReference
         }
         htmlAst
-      }
-      childMdx {
-        frontmatter {
-          title
-          description
-          featuredImage {
-            childImageSharp {
-              gatsbyImageData
-            }
-          }
-        }
-        headings {
-          value
-          depth
-        }
-        fields {
-          image
-          apiReference
-        }
-        body
       }
     }
   }

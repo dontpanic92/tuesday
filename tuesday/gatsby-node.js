@@ -3,10 +3,29 @@ const { execSync } = require('child_process');
 const { getMdCommon, trimSlash, makeSlug } = require('./src/utils');
 const { badges } = require('./src/badges');
 
+function isPandocAvailable() {
+  try {
+    execSync(process.platform === 'win32' ? 'where pandoc' : 'command -v pandoc', {
+      stdio: 'ignore',
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 exports.createPages = async (
   { actions, graphql },
 ) => {
   generate_readme(graphql);
+
+  if (!isPandocAvailable()) {
+    console.warn(
+      "[tuesday] pandoc not found on PATH - skipping PDF generation. " +
+      "PDFs are produced in CI where pandoc/texlive are installed."
+    );
+    return;
+  }
 
   for (let title in articles) {
     if (articles[title].pdf === false) {
@@ -25,31 +44,22 @@ exports.createPages = async (
 async function generate_readme(graphql) {
   const { data } = await graphql(`
   {
-    allFile(filter: {sourceInstanceName: {eq: "content"}, extension: {in: ["md", "mdx"]}}) {
+    allFile(filter: {sourceInstanceName: {eq: "content"}, extension: {in: ["md"]}}) {
       edges {
         node {
-        id
-        relativePath
-        childMarkdownRemark {
-            fields {
-              slug
+          id
+          relativePath
+          childMarkdownRemark {
+              fields {
+                slug
+              }
+              frontmatter {
+                title
+                badges
+              }
+              html
             }
-            frontmatter {
-              title
-              badges
-            }
-            html
           }
-          childMdx {
-            fields {
-              slug
-            }
-            frontmatter {
-              title
-            }
-            body
-          }
-        }
       }
     }
   }

@@ -35,7 +35,7 @@ async function onCreateNode(
     });
   }
 
-  if (['MarkdownRemark', 'Mdx'].includes(node.internal.type)) {
+  if (['MarkdownRemark'].includes(node.internal.type)) {
     const parent = getNode(node.parent);
     let version = localVersion || defaultVersion;
     let slug = createFilePath({
@@ -122,7 +122,7 @@ async function onCreateNode(
 exports.onCreateNode = onCreateNode;
 
 function getPageFromEdge({node}) {
-  return node.childMarkdownRemark || node.childMdx;
+  return node.childMarkdownRemark;
 }
 
 function getSidebarContents(sidebarCategories, edges, version, dirPattern) {
@@ -227,15 +227,12 @@ exports.createPages = async (
 ) => {
   const {data} = await graphql(`
     {
-      allFile(filter: {sourceInstanceName: {eq: "content"}, extension: {in: ["md", "mdx"]}}) {
+      allFile(filter: {sourceInstanceName: {eq: "content"}, extension: {in: ["md"]}}) {
         edges {
           node {
             id
             relativePath
             childMarkdownRemark {
-              ${pageFragment}
-            }
-            childMdx {
               ${pageFragment}
             }
           }

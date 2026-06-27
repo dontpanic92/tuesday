@@ -3,8 +3,6 @@ import styled from '@emotion/styled';
 import { StaticQuery, graphql } from "gatsby"
 import { colors } from 'gatsby-theme-apollo-core';
 import { articles } from '../articles';
-import { MDXProvider } from '@mdx-js/react';
-import { MDXRenderer } from 'gatsby-plugin-mdx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { badges } from '../badges';
@@ -56,8 +54,6 @@ const Icon = styled(FontAwesomeIcon)({
 function renderContent(md) {
   if (!!md.html) {
     return <ShortIntro dangerouslySetInnerHTML={{ __html: md.html }} />;
-  } else if (!!md.body) {
-    return <ShortIntro><MDXProvider><MDXRenderer>{md.body}</MDXRenderer></MDXProvider></ShortIntro>;
   } else {
     return <></>;
   }
@@ -67,7 +63,7 @@ export default function ArticleList(props) {
   return <StaticQuery
     query={graphql`
         query Articles {
-            allFile(filter: {sourceInstanceName: {eq: "content"}, extension: {in: ["md", "mdx"]}}) {
+            allFile(filter: {sourceInstanceName: {eq: "content"}, extension: {in: ["md"]}}) {
             edges {
                 node {
                 id
@@ -81,15 +77,6 @@ export default function ArticleList(props) {
                       badges
                     }
                     html
-                  }
-                  childMdx {
-                    fields {
-                      slug
-                    }
-                    frontmatter {
-                      title
-                    }
-                    body
                   }
                 }
             }

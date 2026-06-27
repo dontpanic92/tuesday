@@ -1,5 +1,5 @@
 exports.getMdCommon = (x) => {
-    return x.childMarkdownRemark || x.childMdx
+    return x.childMarkdownRemark
 }
 
 exports.trimSlash = trimSlash;

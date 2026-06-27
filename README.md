@@ -16,6 +16,9 @@
  </li><li>
 <a href='https://tuesday.dontpanic.blog/xgx-research/2-fmb'>二、打包格式 FMB</a>
             <img src=https://img.shields.io/badge/轩辕剑伍-9c645a?style=flat-square />  <img src=https://img.shields.io/badge/轩辕剑汉之云-2e3a10?style=flat-square />  <img src=https://img.shields.io/badge/轩辕剑云之遥-c8f7ff?style=flat-square />
+ </li><li>
+<a href='https://tuesday.dontpanic.blog/xgx-research/3-imd'>三、打包格式 IMD</a>
+            <img src=https://img.shields.io/badge/轩辕剑伍-9c645a?style=flat-square />  <img src=https://img.shields.io/badge/轩辕剑汉之云-2e3a10?style=flat-square />  <img src=https://img.shields.io/badge/轩辕剑云之遥-c8f7ff?style=flat-square />
  </li>
 </ul>
 
