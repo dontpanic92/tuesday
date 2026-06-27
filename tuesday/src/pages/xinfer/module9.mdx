@@ -20,9 +20,9 @@ export default function Page(props) {
 
 <h2><span className="num">9.1</span>为什么先搭 Cargo workspace？</h2>
 
-一个 LLM 推理引擎不是单个文件能承载的。即使我们从最小原型开始，也很快会遇到模型数学、GPU backend、权重加载、 tokenizer、runtime、CLI、Xbox host 等不同关注点。如果不在第一天就划清边界，后续每个模块都会互相缠在一起。
+LLM 推理引擎同时包含数值计算、GPU backend、权重加载、tokenizer、runtime、CLI 与平台接入等职责。Phase 0 的首要任务是为这些职责建立稳定的 Cargo workspace 边界，而非扩大功能面。这样做可以使模型层、backend 层和用户入口各自演进，避免后续在同一组文件中交叉修改。
 
-因此 Phase 0 的第一步是创建 Cargo workspace，并把未来会变化的部分分成多个 crate：
+xinfer 的实际 workspace 包含 9 个 crate：`xinfer-core`、`xinfer-backend`、`xinfer-dml`、`xinfer-loader`、`xinfer-model`、`xinfer-tokenizer`、`xinfer-runtime`、`xinfer-ffi`、`xinfer-cli`。下表列出 Phase 0 直接涉及的主要边界及其后续职责：
 
 <table className="tbl">
 <thead><tr><th>Crate</th><th>Phase 0 中的角色</th><th>未来扩展</th></tr></thead>
@@ -39,7 +39,7 @@ export default function Page(props) {
 
 <Callout kind="note" tag="工程原则">
 
-Phase 0 不追求功能完整，而追求“边界正确”。只要边界正确，后续每个 phase 都可以局部扩展，而不是重写整个项目。
+Phase 0 的验收重点是边界清楚、最小链路可运行。后续 phase 应在既有 crate 内扩展，而不是因早期边界混乱而重写目录结构。
 
 </Callout>
 
@@ -69,7 +69,7 @@ Phase 0 不追求功能完整，而追求“边界正确”。只要边界正确
 
 <h2><span className="num">9.2</span>创建 D3D12 + DirectML device</h2>
 
-第一条真正的 GPU 路径是 device creation。PC 上通常通过 DXGI 枚举 adapter，选择支持 D3D12 的硬件 adapter， 然后创建 `ID3D12Device`。DirectML device 再建立在这个 D3D12 device 之上。
+GPU backend 的入口是 device creation。`xinfer-dml` 中的 `DmlDevice::new(false)` 通过 DXGI 创建 factory，枚举非 software adapter，用 `D3D12CreateDevice` 检查并创建 `ID3D12Device`，再创建 direct command queue。DirectML 的 `IDMLDevice` 由 `DMLCreateDevice` 建立在同一个 D3D12 device 之上。
 
 Phase 0 的关键步骤可以概括为：
 
@@ -118,17 +118,17 @@ cargo run -p xinfer-cli -- device
 
 # 期望输出
 D3D12 + DirectML device created.
-Adapter: AMD Radeon RX 9070 XT
+Adapter: <name>
 ```
 
 <h2><span className="num">9.3</span>第一个 DirectML GEMM 与第一个 HLSL kernel</h2>
 
-Device 能创建不代表计算正确。Phase 0 还需要两个计算 smoke tests：
+Device 能创建只说明对象链可用，不能说明命令提交、资源绑定或数值计算正确。Phase 0 还需要两个计算 smoke tests：
 
-- **DirectML GEMM：**验证 DirectML operator create/compile/init/bind/dispatch 全链路。
-- **Custom HLSL affine：**验证我们能编译并 dispatch 自己写的 compute shader。
+- DirectML GEMM：验证 operator create、compile、initialize、bind、dispatch 全链路。
+- Custom HLSL affine：验证 FXC 编译、root signature、root constants、SRV/UAV root descriptors 与 dispatch 路径。
 
-<h3>GEMM 的 CPU reference</h3>
+### GEMM 的 CPU reference
 
 对矩阵 $A\in\mathbb{R}^{M\times K}$、$B\in\mathbb{R}^{K\times N}$，GEMM 输出：
 
@@ -136,21 +136,21 @@ $$
 C_{i,j}=\sum_{p=0}^{K-1}A_{i,p}B_{p,j}
 $$
 
-GPU 输出必须与 CPU reference 在容差内一致：
+`crates\xinfer-dml\tests\gemm_smoke.rs` 使用 $M=4,K=3,N=5$ 的小矩阵，把 `gemm_f32` 的输出与三重循环 CPU reference 比较。GPU 输出必须与 CPU reference 在容差内一致：
 
 $$
 \max_{i,j}|C^{\text{gpu}}_{i,j}-C^{\text{cpu}}_{i,j}| < \varepsilon
 $$
 
-<h3>Affine kernel</h3>
+### Affine kernel
 
-自写 HLSL kernel 选择一个极简单的函数：
+自写 HLSL kernel 使用 `shaders\affine.hlsl`，计算下面的逐元素函数：
 
 $$
 y_i = 2x_i + 1
 $$
 
-简单并不意味着没价值。这个 kernel 证明了 root signature、pipeline state、root constants、SRV/UAV 绑定、dispatch、 readback 的最小路径全部可用。后续 RMSNorm、RoPE、SwiGLU、attention 都是从这条路径扩展出来的。
+该 kernel 的价值在于覆盖完整的 custom-kernel 路径：`ComputeKernel::new` 编译 shader 并创建 root signature 与 PSO；`affine_kernel` 上传输入、分配输出、记录 dispatch、等待 fence、下载结果；`compute_smoke.rs` 逐元素验证 `out[i]=in[i]*2+1`。后续 RMSNorm、RoPE、SwiGLU 与 attention 都沿用这条执行路径。
 
 <Figure caption={<><b>图 9-3：</b>Phase 0 的三个门槛：能创建设备、能跑库算子、能跑自写 kernel。</>}>
   <Chart
@@ -175,7 +175,7 @@ $$
 
 <h2><span className="num">9.4</span>Smoke test 的设计原则</h2>
 
-Phase 0 的测试不应该复杂，但必须能覆盖关键风险：
+Phase 0 的测试规模应小，但每个测试必须覆盖一个明确风险：
 
 <table className="tbl">
 <thead><tr><th>测试</th><th>覆盖风险</th><th>失败时优先检查</th></tr></thead>
@@ -189,13 +189,13 @@ Phase 0 的测试不应该复杂，但必须能覆盖关键风险：
 
 <Callout kind="note" tag="Phase 0 的核心心态">
 
-不要一开始就写完整 transformer。先让最小 GPU 计算闭环成立：上传 → dispatch → readback → verify。 这个闭环可靠后，后面的复杂 kernel 才有调试基础。
+完整 transformer 依赖多个尚未验证的子系统。Phase 0 先建立最小 GPU 计算闭环：上传 → dispatch → readback → verify。这个闭环可靠后，复杂 kernel 的错误才能被定位到具体算子或数据布局。
 
 </Callout>
 
 <h2><span className="num">Lab 9</span>站起工作区，通过 GEMM 与 compute smoke tests</h2>
 
-本实验要求从一个空目录或 starter branch 开始，复现 Phase 0。
+本实验要求从空目录或 starter branch 复现 Phase 0。验收标准是 workspace 可构建、device 命令可打印 adapter、GEMM 与 affine kernel 均能通过 CPU/GPU 对比。
 
 1. 创建 Cargo workspace 和主要 crate 目录。
 2. 实现 `xinfer-core` 中的 `DType`、`Shape`、错误类型。
@@ -212,24 +212,25 @@ cargo test -p xinfer-dml --test gemm_smoke
 cargo test -p xinfer-dml --test compute_smoke
 ```
 
+<h2><span className="num">小结</span></h2>
+
+Module 9 建立 xinfer 的工程起点：Cargo workspace 划分 crate 职责，`DmlDevice` 完成 D3D12 + DirectML 对象链创建，DirectML GEMM 与 `affine.hlsl` 分别验证库算子路径和 custom compute path。Phase 0 的核心产物是可重复验证的 GPU 闭环；完整模型会在后续阶段建立在这个闭环之上。
+
 <QAGroup>
 
 ### 思考与练习
 
 <QA question={<><span className="diff easy">基础</span>为什么 Phase 0 不直接实现 transformer，而先实现 affine kernel？</>}>
 
-因为要先打通最小可行管线（device 创建、buffer 分配/上传/下载、kernel 编译/dispatch、fence 同步、结果 readback），并验证它正确。affine kernel（`out=a*in+b`）极简，能在不引入复杂数值的情况下确认整条 GPU 路径可用。若直接上 transformer，一旦出错很难分清是管线 bug 还是模型逻辑 bug。先立“地基”再盖楼。
+因为要先打通最小可行管线：device 创建、buffer 分配/上传/下载、kernel 编译/dispatch、fence 同步和结果 readback。affine kernel（本阶段为 `out[i]=2*in[i]+1`）不引入复杂数值问题，适合确认整条 GPU 路径可用。若直接实现 transformer，错误来源会同时包含管线、shape、权重布局和模型逻辑。
 
 </QA>
 
-<details className="qa">
-<summary><span className="diff easy">基础</span>GEMM 中 $M,K,N$ 分别代表什么？</summary>
-<div className="answer">
+<QA question={<><span className="diff easy">基础</span>GEMM 中 $M,K,N$ 分别代表什么？</>}>
 
 $C_{M\times N}=A_{M\times K}\cdot B_{K\times N}$。$M$ 是输出行数（如序列长度/batch），$K$ 是被求和消去的内积维（contraction，如 in_features），$N$ 是输出列数（如 out_features）。decode 时 $M=1$（GEMV），prefill 时 $M=$ 序列长度。
 
-</div>
-</details>
+</QA>
 
 <QA question={<><span className="diff mid">进阶</span>如果 CPU/GPU GEMM 结果不一致，列出三个可能原因。</>}>
 

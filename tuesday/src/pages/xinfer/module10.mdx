@@ -21,9 +21,9 @@ export default function Page(props) {
 
 <h2><span className="num">10.1</span>为什么需要 HAL？</h2>
 
-如果 `xinfer-model` 直接操作 `ID3D12Resource`、root signature、descriptor heap， 那模型代码就会和 Direct3D 12 绑死。将来如果要换 Vulkan backend、接 Xbox host-created device、 或者只想写 CPU reference，都会被平台细节污染。
+如果 `xinfer-model` 直接操作 `ID3D12Resource`、root signature 和 descriptor heap，模型代码会被 Direct3D 12 的对象生命周期、资源状态和绑定规则占据。后续接入 Xbox host-created device、尝试其他 backend，或在测试中使用 CPU reference，都会被平台细节牵连。
 
-HAL（Hardware Abstraction Layer）的思想是：模型层只依赖一个小接口，接口背后可以是 D3D12/DirectML、 Vulkan、Metal，甚至 CPU fallback。
+HAL（Hardware Abstraction Layer）的作用是给模型层提供较小且稳定的能力接口。模型层依赖 `Device` / `Buffer` 等 trait；D3D12/DirectML、未来的其他 backend 或 CPU fallback 负责实现这些 trait。
 
 $$
 \text{Model} \rightarrow \text{HAL traits} \rightarrow \text{Backend implementation}
@@ -75,7 +75,7 @@ $$
 
 <h2><span className="num">10.2</span><code>Device</code> / <code>Buffer</code> trait 的最小设计</h2>
 
-Phase 1 中，HAL 的最小接口很小：一个 buffer 能告诉你自己的字节数；一个 device 能分配、上传、下载 buffer。 这看似简单，但已经足够支撑后续的权重加载、activation buffer、中间结果和 readback。
+Phase 1 中，`xinfer-backend` 的最小接口保持克制：`Buffer` 只暴露字节数；`Device` 负责分配、上传和下载 buffer。这个接口已经足以支撑权重加载、activation buffer、中间结果和 readback，同时不泄露 D3D12 类型。
 
 ```rust
 pub trait Buffer {
@@ -107,15 +107,15 @@ D3D12 的资源有显式状态：同一个 buffer 在不同时间可能是 `COPY
 
 ```rust
 pub struct DmlBuffer {
-    resource: ID3D12Resource,
-    size: u64,
-    shape: Shape,
-    dtype: DType,
+    pub resource: ID3D12Resource,
+    pub size: u64,
+    pub shape: Shape,
+    pub dtype: DType,
     state: Cell<D3D12_RESOURCE_STATES>,
 }
 ```
 
-当某个 kernel 需要把 buffer 作为 SRV 读取时，它调用 `ensure_state(..., NON_PIXEL_SHADER_RESOURCE)`； 当作为 UAV 写入时，调用 `ensure_state(..., UNORDERED_ACCESS)`。如果当前状态已经正确，就不发 barrier； 否则记录 transition barrier 并更新状态。
+当 custom kernel 需要把 buffer 作为 SRV 读取时，`ComputeKernel::dispatch_grid` 会调用 `ensure_state(..., NON_PIXEL_SHADER_RESOURCE)`；作为 UAV 写入时调用 `ensure_state(..., UNORDERED_ACCESS)`。`download_buffer` 会把源 buffer 转到 `COPY_SOURCE`，`upload_buffer` 则先在 default heap 中创建 `COPY_DEST`，拷贝后转为 `UNORDERED_ACCESS`。如果当前状态已经匹配，`ensure_state` 不记录 barrier；否则写入 transition barrier 并更新状态。
 
 <Diagram
   caption={<><b>图 10-2：</b>一个 buffer 在上传、读取、写入之间需要显式状态转换。</>}
@@ -151,9 +151,9 @@ pub struct DmlBuffer {
 
 <h2><span className="num">10.4</span>One-shot Executor：封装 command list + fence</h2>
 
-D3D12 提交命令需要多个对象配合：command allocator、command list、command queue、fence、event。 如果每个调用点都手写这些细节，代码会非常重复，也容易忘记 reset 或 wait。
+D3D12 提交命令需要 command allocator、command list、command queue、fence 和 event 协同工作。若每个调用点都直接操作这些对象，代码会重复，并且容易遗漏 close、signal、wait 或 reset。
 
-Phase 1 中我们把它封装成 `Executor`：
+`crates\xinfer-dml\src\resource.rs` 将它们封装为 `Executor`：
 
 ```rust
 let mut exec = dev.executor()?;
@@ -162,7 +162,7 @@ exec.submit_and_wait()?;
 exec.reset()?;
 ```
 
-后续优化中，这个 executor 还支持 `uav_barrier()`，从而把一个 decoder layer 的多个 dispatch 记录进同一个 command list，再一次提交。
+`Executor::submit_and_wait` 关闭 command list、提交到 queue、递增 fence 并阻塞等待完成；`reset` 复用 allocator 和 list；`uav_barrier` 用于在同一 command list 中排序相互依赖的 UAV 写读。后续把一个 decoder layer 的多个 dispatch 合并提交时，这个封装是关键基础。
 
 <Diagram
   caption={<><b>图 10-3：</b>Executor 把 D3D12 命令提交的样板代码收拢起来。</>}
@@ -193,12 +193,12 @@ exec.reset()?;
 
 <h2><span className="num">10.5</span>通用 DirectML operator wrapper 与 compute-kernel path</h2>
 
-Phase 1 中有两条执行路径：
+Phase 1 中保留两条执行路径，分别服务于 DirectML 已提供的 operator 和项目自写 kernel：
 
 - `DmlOperator`：封装 DirectML operator 的 create / compile / initialize / bind / dispatch。
 - `ComputeKernel`：封装自写 HLSL compute shader 的 root signature / PSO / root descriptors / dispatch。
 
-二者都记录到 D3D12 command list，但资源绑定方式不同。自写 kernel 的 root descriptors 更简单，也让后续“一个 layer 多个 dispatch 批量提交”更容易。
+二者都向 D3D12 command list 记录工作，但绑定方式不同。`DmlOperator` 需要 DirectML binding table、temporary resource 与 persistent resource；`ComputeKernel` 使用 root constants 以及 SRV/UAV root descriptors，适合 RMSNorm、RoPE、SwiGLU、attention 等自写 HLSL kernel。
 
 <table className="tbl">
 <thead><tr><th>路径</th><th>适合</th><th>主要封装</th></tr></thead>
@@ -210,7 +210,7 @@ Phase 1 中有两条执行路径：
 
 <h2><span className="num">10.6</span>GPU timestamp profiling</h2>
 
-CPU 侧计时包含提交、等待、调度等开销。若想知道某段 GPU 工作本身花了多久，需要 GPU timestamp query。 D3D12 的 timestamp 大致流程是：
+CPU wall-clock 包含命令提交、驱动调度、queue 排队和等待开销。若要测量一段 GPU 工作本身的耗时，需要在 command stream 中写 timestamp query。`GpuTimer` 的实现包含两个 query、一段 readback buffer，并使用 command queue 的 timestamp frequency 换算毫秒。D3D12 timestamp 的基本流程是：
 
 1. 创建 timestamp query heap；
 2. 在 command list 中写 begin timestamp；
@@ -227,13 +227,13 @@ $$
 
 <Callout kind="warn" tag="测量纪律">
 
-优化前必须先测量。不要凭感觉判断瓶颈。xinfer 后来的优化证明：最大的瓶颈一开始不是 matmul 本身，而是过多 GPU submission 和 logits readback。
+性能优化应以测量结果为依据。xinfer 后续优化显示，早期主要瓶颈并非单个 matmul，而是过多 GPU submission 和 logits readback。GPU timestamp 能把这类问题从推测转化为可比较的数据。
 
 </Callout>
 
 <h2><span className="num">Lab 10</span>实现 upload / download + GPU timer</h2>
 
-本实验对应 Phase 1。你需要实现 buffer round-trip 和一个最小 GPU timer。
+本实验对应 Phase 1。目标是通过 HAL 完成 buffer round-trip，并用 GPU timestamp 测量一段已记录的 GPU 工作。
 
 1. 实现 `DmlDevice::alloc_buffer`。
 2. 实现 `DmlDevice::upload_buffer`：用 upload heap → default heap。
@@ -249,6 +249,10 @@ cargo test -p xinfer-dml --test hal
 buffer_roundtrip ... ok
 gpu_timer_reports_nonnegative ... ok
 ```
+
+<h2><span className="num">小结</span></h2>
+
+Module 10 将 Phase 0 的 GPU 闭环提升为 HAL：`xinfer-backend` 定义 `Device` / `Buffer` trait，`xinfer-dml` 以 `DmlBuffer` 跟踪 D3D12 resource state，以 `Executor` 统一 command list 与 fence，以 `DmlOperator` 和 `ComputeKernel` 分别封装 DirectML operator 与 HLSL kernel。`GpuTimer` 提供 GPU 侧时间戳，为后续定位 submission、readback 和 kernel 耗时奠定基础。
 
 <QAGroup>
 

@@ -17,8 +17,8 @@ export default function Index(props) {
   <span className="part-badge">教程首页</span>
   <h1>从零构建 LLM 推理引擎</h1>
   <p className="subtitle">
-    项目式教程：构建 <strong>xinfer</strong> — 一个 Rust + DirectML / D3D12 的
-    自写 LLM 推理引擎，运行 Qwen2.5，并理解 GPU kernel、KV cache、采样、优化与 Xbox GDK 部署。
+    本教程以 <strong>xinfer</strong> 为对象，说明如何用 Rust、DirectML 与 D3D12
+    实现一个可运行 Qwen2.5 的 LLM 推理引擎，并覆盖 GPU kernel、KV cache、采样、性能优化与 Xbox GDK 部署。
   </p>
 </section>
 
@@ -30,68 +30,68 @@ export default function Index(props) {
 <section className="toc-part">
   <h2>Part 0 — Tutorial Orientation</h2>
   <ul className="toc-list">
-    <li><span className="modno">Part 0</span><div><a href="/xinfer/part0">教程导论：我们要从零构建什么？</a><p>教程目标、无黑盒哲学、工具链、crate 图、Lab 0。</p></div></li>
+    <li><span className="modno">Part 0</span><div><a href="/xinfer/part0">教程导论：我们要从零构建什么？</a><p>定义教程目标、实现边界、工具链、crate 依赖关系与 Lab 0。</p></div></li>
   </ul>
 </section>
 
 <section className="toc-part">
   <h2>Part I — Foundations: Large Language Models</h2>
   <ul className="toc-list">
-    <li><span className="modno">Module 1</span><div><a href="/xinfer/module1">从 n-gram 到 Transformer</a><p>next-token prediction、logits、n-gram 局限、attention 直觉、decoder-only 总览。</p></div></li>
-    <li><span className="modno">Module 2</span><div><a href="/xinfer/module2">Transformer Block：算子逐个看</a><p>RMSNorm、linear、attention、GQA、RoPE、SwiGLU、LM head 的数学与 shape。</p></div></li>
-    <li><span className="modno">Module 3</span><div><a href="/xinfer/module3">自回归生成、KV Cache 与采样</a><p>prefill/decode、KV cache、sampling、tokenizer、chat template、吞吐指标。</p></div></li>
+    <li><span className="modno">Module 1</span><div><a href="/xinfer/module1">从 n-gram 到 Transformer</a><p>从 next-token prediction 与 logits 出发，说明 n-gram 的限制、attention 机制与 decoder-only 结构。</p></div></li>
+    <li><span className="modno">Module 2</span><div><a href="/xinfer/module2">Transformer Block：算子逐个看</a><p>给出 RMSNorm、linear、attention、GQA、RoPE、SwiGLU 与 LM head 的 shape 约定和计算式。</p></div></li>
+    <li><span className="modno">Module 3</span><div><a href="/xinfer/module3">自回归生成、KV Cache 与采样</a><p>分析 prefill/decode 流程、KV cache 的作用、sampling 策略、tokenizer、chat template 与吞吐指标。</p></div></li>
   </ul>
 </section>
 
 <section className="toc-part">
   <h2>Part II — Foundations: GPU Compute & Shaders</h2>
   <ul className="toc-list">
-    <li><span className="modno">Module 4</span><div><a href="/xinfer/module4">为什么需要 GPU，什么是 Shader？</a><p>CPU/GPU 模型、SIMT、内存层次、coalescing、dispatch grid、roofline。</p></div></li>
-    <li><span className="modno">Module 5</span><div><a href="/xinfer/module5">GPU Compute API 版图</a><p>CUDA、Vulkan、Metal、OpenCL、D3D12+DirectML 的取舍与 HAL 动机。</p></div></li>
-    <li><span className="modno">Module 6</span><div><a href="/xinfer/module6">HLSL 与 Direct3D 12 编程模型</a><p>HLSL compute、资源类型、groupshared、FXC/DXC、D3D12 对象、barriers、root signature。</p></div></li>
+    <li><span className="modno">Module 4</span><div><a href="/xinfer/module4">为什么需要 GPU，什么是 Shader？</a><p>介绍 CPU/GPU 执行模型、SIMT、内存层次、coalescing、dispatch grid 与 roofline 分析。</p></div></li>
+    <li><span className="modno">Module 5</span><div><a href="/xinfer/module5">GPU Compute API 版图</a><p>比较 CUDA、Vulkan、Metal、OpenCL 与 D3D12+DirectML，并说明 HAL 的设计动机。</p></div></li>
+    <li><span className="modno">Module 6</span><div><a href="/xinfer/module6">HLSL 与 Direct3D 12 编程模型</a><p>说明 HLSL compute、资源类型、groupshared memory、DXC、D3D12 对象、barriers 与 root signature。</p></div></li>
   </ul>
 </section>
 
 <section className="toc-part">
   <h2>Part III — The Concrete Candidates</h2>
   <ul className="toc-list">
-    <li><span className="modno">Module 7</span><div><a href="/xinfer/module7">Qwen2 / Qwen2.5 模型</a><p>config.json、Qwen 特性、safetensors、dtype、模型尺寸与显存估算。</p></div></li>
-    <li><span className="modno">Module 8</span><div><a href="/xinfer/module8">DirectML 与 Direct3D 12 Backend</a><p>DirectML operator 生命周期、自写 HLSL kernel、RDNA4 GEMM 故障、PC/Xbox device creation。</p></div></li>
+    <li><span className="modno">Module 7</span><div><a href="/xinfer/module7">Qwen2 / Qwen2.5 模型</a><p>读取 config.json、safetensors 与 dtype 信息，建立 Qwen2/Qwen2.5 的模型尺寸和显存估算方法。</p></div></li>
+    <li><span className="modno">Module 8</span><div><a href="/xinfer/module8">DirectML 与 Direct3D 12 Backend</a><p>讨论 DirectML operator 生命周期、HLSL kernel、RDNA4 GEMM device removed 问题，以及 PC/Xbox device creation。</p></div></li>
   </ul>
 </section>
 
 <section className="toc-part">
   <h2>Part IV — Implementation: Building xinfer</h2>
   <ul className="toc-list">
-    <li><span className="modno">Module 9</span><div><a href="/xinfer/module9">Phase 0：项目脚手架与 Backend Bring-up</a><p>Cargo workspace、D3D12+DML device、第一个 GEMM 与 affine kernel。</p></div></li>
-    <li><span className="modno">Module 10</span><div><a href="/xinfer/module10">Phase 1：硬件抽象层 HAL</a><p>Device/Buffer traits、状态跟踪 buffer、Executor、operator/kernel wrapper、GPU timer。</p></div></li>
-    <li><span className="modno">Module 11</span><div><a href="/xinfer/module11">Phase 2：Transformer Ops as Kernels</a><p>CPU reference、RMSNorm/RoPE/SwiGLU/add/GQA attention、matmul、parity 测试。</p></div></li>
-    <li><span className="modno">Module 12</span><div><a href="/xinfer/module12">Phase 3：组装 Qwen2 模型</a><p>权重命名、CPU/GPU forward、debug layer、device removed、custom matmul。</p></div></li>
-    <li><span className="modno">Module 13</span><div><a href="/xinfer/module13">Phase 4：Runtime、KV Cache、Decode 与 Sampling</a><p>per-layer KV cache、prefill/decode、samplers、tokenizer、第一次真实 demo。</p></div></li>
-    <li><span className="modno">Module 14</span><div><a href="/xinfer/module14">Phase 5：Layer Streaming</a><p>大于 VRAM 的模型、copy queue、staging、double-buffering、cross-queue state。</p></div></li>
+    <li><span className="modno">Module 9</span><div><a href="/xinfer/module9">Phase 0：项目脚手架与 Backend Bring-up</a><p>建立 Cargo workspace，初始化 D3D12/DirectML device，并实现 GEMM 与 affine kernel 的最小路径。</p></div></li>
+    <li><span className="modno">Module 10</span><div><a href="/xinfer/module10">Phase 1：硬件抽象层 HAL</a><p>定义 Device/Buffer traits、buffer 状态跟踪、Executor、operator/kernel wrapper 与 GPU timer。</p></div></li>
+    <li><span className="modno">Module 11</span><div><a href="/xinfer/module11">Phase 2：Transformer Ops as Kernels</a><p>为 RMSNorm、RoPE、SwiGLU、add、GQA attention 与 matmul 建立 CPU reference、GPU kernel 和 parity 测试。</p></div></li>
+    <li><span className="modno">Module 12</span><div><a href="/xinfer/module12">Phase 3：组装 Qwen2 模型</a><p>处理权重命名、CPU/GPU forward、debug layer、device removed 诊断与 custom matmul 接入。</p></div></li>
+    <li><span className="modno">Module 13</span><div><a href="/xinfer/module13">Phase 4：Runtime、KV Cache、Decode 与 Sampling</a><p>实现 per-layer KV cache、prefill/decode、samplers、tokenizer 集成与端到端生成示例。</p></div></li>
+    <li><span className="modno">Module 14</span><div><a href="/xinfer/module14">Phase 5：Layer Streaming</a><p>说明模型权重超过 VRAM 时的 copy queue、staging、double-buffering 与 cross-queue state 管理。</p></div></li>
   </ul>
 </section>
 
 <section className="toc-part">
   <h2>Part V — Performance Engineering</h2>
   <ul className="toc-list">
-    <li><span className="modno">Module 15</span><div><a href="/xinfer/module15">先测量，再优化</a><p>benchmark、prefill/decode tok/s、memory reporting、bottleneck 分类、regression gate。</p></div></li>
-    <li><span className="modno">Module 16</span><div><a href="/xinfer/module16">六层优化案例</a><p>batching、f16、coalesced GEMV、single-pass attention、cooperative RMSNorm、GPU argmax。</p></div></li>
-    <li><span className="modno">Module 17</span><div><a href="/xinfer/module17">高级优化方向</a><p>量化、tiled GEMM、fused epilogues、GPU sampling、speculative decoding、paged KV。</p></div></li>
+    <li><span className="modno">Module 15</span><div><a href="/xinfer/module15">先测量，再优化</a><p>建立 benchmark、prefill/decode tok/s、memory reporting、bottleneck 分类与 regression gate。</p></div></li>
+    <li><span className="modno">Module 16</span><div><a href="/xinfer/module16">六层优化案例</a><p>分析 batching、f16 权重、coalesced GEMV、single-pass attention、cooperative RMSNorm 与 GPU argmax。</p></div></li>
+    <li><span className="modno">Module 17</span><div><a href="/xinfer/module17">高级优化方向</a><p>概述量化、tiled GEMM、fused epilogues、GPU sampling、speculative decoding 与 paged KV。</p></div></li>
   </ul>
 </section>
 
 <section className="toc-part">
   <h2>Part VI — Portability & Deployment</h2>
   <ul className="toc-list">
-    <li><span className="modno">Module 18</span><div><a href="/xinfer/module18">Xbox GDK 部署路径</a><p>Rust C ABI staticlib、C++ GDK host、device injection、ctypes 与 GDK desktop 验证。</p></div></li>
-    <li><span className="modno">Module 19</span><div><a href="/xinfer/module19">Productionizing</a><p>logging/tracing、GenerateStats、memory reporting、CLI、reproducibility、README。</p></div></li>
+    <li><span className="modno">Module 18</span><div><a href="/xinfer/module18">Xbox GDK 部署路径</a><p>说明 Rust C ABI staticlib、C++ GDK host、device injection、ctypes 验证与 GDK desktop 流程。</p></div></li>
+    <li><span className="modno">Module 19</span><div><a href="/xinfer/module19">Productionizing</a><p>整理 logging/tracing、GenerateStats、memory reporting、CLI、reproducibility 与 README 要求。</p></div></li>
   </ul>
 </section>
 
 <section className="toc-part">
   <h2>Appendices</h2>
   <ul className="toc-list">
-    <li><span className="modno">A–G</span><div><a href="/xinfer/appendices">附录：数学、Rust、浮点、调试、术语与阅读清单</a><p>点积、matmul、softmax、FFI、f32/f16/bf16、PIX、D3D12 debug layer、术语表、仓库地图。</p></div></li>
+    <li><span className="modno">A–G</span><div><a href="/xinfer/appendices">附录：数学、Rust、浮点、调试、术语与阅读清单</a><p>提供点积、matmul、softmax、FFI、f32/f16/bf16、PIX、D3D12 debug layer、术语表与仓库地图速查。</p></div></li>
   </ul>
 </section>

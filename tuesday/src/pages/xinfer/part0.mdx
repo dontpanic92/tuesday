@@ -19,17 +19,13 @@ export default function Page(props) {
 
 <h2><span className="num">0.1</span>我们正在构建什么，为什么值得构建？</h2>
 
-大语言模型（Large Language Model, LLM）在用户看来像一个会对话的程序；但在系统工程师看来，
-    它是一个非常大的、反复执行的数值计算图。给定一串 token，模型输出下一 token 的概率分布；
-    把这个过程循环起来，就得到文本生成。
+大语言模型（Large Language Model, LLM）的基本行为可以精确描述：输入一串 token，输出一个长度等于词表大小的向量，其中每个分量表示对应 token 作为下一个 token 的得分。将选出的 token 追加到输入末尾并重新计算，即可逐 token 生成文本。
 
-本教程的目标不是“调用一个现成 API”，而是构建一个能阅读、能调试、能优化的推理引擎：
-    **从 tokenizer 到 KV cache，从 Qwen2 权重加载到 HLSL compute shader，从 Windows PC 到 Xbox GDK 的 C++ host**。
+现成的推理 API 能够直接完成这一过程，但同时隐藏了其内部实现。本教程从零实现一个完整的推理引擎，覆盖 tokenizer 分词、Qwen2.5 权重加载、矩阵乘法在 GPU 上的计算，以及 KV cache 的作用；实现深入到 HLSL compute shader 一层，并使同一份核心代码既可运行于 Windows PC，也可运行于 Xbox 的 C++ host。该引擎即本教程的最终产物，命名为 `xinfer`。
 
 <Callout kind="def" tag="定义：推理（Inference）">
 
-在本教程中，推理指的是：加载已经训练好的模型权重，然后对输入 token 执行前向计算，得到下一 token 的分布。
-    我们不训练模型，也不计算梯度；我们只关心如何**正确、快速、可移植**地运行它。
+在本教程中，推理特指以下过程：加载训练完成的权重，对输入 token 执行一次前向计算，得到下一个 token 的分布。推理不涉及训练、梯度计算与优化器，关注点在于如何**正确、高效且可移植地**运行模型。
 
 </Callout>
 
@@ -83,16 +79,14 @@ $$
 
 <h2><span className="num">0.2</span>“无黑盒”哲学：为什么不用现成运行时？</h2>
 
-工业界有许多成熟推理运行时，例如 ONNX Runtime、TensorRT、llama.cpp、vLLM。它们非常实用，
-    但对教学来说会把很多关键知识封装起来。你可以调用它们，却不一定知道：
+ONNX Runtime、TensorRT、llama.cpp、vLLM 等成熟运行时在生产环境中表现良好，但它们将最具学习价值的实现细节封装在 API 之后。调用一句 `session.run()` 即可得到结果，却难以回答以下问题：
 
-- 一个 attention head 的 $QK^\top$ 究竟怎样访问内存？
-- 为什么 decode 阶段常常是 GEMV 而不是 GEMM？
-- 为什么一次 608 KB 的 logits readback 会拖慢每个 token？
-- 为什么同样的数学公式在 GPU 上需要 threadgroup、barrier、资源状态？
+- 一个 attention head 在计算 $QK^\top$ 时如何访问显存？
+- 为什么 decode 阶段的矩阵乘是 GEMV，而 prefill 阶段是 GEMM？
+- 为什么每个 token 都需要将约 608 KB 的 logits 从显存读回内存，且这一步足以拖慢整条流水线？
+- 同一个 softmax 公式在 GPU 上为何涉及 threadgroup、barrier 与资源状态？
 
-因此，本教程选择“可解释优先”：我们不调用 ONNX Runtime，也不把 matmul 交给 cuBLAS。
-    我们会亲手实现 HLSL kernel，并在每一步用 CPU reference 做 correctness oracle。
+xinfer 采用相反的原则：核心计算路径不依赖现成库。矩阵乘法不调用 cuBLAS，算子不调用 ONNX Runtime，而是以 HLSL kernel 逐一实现；每个 kernel 均以一份 CPU 实现作为正确性基准（correctness oracle）进行对拍，数值一致后再继续。
 
 <Callout kind="warn" tag="工程现实">
 
@@ -103,9 +97,7 @@ $$
 
 <h2><span className="num">0.3</span>工具与环境：从第一天能跑起来开始</h2>
 
-教程使用 Windows + DirectML / Direct3D 12 作为主要 GPU backend。原因是 Direct3D 12 是 Windows
-    和 Xbox 的共同底层图形/计算 API；DirectML 可以与 D3D12 资源协同工作；Rust 通过 `windows`
-    crate 可以直接调用这些 COM API。
+主 GPU backend 选用 Windows 上的 Direct3D 12 + DirectML，原因如下：D3D12 是 Windows 与 Xbox 共用的底层图形/计算 API，同一份代码可在两个平台复用；DirectML 的算子可直接使用 D3D12 资源；Rust 通过官方 `windows` crate 即可调用这些 COM 接口，无需额外的 C++ 胶水层。
 
 <table className="tbl">
     <thead><tr><th>组件</th><th>用途</th><th>本教程中的位置</th></tr></thead>
@@ -131,7 +123,7 @@ $$
 \operatorname{bytes}(W) = m\cdot n\cdot 4
 $$
 
-换成 f16 后，公式中的 4 变成 2。因此同样的权重矩阵显存和带宽需求大约减半。
+改用 f16 后，每个元素由 4 字节降为 2 字节，显存与带宽需求约减半。这也是 xinfer 将权重与 LM head 均存为 f16 的原因：Qwen2.5-0.5B 的全部权重因此约为 942 MiB，可完整驻留显存。
 
 <Figure caption={<><b>图 0-2：</b>教程项目推进路线：先保证正确，再测量，再优化。</>}>
   <Chart
@@ -202,14 +194,14 @@ $$
 
 Lab 0 的目标非常朴素：确认你的开发环境可以构建项目、找到 DirectML GPU、运行测试。
 
-<h3>步骤 1：构建工作区</h3>
+### 步骤 1：构建工作区
 
 ```text
 # 在仓库根目录执行
 cargo build
 ```
 
-<h3>步骤 2：确认 GPU backend 可用</h3>
+### 步骤 2：确认 GPU backend 可用
 
 ```bash
 cargo run -p xinfer-cli -- device
@@ -222,7 +214,7 @@ D3D12 + DirectML device created.
 Adapter: AMD Radeon RX 9070 XT
 ```
 
-<h3>步骤 3：运行测试</h3>
+### 步骤 3：运行测试
 
 ```bash
 cargo test
@@ -259,8 +251,7 @@ $$
 
 <h2><span className="num">小结</span></h2>
 
-Part 0 的重点不是让你立刻懂 transformer 的全部细节，而是建立一张地图：我们要构建的系统是什么、为什么要亲手构建、
-    用哪些工具、代码怎样组织、第一步怎样跑起来。后面的 Part I 会从语言模型的基本概念开始。
+本章建立了全局认识：最终目标是一个可运行 Qwen2.5 的推理引擎 `xinfer`；选择自行实现 kernel 而非依赖现成运行时，是为了暴露并掌握核心计算路径；crate 的划分与依赖方向遵循“上层依赖抽象、底层处理平台”的原则；Lab 0 通过 `cargo build` 与 `cargo test` 验证了开发环境。Transformer 内部算子的细节将从下一章 Part I 开始逐一展开。
 
 <QAGroup>
 
