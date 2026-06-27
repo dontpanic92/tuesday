@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Part IV · Module 11 — Phase 2：Transformer Ops as Kernels｜从零构建 LLM 推理引擎</title>
+  <link rel="stylesheet" href="assets/textbook.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script defer src="assets/textbook.js"></script>
+</head>
+<body>
+<main class="page">
+  <div class="coursemark">
+    <span>Building an LLM Inference Engine from Scratch</span>
+    <span>Part IV / Module 11</span>
+  </div>
+
+  <span class="part-badge">Part IV · Implementation</span>
+  <h1>Module 11：Phase 2 — 把 Transformer 算子写成 Kernel</h1>
+  <p class="subtitle">CPU reference 先行：RMSNorm、RoPE、SwiGLU、Residual Add、GQA Attention、Matmul 的 GPU kernel 与数值校验。</p>
+
+  <section class="objectives">
+    <h4>学习目标</h4>
+    <ul>
+      <li>理解为什么每个 GPU kernel 都要先有 CPU reference 作为 correctness oracle。</li>
+      <li>能把 RMSNorm、RoPE、SwiGLU、residual add、GQA attention 拆成可测试的输入/输出 shape。</li>
+      <li>理解 matmul / transposed-weight linear 的 shape 约定，以及为什么后来改成 custom HLSL matmul。</li>
+      <li>理解数值误差来源：浮点舍入、归约顺序、f16 权重、softmax 稳定性。</li>
+      <li>完成 Lab 11：实现 kernel 并通过 GPU-vs-CPU parity tests。</li>
+    </ul>
+  </section>
+
+  <h2><span class="num">11.1</span>CPU reference first：正确性 oracle</h2>
+
+  <p>
+    写 GPU kernel 最危险的地方是：它可能“看起来能跑”，但数值悄悄错了。调试 GPU 输出比调试 CPU 函数困难得多，
+    因此每个 kernel 都要先有一个简单、清晰、慢但可信的 CPU reference。
+  </p>
+
+  <p>
+    在 xinfer 中，CPU reference 放在 <code>xinfer_core::cpu</code>，采用统一 layout：
+  </p>
+
+  <ul>
+    <li>hidden states：<code>[seq, hidden]</code></li>
+    <li>Q：<code>[seq_q, n_heads, head_dim]</code></li>
+    <li>K/V：<code>[seq_k, n_kv_heads, head_dim]</code></li>
+  </ul>
+
+  <p>
+    每个 GPU kernel 的测试都遵循同一个结构：
+  </p>
+
+  \[
+    \text{input} \xrightarrow{\text{CPU reference}} y_{\text{cpu}},
+    \qquad
+    \text{input} \xrightarrow{\text{GPU kernel}} y_{\text{gpu}},
+    \qquad
+    \lVert y_{\text{gpu}}-y_{\text{cpu}}\rVert_\infty < \varepsilon
+  \]
+
+  <figure class="fig-card">
+    <svg width="820" height="300" viewBox="0 0 820 300" role="img" aria-label="CPU reference and GPU kernel parity testing">
+      <defs>
+        <marker id="p11a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.5}
+        .hi{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .hot{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.6}
+        .txt{font-family:sans-serif;font-size:14px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:12px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2.2;fill:none;marker-end:url(#p11a)}
+      </style>
+      <rect x="55" y="112" width="120" height="58" rx="10" class="hi"/>
+      <text x="115" y="137" text-anchor="middle" class="txt">Test input</text>
+      <text x="115" y="158" text-anchor="middle" class="sm">deterministic tensors</text>
+      <rect x="260" y="55" width="145" height="58" rx="10" class="box"/>
+      <text x="332" y="80" text-anchor="middle" class="txt">CPU reference</text>
+      <text x="332" y="101" text-anchor="middle" class="sm">simple loops</text>
+      <rect x="260" y="175" width="145" height="58" rx="10" class="box"/>
+      <text x="332" y="200" text-anchor="middle" class="txt">GPU kernel</text>
+      <text x="332" y="221" text-anchor="middle" class="sm">HLSL dispatch</text>
+      <rect x="505" y="112" width="135" height="58" rx="10" class="hot"/>
+      <text x="572" y="137" text-anchor="middle" class="txt">Compare</text>
+      <text x="572" y="158" text-anchor="middle" class="sm">max abs diff</text>
+      <rect x="690" y="112" width="90" height="58" rx="10" class="hi"/>
+      <text x="735" y="137" text-anchor="middle" class="txt">Pass?</text>
+      <text x="735" y="158" text-anchor="middle" class="sm">ε tolerance</text>
+      <path d="M175 141 C210 141 220 84 257 84" class="edge"/>
+      <path d="M175 141 C210 141 220 204 257 204" class="edge"/>
+      <path d="M405 84 C455 84 460 128 502 132" class="edge"/>
+      <path d="M405 204 C455 204 460 156 502 150" class="edge"/>
+      <line x1="640" y1="141" x2="687" y2="141" class="edge"/>
+      <text x="410" y="270" text-anchor="middle" class="sm">CPU reference 不追求快；它追求简单、可信、容易审查。</text>
+    </svg>
+    <figcaption><b>图 11-1：</b>每个 GPU kernel 都要通过 CPU reference 的数值校验。</figcaption>
+  </figure>
+
+  <h2><span class="num">11.2</span>HLSL kernels：逐个算子落地</h2>
+
+  <p>
+    Phase 2 中，我们把 Module 2 的数学算子逐个写成 HLSL kernel。每个 kernel 的设计都要回答三个问题：
+    输入/输出 shape 是什么？每个 thread 或 threadgroup 负责哪部分数据？需要哪些同步？
+  </p>
+
+  <table class="tbl">
+    <thead><tr><th>算子</th><th>数学定义</th><th>GPU 切分方式</th><th>文件</th></tr></thead>
+    <tbody>
+      <tr><td>RMSNorm</td><td>\(x/\sqrt{\operatorname{mean}(x^2)+\varepsilon}\cdot g\)</td><td>每行一个 threadgroup，组内归约</td><td><code>rms_norm.hlsl</code></td></tr>
+      <tr><td>RoPE</td><td>二维旋转</td><td>每个 (token, head) 一个 thread</td><td><code>rope.hlsl</code></td></tr>
+      <tr><td>SwiGLU</td><td>\(\operatorname{SiLU}(g)\odot u\)</td><td>每个元素一个 thread</td><td><code>swiglu.hlsl</code></td></tr>
+      <tr><td>Residual Add</td><td>\(a+b\)</td><td>每个元素一个 thread</td><td><code>add.hlsl</code></td></tr>
+      <tr><td>GQA Attention</td><td>masked softmax + weighted V</td><td>每个 (query, head) 一个 thread</td><td><code>attention.hlsl</code></td></tr>
+      <tr><td>Linear</td><td>\(XW^\top\)</td><td>Phase 2 先走 DML GEMM；后续改 HLSL</td><td><code>gemm.rs</code> / <code>linear*.hlsl</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>RMSNorm kernel</h3>
+  <p>
+    CPU 公式是：
+  </p>
+
+  \[
+    y_i = \frac{x_i}{\sqrt{\frac{1}{H}\sum_j x_j^2+\varepsilon}}g_i
+  \]
+
+  <p>
+    GPU 上，最直接的版本可以一个 thread 处理一整行；优化版则让一个 threadgroup 合作归约。无论哪种版本，
+    测试输入和输出 shape 都是 <code>[seq, hidden]</code>。
+  </p>
+
+  <h3>RoPE kernel</h3>
+  <p>
+    RoPE 对 Q/K 的每个 head 做旋转。GPT-NeoX / Qwen2 约定把 head_dim 的前半和后半配对：
+  </p>
+
+  \[
+    a' = a\cos\phi - b\sin\phi,\qquad
+    b' = b\cos\phi + a\sin\phi
+  \]
+
+  <p>
+    它是 in-place kernel：输入 buffer 被直接改写。一个常见测试是验证 L2 norm 不变。
+  </p>
+
+  <h3>GQA attention kernel</h3>
+  <p>
+    注意力 kernel 要处理 <code>seq_q</code> 与 <code>seq_k</code> 可能不同的情况，这为 KV cache 做准备。
+    对 query row \(t_q\)，可见 key 数是：
+  </p>
+
+  \[
+    \text{key\_count} = \min(q\_\text{pos\_base}+t_q+1,\; \text{seq\_k})
+  \]
+
+  <p>
+    在 Phase 2 中，attention kernel 的重点不是最快，而是把 GQA mapping、causal mask、softmax 稳定性都做对。
+  </p>
+
+  <figure class="fig-card">
+    <svg width="820" height="420" viewBox="0 0 820 420" role="img" aria-label="Transformer ops as kernels graph">
+      <defs>
+        <marker id="p11b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/>
+        </marker>
+      </defs>
+      <style>
+        .box{fill:#fff;stroke:#e3e1da;stroke-width:1.4}
+        .k{fill:#eef6f6;stroke:#1f6f78;stroke-width:1.6}
+        .m{fill:#f3f0fb;stroke:#6b4fbb;stroke-width:1.5}
+        .a{fill:#fdf2e9;stroke:#b8531a;stroke-width:1.5}
+        .txt{font-family:sans-serif;font-size:13px;fill:#1a1a1a}
+        .sm{font-family:sans-serif;font-size:11px;fill:#555}
+        .edge{stroke:#1f6f78;stroke-width:2;fill:none;marker-end:url(#p11b)}
+      </style>
+      <text x="410" y="30" text-anchor="middle" class="txt">Phase 2：把每个数学算子变成可测试的 kernel</text>
+      <rect x="35" y="78" width="90" height="48" rx="9" class="box"/><text x="80" y="106" text-anchor="middle" class="txt">X [S,H]</text>
+      <rect x="165" y="78" width="100" height="48" rx="9" class="k"/><text x="215" y="106" text-anchor="middle" class="txt">RMSNorm</text>
+      <rect x="305" y="40" width="92" height="42" rx="8" class="m"/><text x="351" y="66" text-anchor="middle" class="txt">q_proj</text>
+      <rect x="305" y="92" width="92" height="42" rx="8" class="m"/><text x="351" y="118" text-anchor="middle" class="txt">k_proj</text>
+      <rect x="305" y="144" width="92" height="42" rx="8" class="m"/><text x="351" y="170" text-anchor="middle" class="txt">v_proj</text>
+      <rect x="435" y="40" width="76" height="42" rx="8" class="k"/><text x="473" y="66" text-anchor="middle" class="txt">RoPE</text>
+      <rect x="435" y="92" width="76" height="42" rx="8" class="k"/><text x="473" y="118" text-anchor="middle" class="txt">RoPE</text>
+      <rect x="550" y="80" width="100" height="62" rx="10" class="k"/><text x="600" y="105" text-anchor="middle" class="txt">GQA Attn</text><text x="600" y="126" text-anchor="middle" class="sm">softmax + V</text>
+      <rect x="690" y="88" width="90" height="48" rx="9" class="m"/><text x="735" y="116" text-anchor="middle" class="txt">o_proj</text>
+
+      <path d="M125 102 L162 102" class="edge"/>
+      <path d="M265 102 C285 92 287 62 302 61" class="edge"/>
+      <path d="M265 102 L302 113" class="edge"/>
+      <path d="M265 102 C285 122 287 165 302 165" class="edge"/>
+      <path d="M397 61 L432 61" class="edge"/>
+      <path d="M397 113 L432 113" class="edge"/>
+      <path d="M511 61 C532 70 535 92 547 95" class="edge"/>
+      <path d="M511 113 C532 113 535 111 547 111" class="edge"/>
+      <path d="M397 165 C470 165 500 132 547 126" class="edge"/>
+      <path d="M650 111 L687 111" class="edge"/>
+
+      <rect x="165" y="260" width="100" height="48" rx="9" class="k"/><text x="215" y="288" text-anchor="middle" class="txt">RMSNorm</text>
+      <rect x="305" y="230" width="100" height="42" rx="8" class="m"/><text x="355" y="256" text-anchor="middle" class="txt">gate_proj</text>
+      <rect x="305" y="284" width="100" height="42" rx="8" class="m"/><text x="355" y="310" text-anchor="middle" class="txt">up_proj</text>
+      <rect x="450" y="260" width="100" height="48" rx="9" class="k"/><text x="500" y="288" text-anchor="middle" class="txt">SwiGLU</text>
+      <rect x="595" y="260" width="100" height="48" rx="9" class="m"/><text x="645" y="288" text-anchor="middle" class="txt">down_proj</text>
+      <rect x="725" y="260" width="64" height="48" rx="9" class="a"/><text x="757" y="288" text-anchor="middle" class="txt">Add</text>
+      <path d="M265 284 C285 270 287 251 302 251" class="edge"/>
+      <path d="M265 284 C285 294 287 305 302 305" class="edge"/>
+      <path d="M405 251 L447 275" class="edge"/>
+      <path d="M405 305 L447 294" class="edge"/>
+      <path d="M550 284 L592 284" class="edge"/>
+      <path d="M695 284 L722 284" class="edge"/>
+      <text x="410" y="390" text-anchor="middle" class="sm">绿色：自写 HLSL kernel；紫色：线性/matmul 路径；橙色：residual add。</text>
+    </svg>
+    <figcaption><b>图 11-2：</b>Phase 2 把 decoder layer 中的每个数学算子变成可单独测试的 GPU kernel。</figcaption>
+  </figure>
+
+  <h2><span class="num">11.3</span>Matmul 与 transposed-weight linear</h2>
+
+  <p>
+    HuggingFace 权重通常按 <code>[out_features, in_features]</code> 存储，因此线性层是：
+  </p>
+
+  \[
+    Y = XW^\top
+  \]
+
+  <p>
+    如果 \(X\in\mathbb{R}^{M\times K}\)，\(W\in\mathbb{R}^{N\times K}\)，则：
+  </p>
+
+  \[
+    Y_{i,j}=\sum_{p=0}^{K-1}X_{i,p}W_{j,p},
+    \qquad
+    Y\in\mathbb{R}^{M\times N}
+  \]
+
+  <p>
+    Phase 2 先用 DirectML GEMM / transposed-B 路径验证 linear 层。但真实项目后来发现某些 RDNA4 shape 会触发 DirectML GEMM
+    device removed，因此 Phase 3 之后 matmul 迁移到 custom HLSL。教学上这很好：Phase 2 让你先理解标准 GEMM，
+    后续模块再学习为什么要定制 kernel。
+  </p>
+
+  <h2><span class="num">11.4</span>数值 parity：为什么很少 bit-exact？</h2>
+
+  <p>
+    CPU 与 GPU 做同一个数学计算，结果通常不会逐 bit 完全相同。原因包括：
+  </p>
+
+  <ul>
+    <li>浮点加法不满足结合律：\((a+b)+c\) 与 \(a+(b+c)\) 可能不同；</li>
+    <li>GPU 归约顺序可能与 CPU loop 不同；</li>
+    <li>f16 / bf16 权重会引入舍入；</li>
+    <li>softmax / exp 对微小误差敏感；</li>
+    <li>不同硬件可能使用不同 fused multiply-add 行为。</li>
+  </ul>
+
+  <p>
+    因此测试通常设定容差：
+  </p>
+
+  \[
+    \max_i |y^{gpu}_i-y^{cpu}_i| < \varepsilon
+  \]
+
+  <p>
+    选择 \(\varepsilon\) 时要看 dtype 和算子。纯 f32 的 elementwise add 可以很小；attention / matmul / f16 权重通常需要稍大一些。
+    除了数值差，也可以检查 argmax 是否稳定，因为生成时最终常常只关心最大 logit 对应的 token。
+  </p>
+
+  <figure class="fig-card">
+    <div class="chart-wrap"><canvas id="toleranceChart"></canvas></div>
+    <figcaption><b>图 11-3：</b>不同算子适合不同容差；图中数值是教学示意，不是硬规则。</figcaption>
+  </figure>
+
+  <h2><span class="num">Lab 11</span>实现每个 kernel，通过 GPU-vs-CPU parity</h2>
+
+  <p>
+    本实验要求你为每个 CPU reference 写一个 GPU 版本，并通过 parity test。建议顺序如下：
+  </p>
+
+  <ol>
+    <li><code>add.hlsl</code>：逐元素 add，最简单。</li>
+    <li><code>swiglu.hlsl</code>：逐元素 SiLU 与乘法。</li>
+    <li><code>rms_norm.hlsl</code>：先写单线程版本，再改成 threadgroup 归约。</li>
+    <li><code>rope.hlsl</code>：in-place 旋转，测试 L2 norm 保持。</li>
+    <li><code>attention.hlsl</code>：GQA + causal mask + softmax 稳定性。</li>
+    <li><code>linear</code>：先验证 GEMM shape，再实现/替换 custom kernel。</li>
+  </ol>
+
+  <pre><code><span class="tok-c"># 关键验收命令</span>
+cargo test -p xinfer-dml --test ops_parity -- --nocapture
+
+<span class="tok-c"># 你应该看到：</span>
+rms_norm_matches_cpu ... ok
+rope_matches_cpu ... ok
+swiglu_matches_cpu ... ok
+add_matches_cpu ... ok
+attention_matches_cpu ... ok</code></pre>
+
+  <div class="callout warn">
+    <span class="tag">调试建议</span>
+    如果 parity 失败，不要立刻怀疑 GPU 驱动。先检查 shape、row-major offset、head mapping、causal limit、softmax 是否减 max。
+    大多数 kernel bug 都是 indexing bug。
+  </div>
+
+  <div class="exercises">
+    <h3>思考与练习</h3>
+    <details class="qa">
+      <summary><span class="diff easy">基础</span>为什么 CPU reference 必须比 GPU kernel 更简单？</summary>
+      <div class="answer">
+        <p>因为 CPU 参考是“正确性的真值来源”。它越简单（直白的三重循环、串行、f32），越不容易自身出错，也越容易肉眼核对。GPU kernel 为性能引入并行、分块、向量化、f16，复杂且易错；用一个简单可信的 CPU 实现做 parity 比较，才能把错误隔离在 GPU 侧。若两边都复杂，出错时无法判断谁是对的。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff easy">基础</span>写出 transposed-weight linear 的 shape 关系。</summary>
+      <div class="answer">
+        <p>权重以 \(W\in\mathbb{R}^{N\times K}\)（out×in）存储，计算 \(Y=XW^\top\)：\(X\in\mathbb{R}^{M\times K}\)，\(W^\top\in\mathbb{R}^{K\times N}\)，\(Y\in\mathbb{R}^{M\times N}\)。即对每个输出元素 \(Y_{m,n}=\sum_k X_{m,k}W_{n,k}\)——注意 W 的两个下标都按行存，正好让同一输出列读取 W 的连续一行，利于 coalescing。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff mid">进阶</span>解释 GQA 中 query head 到 KV head 的映射公式。</summary>
+      <div class="answer">
+        <p>设 group size \(g=n_{\text{heads}}/n_{\text{kv}}\)。query head \(h\) 使用的 KV head 为 \(\text{kv}(h)=\lfloor h/g\rfloor\)。Qwen2.5-0.5B 中 \(g=14/2=7\)：head 0–6 → KV 0，head 7–13 → KV 1。attention 计算时 Q 用 \(h\) 索引、K/V 用 \(\lfloor h/g\rfloor\) 索引。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff mid">进阶</span>为什么 attention softmax 必须减去最大 score？</summary>
+      <div class="answer">
+        <p>数值稳定性。softmax 要算 \(e^{s_i}\)，若 \(s_i\) 较大，\(e^{s_i}\) 会溢出成 inf。减去最大值 \(m=\max_i s_i\) 后算 \(e^{s_i-m}\)，最大项变成 \(e^0=1\)，其余 \(\le1\)，不会上溢；由于分子分母同乘 \(e^{-m}\)，结果数学上不变。这就是“safe softmax”，flash attention 的 online softmax 也据此维护 running max 并 rescale。</p>
+      </div>
+    </details>
+    <details class="qa">
+      <summary><span class="diff hard">挑战</span>构造一个小输入，手算 causal attention 输出，并用它作为单元测试。</summary>
+      <div class="answer">
+        <p>取 1 head，\(d=1\)，两个 token。令 \(Q=[q_0,q_1]\)，\(K=[k_0,k_1]\)，\(V=[v_0,v_1]\)，缩放 \(1/\sqrt{1}=1\)。</p>
+        <p>token 0（只能看自己）：score=\(q_0k_0\)，softmax 单元素=1，输出 \(=v_0\)。</p>
+        <p>token 1（看 0,1）：scores \(s_0=q_1k_0,\ s_1=q_1k_1\)；\(w_0=\frac{e^{s_0-m}}{e^{s_0-m}+e^{s_1-m}}\)，\(w_1=1-w_0\)；输出 \(=w_0v_0+w_1v_1\)。</p>
+        <p>代入具体数（如 \(q=[1,1],k=[1,2],v=[3,5]\)）：token1 scores=[1,2]，\(w=\text{softmax}([1,2])\approx[0.269,0.731]\)，输出 \(\approx0.269\cdot3+0.731\cdot5\approx4.46\)。把这些常数硬编码进测试，断言 kernel 输出在容差内匹配 [3.0, 4.46]，并验证 token0 不会看到 token1（causal）。</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="pager">
+    <a href="part4-module10-hal.html">← Module 10：HAL</a>
+    <a href="../toc.md">教程目录 ↑</a>
+    <a href="part4-module12-assembling-qwen2.html">Module 12：组装 Qwen2 模型 →</a>
+  </div>
+</main>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const P = window.XINFER_PALETTE || { teal: "#1f6f78", orange: "#b8531a", purple: "#6b4fbb", green: "#2e7d4f", grayline: "#e3e1da" };
+  makeChart("toleranceChart", {
+    type: "bar",
+    data: {
+      labels: ["add", "swiglu", "rms_norm", "rope", "attention", "matmul/f16"],
+      datasets: [{
+        label: "典型容差量级（示意）",
+        data: [1e-6, 1e-5, 1e-4, 1e-4, 1e-4, 1e-2],
+        backgroundColor: [P.green, P.green, P.teal, P.teal, P.purple, P.orange]
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { type: "logarithmic", title: { display: true, text: "max abs diff tolerance (log)" }, grid: { color: P.grayline } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>
+
+
+
+

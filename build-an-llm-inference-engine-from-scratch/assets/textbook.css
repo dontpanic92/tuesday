@@ -1,0 +1,300 @@
+/* xinfer 教程教材 — 共享样式表
+   Shared textbook stylesheet for the "从零构建 LLM 推理引擎" tutorial. */
+
+:root {
+  --ink: #1a1a1a;
+  --ink-soft: #444;
+  --paper: #fbfbf9;
+  --paper-2: #ffffff;
+  --accent: #1f6f78;       /* teal */
+  --accent-2: #b8531a;     /* burnt orange */
+  --rule: #e3e1da;
+  --code-bg: #f4f3ee;
+  --note-bg: #eef6f6;
+  --note-border: #1f6f78;
+  --warn-bg: #fdf2e9;
+  --warn-border: #b8531a;
+  --def-bg: #f3f0fb;
+  --def-border: #6b4fbb;
+  --max-width: 860px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC",
+    "SimSun", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 48px 28px 120px;
+}
+
+/* ---------- 页眉 / 教程标识 ---------- */
+.coursemark {
+  font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC",
+    "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-bottom: 2px solid var(--rule);
+  padding-bottom: 10px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.part-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC",
+    "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+h1 { font-size: 34px; margin: 6px 0 8px; font-weight: 800; }
+.subtitle { color: var(--ink-soft); font-size: 18px; margin: 0 0 28px;
+  font-family: "Noto Sans SC", system-ui, sans-serif; }
+
+h2 {
+  font-size: 25px;
+  margin: 56px 0 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font-weight: 700;
+}
+h2 .num { color: var(--accent); margin-right: 10px; }
+
+h3 { font-size: 20px; margin: 34px 0 12px; color: var(--accent); }
+
+p { margin: 14px 0; }
+strong { color: var(--accent-2); font-weight: 700; }
+em { color: var(--ink); }
+
+a { color: var(--accent); }
+
+/* ---------- 行内代码 / 代码块 ---------- */
+code, kbd, pre, .mono {
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas,
+    "Courier New", monospace;
+}
+:not(pre) > code {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.86em;
+  color: #8a3b12;
+}
+pre {
+  background: #20242b;
+  color: #e6e6e6;
+  padding: 16px 18px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 14.5px;
+  line-height: 1.6;
+  border: 1px solid #11141a;
+}
+pre code { color: inherit; background: none; padding: 0; }
+.tok-c { color: #7f8c9a; }   /* 注释 */
+.tok-k { color: #c792ea; }   /* 关键字 */
+.tok-s { color: #c3e88d; }   /* 字符串 */
+.tok-f { color: #82aaff; }   /* 函数/路径 */
+
+/* ---------- 提示框 ---------- */
+.callout {
+  border-left: 4px solid var(--note-border);
+  background: var(--note-bg);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  margin: 22px 0;
+  font-size: 16.5px;
+}
+.callout .tag {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 4px;
+}
+.callout.note { border-color: var(--note-border); background: var(--note-bg); }
+.callout.note .tag { color: var(--accent); }
+.callout.warn { border-color: var(--warn-border); background: var(--warn-bg); }
+.callout.warn .tag { color: var(--accent-2); }
+.callout.def  { border-color: var(--def-border); background: var(--def-bg); }
+.callout.def  .tag { color: var(--def-border); }
+
+/* ---------- 图 / 表 ---------- */
+figure { margin: 28px 0; text-align: center; }
+figure svg, figure .chart-wrap { max-width: 100%; }
+figcaption {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+}
+figcaption b { color: var(--accent); }
+.fig-card {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.chart-wrap { position: relative; height: 340px; }
+
+table.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 22px 0;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 15.5px;
+}
+table.tbl th, table.tbl td {
+  border: 1px solid var(--rule);
+  padding: 9px 12px;
+  text-align: left;
+}
+table.tbl th { background: var(--note-bg); color: var(--accent); }
+table.tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.tbl tr:nth-child(even) td { background: #faf9f5; }
+
+/* ---------- 学习目标盒 ---------- */
+.objectives {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-top: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 26px 0 36px;
+}
+.objectives h4 {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+.objectives ul { margin: 6px 0 0; padding-left: 22px; }
+.objectives li { margin: 6px 0; }
+
+/* ---------- 习题 ---------- */
+.exercises { margin-top: 18px; counter-reset: qa; }
+.exercises ol { padding-left: 24px; }
+.exercises li { margin: 10px 0; }
+.diff {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 12px; font-weight: 700;
+  padding: 1px 7px; border-radius: 4px; margin-right: 8px;
+  vertical-align: 2px;
+}
+.diff.easy { background: #e3f3e8; color: #2e7d4f; }
+.diff.mid  { background: #fff2d6; color: #9a6b00; }
+.diff.hard { background: #fbe0d8; color: #b8351a; }
+
+/* ---------- 可折叠问答 ---------- */
+.qa {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  margin: 12px 0;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+.qa[open] { box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+.qa > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 13px 18px 13px 44px;
+  position: relative;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  counter-increment: qa;
+}
+.qa > summary::-webkit-details-marker { display: none; }
+.qa > summary::before {
+  content: "Q" counter(qa);
+  position: absolute;
+  left: 14px; top: 13px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.qa > summary::after {
+  content: "▸";
+  position: absolute;
+  right: 16px; top: 13px;
+  color: var(--accent);
+  transition: transform 0.18s ease;
+}
+.qa[open] > summary::after { transform: rotate(90deg); }
+.qa > summary:hover { background: var(--note-bg); }
+.qa .answer {
+  padding: 4px 18px 16px 44px;
+  border-top: 1px dashed var(--rule);
+  margin-top: 2px;
+  font-size: 15.5px;
+  color: var(--ink-soft);
+  line-height: 1.8;
+}
+.qa .answer p { margin: 10px 0; }
+.qa .answer .label {
+  display: inline-block;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  margin: 8px 0 2px;
+}
+.qa .answer code { font-size: 0.85em; }
+
+/* ---------- 页脚导航 ---------- */
+.pager {
+  display: flex; justify-content: space-between;
+  margin-top: 64px; padding-top: 18px;
+  border-top: 2px solid var(--rule);
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 15px;
+}
+.pager a { text-decoration: none; color: var(--accent); }
+.pager .disabled { color: #bbb; }
+
+hr.soft { border: none; border-top: 1px dashed var(--rule); margin: 40px 0; }
+
+/* MathJax 显示公式留白 */
+mjx-container[display="true"] { margin: 18px 0 !important; }
+
+@media (max-width: 620px) {
+  body { font-size: 16.5px; }
+  h1 { font-size: 27px; }
+  h2 { font-size: 21px; }
+  .chart-wrap { height: 280px; }
+}
+
