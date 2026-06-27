@@ -1,5 +1,1 @@
-{
-    "componentChunkName": "component---src-pages-license-mdx",
-    "path": "/license/",
-    "result": {"pageContext":{"frontmatter":{"title":"License","description":"License"}}},
-    "staticQueryHashes": ["1511030359","2468095761","4121983877"]}
+{"componentChunkName":"component---src-pages-license-mdx","path":"/license/","result":{"pageContext":{"frontmatter":{"title":"License","description":"License"}}},"staticQueryHashes":["1511030359","2468095761"],"slicesMap":{}}
