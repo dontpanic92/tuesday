@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { sizes } from 'gatsby-theme-apollo-core';
+import { sizes } from 'gatsby-theme-apollo';
 
 const PageWrapper = styled.div({
     maxWidth: sizes.md,

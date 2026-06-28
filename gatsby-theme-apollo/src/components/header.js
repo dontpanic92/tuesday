@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from '@emotion/styled';
 import {HEADER_HEIGHT} from '../utils';
-import {breakpoints} from 'gatsby-theme-apollo-core';
+import {breakpoints} from '../../core-exports';
 
 const Wrapper = styled.header({
   position: 'sticky',
@@ -32,6 +32,6 @@ export default function Header(props) {
 }
 
 Header.propTypes = {
-  beforeContent: PropTypes.node.isRequired,
+  beforeContent: PropTypes.node,
   children: PropTypes.node.isRequired
 };

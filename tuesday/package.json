@@ -26,7 +26,7 @@
     "gatsby-plugin-sharp": "^5.16.0",
     "gatsby-plugin-sitemap": "^6.16.0",
     "gatsby-source-filesystem": "^5.16.0",
-    "gatsby-theme-apollo-docs": "^4.7.13",
+    "gatsby-theme-apollo": "1.0.0",
     "gatsby-transformer-sharp": "^5.16.0",
     "katex": "^0.17.0",
     "pandoc-filter": "^2.2.0",

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { StaticQuery, graphql } from "gatsby"
-import { colors } from 'gatsby-theme-apollo-core';
+import { colors } from 'gatsby-theme-apollo';
 import { articles } from '../articles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';

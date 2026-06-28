@@ -8,9 +8,9 @@ import {HEADER_HEIGHT} from '../utils';
 import {IconGithub} from '@apollo/space-kit/icons/IconGithub';
 import {IconStar} from '@apollo/space-kit/icons/IconStar';
 import {IconComment} from '@apollo/space-kit/icons/IconComment';
-import {PageNav, breakpoints, colors} from 'gatsby-theme-apollo-core';
+import {PageNav, breakpoints, colors} from '../../core-exports';
 import {withPrefix} from 'gatsby';
-import { NavHeight } from 'gatsby-theme-apollo-core';
+import { NavHeight } from '../../core-exports';
 import Comments from './comment';
 
 const Wrapper = styled.div({

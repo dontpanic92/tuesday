@@ -50,7 +50,7 @@ export default {
       __key: "pages",
     },
     {
-      resolve: "gatsby-theme-apollo-docs",
+      resolve: "gatsby-theme-apollo",
       options: {
         root: __dirname,
         description: "dontpanic 的技术专栏",

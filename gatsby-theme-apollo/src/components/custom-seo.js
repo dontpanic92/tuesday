@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {SEO} from 'gatsby-theme-apollo-core';
+import {SEO} from '../../core-exports';
 
 export default function CustomSEO({image, twitterHandle, ...props}) {
   return (

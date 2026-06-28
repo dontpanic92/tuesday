@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import React, {Fragment, createContext, useContext} from 'react';
 import rehypeReact from 'rehype-react';
 import styled from '@emotion/styled';
-import {ContentWrapper, colors, smallCaps, NavHeight} from 'gatsby-theme-apollo-core';
+import {ContentWrapper, colors, smallCaps, NavHeight} from '../../core-exports';
 import {Global} from '@emotion/react';
 import {HEADER_HEIGHT} from '../utils';
 import {graphql, navigate} from 'gatsby';

@@ -8,7 +8,7 @@ import {
   MultiCodeBlockContext
 } from './multi-code-block';
 import {Select} from './select';
-import {colors} from 'gatsby-theme-apollo-core';
+import {colors} from '../../core-exports';
 import {trackCustomEvent} from '../utils';
 
 const Container = styled.div({

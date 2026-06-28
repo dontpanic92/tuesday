@@ -1,6 +1,8 @@
 const path = require('path');
+const mapKeys = require('lodash/mapKeys');
 const { HEADER_HEIGHT } = require('./src/utils');
-const { NavHeight } = require('gatsby-theme-apollo-core/src/utils/constants');
+const { NavHeight } = require('./src/utils/constants');
+const { colors } = require('./src/utils/colors');
 
 module.exports = ({
   root,
@@ -13,7 +15,6 @@ module.exports = ({
   contentDir = 'content',
   versions = {},
   gaTrackingId,
-  gtmContainerId,
   ignore,
   checkLinksOptions,
   gatsbyRemarkPlugins = [],
@@ -48,7 +49,18 @@ module.exports = ({
   ];
 
   const plugins = [
-    'gatsby-theme-apollo-core',
+    'gatsby-plugin-svgr',
+    'gatsby-plugin-emotion',
+    'gatsby-plugin-react-helmet',
+    {
+      resolve: 'gatsby-plugin-less',
+      options: {
+        lessOptions: {
+          modifyVars: mapKeys(colors, (value, key) => `color-${key}`)
+        },
+        javascriptEnabled: true
+      }
+    },
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
     {
@@ -85,15 +97,6 @@ module.exports = ({
       resolve: 'gatsby-plugin-google-gtag',
       options: {
         trackingIds: Array.isArray(gaTrackingId) ? gaTrackingId : [gaTrackingId]
-      }
-    });
-  }
-
-  if (gtmContainerId) {
-    plugins.push({
-      resolve: 'gatsby-plugin-google-tagmanager',
-      options: {
-        id: gtmContainerId
       }
     });
   }

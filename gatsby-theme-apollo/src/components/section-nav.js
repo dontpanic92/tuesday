@@ -6,7 +6,7 @@ import striptags from 'striptags';
 import styled from '@emotion/styled';
 import useWindowScroll from 'react-use/lib/useWindowScroll';
 import useWindowSize from 'react-use/lib/useWindowSize';
-import {colors} from 'gatsby-theme-apollo-core';
+import {colors} from '../../core-exports';
 import {trackCustomEvent} from '../utils';
 
 const StyledList = styled.ul({
