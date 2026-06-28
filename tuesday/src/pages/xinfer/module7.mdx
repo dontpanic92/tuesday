@@ -11,7 +11,7 @@ export default function Page(props) {
 <Objectives>
   <ul>
         <li>读懂 Qwen2 / Qwen2.5 的 <code>config.json</code>，并把字段转成张量 shape。</li>
-        <li>理解 Qwen2 的关键结构：RMSNorm、RoPE、GQA、QKV bias、SwiGLU。</li>
+        <li>掌握 Qwen2 相对通用 decoder 的具体差异：`rope_theta`、GQA head 数、QKV bias、tied embeddings 及其对应张量名。</li>
         <li>解释 tied / untied LM head 与词表大小对内存和计算的影响。</li>
         <li>理解 safetensors、f32/f16/bf16、memory mapping 在推理加载中的作用。</li>
         <li>能估算一个 checkpoint 是否适合教学机器的 VRAM，并知道哪些量随模型大小增长。</li>
@@ -102,57 +102,23 @@ $$
     </svg>`}
 />
 
-<h2><span className="num">7.2</span>Qwen2 的关键结构</h2>
+<h2><span className="num">7.2</span>Qwen2 相对通用 decoder 的差异点</h2>
 
-Qwen2 的 decoder layer 仍由 attention、MLP、residual 与 normalization 组成。与抽象公式相比，工程实现需要特别处理以下结构，否则张量 shape 或权重名称会与 checkpoint 不一致。
+Qwen2 的 decoder layer 与 Module 2 描述的通用结构完全一致——RMSNorm、RoPE、GQA、SwiGLU 的数学定义已在那里给出，这里不再重复。装配一个真实 checkpoint 时，真正需要落实的是每个算子的**具体取值**与**权重张量名称**。下表把 Qwen2 的选择与 Module 2 的对应小节并列，作为对照表（张量名均省略 `model.layers.{i}.` 前缀）：
 
-### RMSNorm
+<table className="tbl">
+    <thead><tr><th>结构</th><th>Qwen2 的选择</th><th>config 字段</th><th>权重 / 张量名</th><th>数学见</th></tr></thead>
+    <tbody>
+      <tr><td>归一化</td><td>RMSNorm，pre-norm，不减均值、无 bias</td><td><code>rms_norm_eps=1e-6</code></td><td><code>input_layernorm.weight</code>、<code>post_attention_layernorm.weight</code>、<code>model.norm.weight</code></td><td>§2.2</td></tr>
+      <tr><td>位置编码</td><td>RoPE（GPT-NeoX <code>rotate_half</code>）</td><td><code>rope_theta=1000000</code></td><td>无权重，由位置在线计算</td><td>§2.6</td></tr>
+      <tr><td>注意力</td><td>GQA：14 query / 2 KV head，group=7</td><td><code>num_attention_heads=14</code>、<code>num_key_value_heads=2</code></td><td><code>self_attn.{q,k,v,o}_proj.weight</code></td><td>§2.4–2.5</td></tr>
+      <tr><td>QKV bias</td><td>带 bias（区别于多数 Llama）</td><td>由权重是否存在决定</td><td><code>self_attn.{q,k,v}_proj.bias</code></td><td>§2.4</td></tr>
+      <tr><td>MLP</td><td>gated SwiGLU（SiLU）</td><td><code>hidden_act="silu"</code>、<code>intermediate_size=4864</code></td><td><code>mlp.{gate,up,down}_proj.weight</code></td><td>§2.7</td></tr>
+      <tr><td>LM head</td><td>tied embeddings</td><td><code>tie_word_embeddings=true</code></td><td>复用 <code>model.embed_tokens.weight</code></td><td>§2.8、§7.3</td></tr>
+    </tbody>
+  </table>
 
-Qwen2 使用 RMSNorm。配置中的 `rms_norm_eps` 进入每一层的 input layernorm、post-attention layernorm，以及最终的 `model.norm.weight`：
-
-$$
-\operatorname{RMSNorm}(x)_i
-  = \frac{x_i}{\sqrt{\frac{1}{H}\sum_j x_j^2+\varepsilon}}g_i
-$$
-
-### RoPE 与 rope_theta
-
-Qwen2 对 Q/K 使用 RoPE。`rope_theta` 给出频率基底，0.5B Instruct checkpoint 中该值为 1,000,000：
-
-$$
-\omega_i = \theta_{\text{base}}^{-2i/d_{\text{head}}},
-\qquad
-\phi_{p,i}=p\omega_i
-$$
-
-### GQA head counts
-
-Qwen2.5-0.5B 有 14 个 query heads，但只有 2 个 KV heads，因此每个 KV head 被 7 个 query head 共享：
-
-$$
-\text{group size} = \frac{14}{2}=7
-$$
-
-这样可以减少 K/V projection 输出维度和 KV cache 规模，同时保留较多 query heads。
-
-### QKV bias
-
-许多 Llama 系模型的 Q/K/V projection 不带 bias；Qwen2 的 Q、K、V projection 带 bias：
-
-$$
-Q=XW_Q^\top+b_Q,\quad K=XW_K^\top+b_K,\quad V=XW_V^\top+b_V
-$$
-
-因此模型装配必须读取 `q_proj.bias`、`k_proj.bias`、`v_proj.bias`。`xinfer-model` 的 CPU reference 与 GPU forward 都按这些名称加载 bias；忽略 bias 会使 logits parity 失效。
-
-### SwiGLU
-
-MLP 使用 gate/up/down 三个矩阵，激活函数由 config 中的 `hidden_act: "silu"` 对应到 SiLU：
-
-$$
-\operatorname{MLP}(x)
-  = \left(\operatorname{SiLU}(xW_g^\top)\odot xW_u^\top\right)W_d^\top
-$$
+表中唯一需要展开的差异是 **QKV bias**：多数 Llama 系模型的 Q/K/V projection 不带 bias，而 Qwen2 带 bias。因此模型装配必须额外加载 `q_proj.bias`、`k_proj.bias`、`v_proj.bias`（`o_proj` 仍无 bias）。`xinfer-model` 的 CPU reference 与 GPU forward 都按这些名称读取 bias；遗漏会使 logits parity 失效。
 
 <Figure caption={<><b>图 7-2：</b>GQA 让 Q head 数保持较多，但 K/V cache 只需要较少 head。</>}>
   <Chart

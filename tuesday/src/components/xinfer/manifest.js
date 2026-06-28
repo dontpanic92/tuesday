@@ -21,7 +21,7 @@ export const pages = [
   },
   {
     slug: "module2",
-    title: "Module 2：Transformer Block，算子逐个看",
+    title: "Module 2：Transformer Block 与算子",
     badge: "Part I · Foundations",
     crumb: "Part I / Module 2",
   },

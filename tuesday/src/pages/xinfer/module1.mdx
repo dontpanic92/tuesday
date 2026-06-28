@@ -416,10 +416,12 @@ GPT、Llama、Qwen 都属于 decoder-only transformer。它们的基本结构可
 这里的每一个方块最终都会落到代码中：embedding 是一次查表，attention 是若干 matmul + softmax + 加权求和，
 MLP 是线性层与激活函数，LM head 是把 hidden vector 投影回词表大小的 logits。
 
-<h2><span className="num">1.6</span>推理 vs 训练：为什么本教程只做推理？</h2>
+<h2><span className="num">1.6</span>推理 vs 训练</h2>
 
 训练和推理使用同一个模型结构，但工程目标完全不同。训练要计算 loss、反向传播、梯度、优化器状态；
 推理只做前向计算，并且要尽可能低延迟地生成 token。
+
+本教程只关注推理部分。
 
 <table className="tbl">
   <thead><tr><th>维度</th><th>训练 Training</th><th>推理 Inference</th></tr></thead>
