@@ -111,9 +111,9 @@ Qwen2 的 decoder layer 与 Module 2 描述的通用结构完全一致——RMSN
     <tbody>
       <tr><td>归一化</td><td>RMSNorm，pre-norm，不减均值、无 bias</td><td><code>rms_norm_eps=1e-6</code></td><td><code>input_layernorm.weight</code>、<code>post_attention_layernorm.weight</code>、<code>model.norm.weight</code></td><td>§2.2</td></tr>
       <tr><td>位置编码</td><td>RoPE（GPT-NeoX <code>rotate_half</code>）</td><td><code>rope_theta=1000000</code></td><td>无权重，由位置在线计算</td><td>§2.6</td></tr>
-      <tr><td>注意力</td><td>GQA：14 query / 2 KV head，group=7</td><td><code>num_attention_heads=14</code>、<code>num_key_value_heads=2</code></td><td><code>self_attn.{q,k,v,o}_proj.weight</code></td><td>§2.4–2.5</td></tr>
-      <tr><td>QKV bias</td><td>带 bias（区别于多数 Llama）</td><td>由权重是否存在决定</td><td><code>self_attn.{q,k,v}_proj.bias</code></td><td>§2.4</td></tr>
-      <tr><td>MLP</td><td>gated SwiGLU（SiLU）</td><td><code>hidden_act="silu"</code>、<code>intermediate_size=4864</code></td><td><code>mlp.{gate,up,down}_proj.weight</code></td><td>§2.7</td></tr>
+      <tr><td>注意力</td><td>GQA：14 query / 2 KV head，group=7</td><td><code>num_attention_heads=14</code>、<code>num_key_value_heads=2</code></td><td><code>self_attn.&#123;q,k,v,o&#125;_proj.weight</code></td><td>§2.4–2.5</td></tr>
+      <tr><td>QKV bias</td><td>带 bias（区别于多数 Llama）</td><td>由权重是否存在决定</td><td><code>self_attn.&#123;q,k,v&#125;_proj.bias</code></td><td>§2.4</td></tr>
+      <tr><td>MLP</td><td>gated SwiGLU（SiLU）</td><td><code>hidden_act="silu"</code>、<code>intermediate_size=4864</code></td><td><code>mlp.&#123;gate,up,down&#125;_proj.weight</code></td><td>§2.7</td></tr>
       <tr><td>LM head</td><td>tied embeddings</td><td><code>tie_word_embeddings=true</code></td><td>复用 <code>model.embed_tokens.weight</code></td><td>§2.8、§7.3</td></tr>
     </tbody>
   </table>
