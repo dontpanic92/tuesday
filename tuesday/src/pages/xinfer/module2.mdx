@@ -27,7 +27,7 @@ X_0[t] = E[x_t], \qquad
     E \in \mathbb{R}^{|V|\times d_{\text{model}}}
 $$
 
-这里 $X_0\in\mathbb{R}^{S\times H}$，$S$ 是序列长度，$H=d_{\text{model}}$ 是 hidden size。Qwen2.5-0.5B-Instruct 的 `config.json` 给出 $H=896$、$|V|=151936$、24 个 decoder layer、14 个 query head、2 个 KV head、intermediate size 4864、`rope_theta=1000000.0`、`rms_norm_eps=1e-6`、`tie_word_embeddings=true`。这条 $S\times H$ 张量在各层之间通过 residual add 传递，通常称为 **residual stream**。
+这里 $X_0\in\mathbb{R}^{S\times H}$，$S$ 是序列长度，$H=d_{\text{model}}$ 是 hidden size。这条 $S\times H$ 张量在各层之间通过 residual add 传递，通常称为 **residual stream**。
 
 <Diagram
   caption={<><b>图 2-1：</b>一个 decoder layer 由 attention 子层和 MLP 子层组成，每个子层都带 residual add。</>}
@@ -97,7 +97,7 @@ $$
     </svg>`}
 />
 
-Qwen2 的 decoder layer 采用 pre-norm 结构。归一化先作用于子层输入，子层输出再加回 residual stream：
+以 Qwen2 为例，它的 decoder layer 采用 pre-norm 结构。归一化先作用于子层输入，子层输出再加回 residual stream：
 
 $$
 \begin{aligned}

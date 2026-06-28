@@ -4,9 +4,9 @@ export default function Page(props) {
   return <Layout slug="part0">{props.children}</Layout>;
 }
 
-<h1>教程导论：我们要从零构建什么？</h1>
+<h1>教程导论：我们要构建什么？</h1>
 
-<p className="subtitle">项目式教材：从“LLM 是什么”走到一个能运行 Qwen2.5 的 Rust + DirectML 推理引擎。</p>
+<p className="subtitle">项目式教程：从“LLM 是什么”走到一个能运行 Qwen2.5 的 Rust + DirectML 推理引擎。</p>
 
 <Objectives>
   <ul>
@@ -21,7 +21,7 @@ export default function Page(props) {
 
 大语言模型（Large Language Model, LLM）的基本行为可以精确描述：输入一串 token，输出一个长度等于词表大小的向量，其中每个分量表示对应 token 作为下一个 token 的得分。将选出的 token 追加到输入末尾并重新计算，即可逐 token 生成文本。
 
-现成的推理 API 能够直接完成这一过程，但同时隐藏了其内部实现。本教程从零实现一个完整的推理引擎，覆盖 tokenizer 分词、Qwen2.5 权重加载、矩阵乘法在 GPU 上的计算，以及 KV cache 的作用；实现深入到 HLSL compute shader 一层，并使同一份核心代码既可运行于 Windows PC，也可运行于 Xbox 的 C++ host。该引擎即本教程的最终产物，命名为 `xinfer`。
+现成的推理 API 能够直接完成这一过程，但同时隐藏了其内部实现。本教程从零实现一个完整的推理引擎，覆盖 Qwen2.5 权重加载、矩阵乘法在 GPU 上的计算，以及 KV cache 的作用；实现深入到 HLSL compute shader 一层，并使同一份核心代码既可运行于 Windows PC，也可运行于 Xbox 的 C++ host。该引擎即本教程的最终产物，命名为 `xinfer`。
 
 <Callout kind="def" tag="定义：推理（Inference）">
 
@@ -123,7 +123,7 @@ $$
 \operatorname{bytes}(W) = m\cdot n\cdot 4
 $$
 
-改用 f16 后，每个元素由 4 字节降为 2 字节，显存与带宽需求约减半。这也是 xinfer 将权重与 LM head 均存为 f16 的原因：Qwen2.5-0.5B 的全部权重因此约为 942 MiB，可完整驻留显存。
+改用 f16 后，每个元素由 4 字节降为 2 字节，显存与带宽需求约减半。
 
 <Figure caption={<><b>图 0-2：</b>教程项目推进路线：先保证正确，再测量，再优化。</>}>
   <Chart
