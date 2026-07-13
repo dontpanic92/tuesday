@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets） — USB GPIO PCB 离线教程">
+  <title>6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-06">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html" aria-current="page">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</li><li aria-current="page">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</p>
+          <h1>6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#learning-goals-6">学习目标</a></li><li class="toc-level-2"><a href="#section-6-1">6.1 把需求转换为器件选择条件</a></li><li class="toc-level-2"><a href="#section-6-2">6.2 为什么选择 CH32V203K8T6</a></li><li class="toc-level-2"><a href="#section-6-3">6.3 比较其他微控制器</a></li><li class="toc-level-2"><a href="#section-6-4">6.4 选择 USB-C 插座</a></li><li class="toc-level-2"><a href="#section-6-5">6.5 选择 USBLC6-2SC6 ESD 保护器</a></li><li class="toc-level-2"><a href="#section-6-6">6.6 选择 SY8089 Buck 与 2.2 µH 电感</a></li><li class="toc-level-2"><a href="#section-6-7">6.7 选择 SY6280 负载开关</a></li><li class="toc-level-2"><a href="#section-6-8">6.8 选择晶体、电容、电阻与 LED</a></li><li class="toc-level-2"><a href="#section-6-9">6.9 制造商料号、供应商编码、生命周期与库存</a></li><li class="toc-level-2"><a href="#section-6-10">6.10 基础库与扩展库装配器件</a></li><li class="toc-level-2"><a href="#section-6-11">6.11 阅读绝对最大值、推荐工作条件与典型规格</a></li><li class="toc-level-2"><a href="#section-6-12">6.12 绝不在未核对引脚与尺寸时相信元件库</a></li><li class="toc-level-2"><a href="#section-6-13">6.13 实验：用数据手册验证一个符号与封装</a></li><li class="toc-level-2"><a href="#summary-6">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="learning-goals-6">
+  <h2 id="learning-goals-6">学习目标</h2>
+  <p>器件选型不是从搜索结果中挑一个“参数看起来差不多”的型号。本章建立从需求、数据手册、供应链、封装到 EDA 库的证据链。学完后，你应能说明 R1 关键器件为何被选中，并独立核对一个符号和封装。</p>
+  <ul>
+    <li>把系统要求转换成可比较的器件筛选条件；</li>
+    <li>区分器件能力、典型性能、保证条件和绝对最大额定值；</li>
+    <li>使用制造商料号与供应商编码避免同名器件混淆；</li>
+    <li>检查引脚映射、封装尺寸、极性、热和布局约束；</li>
+    <li>明确库存、装配分类和实物性能会随时间或生产条件变化。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-6-1">
+  <h2 id="section-6-1">6.1 把需求转换为器件选择条件</h2>
+  <p>每个候选器件都应通过“必须条件—比较条件—验证条件”三层筛选。</p>
+  <table>
+    <caption>从 R1 需求推导的选型条件</caption>
+    <thead>
+      <tr><th scope="col">功能</th><th scope="col">必须条件</th><th scope="col">比较条件</th><th scope="col">验证条件</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">MCU</th><td>3.3 V 工作、原生 USB FS、足够 GPIO、4 路并发 PWM、UART、调试</td><td>成本、封装可返修性、存储器、工具链、供货</td><td>引脚复用无冲突、时钟与 USB 在实物上工作</td></tr>
+      <tr><th scope="row">USB-C</th><td>USB2-only 设备插座、可翻转 D+/D−、独立 CC1/CC2、可靠固定</td><td>板边尺寸、装配工艺、库存、价格</td><td>封装与机械图一致，实际线缆可插拔</td></tr>
+      <tr><th scope="row">3.3 V 电源</th><td>从 USB VBUS 降压、满足系统与目标负载、稳定</td><td>效率、热、外围数量、噪声、封装</td><td>启动、纹波、负载阶跃、温升和稳定性</td></tr>
+      <tr><th scope="row">负载开关</th><td>高侧通断、默认关闭、可设目标限流</td><td>导通电阻、保护、封装、成本</td><td>阈值、压降、浪涌、热关断与恢复</td></tr>
+      <tr><th scope="row">ESD 器件</th><td>适合 USB 数据线、低寄生、双线拓扑</td><td>钳位能力、封装、布局便利</td><td>引脚拓扑、系统 ESD 和信号完整性</td></tr>
+    </tbody>
+  </table>
+  <p>筛选条件必须带单位与条件。例如“电流够大”应改写为输入电压、输出电压、环境温度、允许温升和负载变化下的连续/峰值需求。若只有典型曲线而没有保证条件，就应把结论标为预期或待验证。</p>
+</section>
+
+<section aria-labelledby="section-6-2">
+  <h2 id="section-6-2">6.2 为什么选择 CH32V203K8T6</h2>
+  <p>R1 最终选择 U1 CH32V203K8T6，供应商编码 LCSC <code>C5372188</code>，封装为四边扁平封装（Low-Profile Quad Flat Package，LQFP）32 引脚。它满足本版的关键组合：</p>
+  <ul>
+    <li>2.4 V 至 3.6 V 供电范围，R1 按 3.3 V 运行；</li>
+    <li>原生 USB 2.0 Full-Speed 设备控制器，不需要额外 USB-UART 芯片；</li>
+    <li>USART2 可分配到 PA2/PA3；</li>
+    <li>TIM3 的四个通道可分配到 PA6、PA7、PB0、PB1，实现四路并发 PWM；</li>
+    <li>其余引脚能容纳 GPIO4–GPIO7、两路电源使能、状态 LED、SWD 和外部晶体；</li>
+    <li>LQFP-32 的可见引脚便于教学、目检与返修。</li>
+  </ul>
+  <table>
+    <caption>最终冻结的关键引脚资源</caption>
+    <thead>
+      <tr><th scope="col">功能</th><th scope="col">MCU 引脚</th><th scope="col">封装脚</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">USB D− / D+</th><td>PA11 / PA12</td><td>21 / 22</td></tr>
+      <tr><th scope="row">UART TX / RX</th><td>PA2 / PA3</td><td>8 / 9</td></tr>
+      <tr><th scope="row">PWM0–PWM3</th><td>PA6、PA7、PB0、PB1</td><td>12–15</td></tr>
+      <tr><th scope="row">GPIO4–GPIO7</th><td>PA0、PA1、PA4、PA5</td><td>6、7、10、11</td></tr>
+      <tr><th scope="row">SWD</th><td>PA13、PA14</td><td>23、24</td></tr>
+      <tr><th scope="row">电源使能</th><td>PB3、PB4</td><td>26、27</td></tr>
+    </tbody>
+  </table>
+  <p>“外设数量足够”还不够，必须验证这些外设能在同一封装和同一复用映射下同时存在。R1 已在最终原理图中冻结映射；USB、PWM、UART 与调试不会因选择同一引脚而互相排斥。实际固件是否正确配置仍待验证。</p>
+</section>
+
+<section aria-labelledby="section-6-3">
+  <h2 id="section-6-3">6.3 比较其他微控制器</h2>
+  <table>
+    <caption>提案阶段考虑的 MCU 方案</caption>
+    <thead>
+      <tr><th scope="col">器件/方案</th><th scope="col">优势</th><th scope="col">未用于 R1 的主要原因</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">CH32V203K8T6</th><td>原生 USB、足够定时器/UART/GPIO、成本低、LQFP-32 可返修</td><td>最终选用</td></tr>
+      <tr><th scope="row">CH552T</th><td>价格低、原生 USB、结构简单</td><td>8 位核心、RAM 与 PWM/UART 资源余量较小，不满足本版四路并发 PWM 与扩展目标</td></tr>
+      <tr><th scope="row">RP2040</th><td>工具生态好、USB 与可编程 I/O 灵活</td><td>支持电路与能力超过本项目需要，成本和板面积方向不占优</td></tr>
+      <tr><th scope="row">STM32F072/部分 STM32G0 USB 型号</th><td>生态成熟、资料丰富</td><td>同等功能下器件成本较高</td></tr>
+      <tr><th scope="row">CH32V003 + USB-UART 桥</th><td>MCU 很便宜</td><td>增加第二颗 IC，USB 控制和 GPIO 协议依赖桥接架构</td></tr>
+    </tbody>
+  </table>
+  <p>比较不能只列主频或 Flash。应使用加权决策：先淘汰不满足必须条件的方案，再比较成本、风险和扩展性。CH552T 仍可能适合“减少到两路 PWM 和更少并发功能”的后续降本版本，但不是对 R1 规格的等价替换。</p>
+  <aside class="checkpoint">
+    <p><strong>设计练习：</strong>若把需求改为“仅 4 路 GPIO、2 路 PWM、无目标 UART”，重新评估 CH552T。写出哪些原先的淘汰理由消失，哪些 USB、供电和工具链风险仍存在。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-6-4">
+  <h2 id="section-6-4">6.4 选择 USB-C 插座</h2>
+  <p>R1 的 J1 为 TYPE-C-31-M-12，LCSC <code>C165948</code>，是 USB2-only 16 引脚 Type-C 母座。选连接器必须同时核对电气和机械：</p>
+  <ul>
+    <li>A6/B6 为 D+，A7/B7 为 D−，支持插头翻转；</li>
+    <li>A5、B5 分别提供 CC1、CC2，不能短接成一个节点；</li>
+    <li>VBUS 与 GND 的重复触点及外壳固定焊盘必须按封装映射；</li>
+    <li>连接器开口应朝板外，并留出插头、线缆和手指空间；</li>
+    <li>固定脚、焊盘尺寸、钢网与回流工艺影响插拔寿命；</li>
+    <li>高度、板边退让和外壳开孔必须来自机械图，而不是 3D 模型猜测。</li>
+  </ul>
+  <p>R1 最终把 J1 中心放在约 (5.093 mm, 11.989 mm)，旋转 270°，朝左板边并有意外伸。最终机械审核记录该外伸并确认与邻件无碰撞。若换用“也是 16P USB-C”的其他型号，焊盘、固定脚和壳体尺寸可能不同，不能直接替代。</p>
+</section>
+
+<section aria-labelledby="section-6-5">
+  <h2 id="section-6-5">6.5 选择 USBLC6-2SC6 ESD 保护器</h2>
+  <p>U2 采用 USBLC6-2SC6，LCSC <code>C2687116</code>，SOT-23-6 封装。选 USB ESD 器件时至少检查：</p>
+  <ul>
+    <li>拓扑能同时保护 D+ 与 D−，且引脚方向与布局流向匹配；</li>
+    <li>数据线寄生电容足够低，不显著损害 USB Full-Speed 信号；</li>
+    <li>钳位参考、工作电压和反向漏电适合电路；</li>
+    <li>封装允许连接器侧与 MCU 侧形成直通、短支路布局；</li>
+    <li>数据手册的 ESD 等级对应何种测试模型，不能直接等同于整机合规。</li>
+  </ul>
+  <p>最终网络映射为：D− 从 J1 的 <code>USB_DM_CONN</code> 进入 U2，再由 <code>USB_DM_ESD</code> 经 R3 到 U1；D+ 类似经 <code>USB_DP_CONN</code>、U2、<code>USB_DP_ESD</code> 和 R4。若符号输入/输出脚或封装编号错误，可能把 D+/D−、VBUS 或 GND 错接，使 USB 无法枚举。</p>
+  <p>U2 的型号、网络和封装属于设计事实；R1 的系统级 ESD 承受能力和 USB 眼图仍为待验证。</p>
+</section>
+
+<section aria-labelledby="section-6-6">
+  <h2 id="section-6-6">6.6 选择 SY8089 Buck 与 2.2 µH 电感</h2>
+  <p>U3 采用 SY8089AAAC，LCSC <code>C78988</code>；L1 采用 SWPA252012S2R2MT，LCSC <code>C23894</code>，设计值 2.2 µH。早期 LDO 方案在较大 3.3 V 负载下会把压差直接转成热，因此最终改为同步 Buck。</p>
+  <table>
+    <caption>U3 电源级外围的选择依据</caption>
+    <thead>
+      <tr><th scope="col">元件</th><th scope="col">R1 设计值</th><th scope="col">选型理由</th><th scope="col">待验证</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">U3</th><td>SY8089AAAC</td><td>从 USB VBUS 高效产生 3.3 V，外围较少</td><td>启动、效率、纹波、稳定性、热</td></tr>
+      <tr><th scope="row">L1</th><td>2.2 µH</td><td>符合器件典型应用方向；项目元数据记录 1.25 A 额定、2.07 A 饱和</td><td>峰值电流、饱和与温升裕量</td></tr>
+      <tr><th scope="row">C2</th><td>10 µF</td><td>输入储能，缩小开关输入环</td><td>直流偏压后的有效容量</td></tr>
+      <tr><th scope="row">C3</th><td>22 µF</td><td>输出储能与纹波滤波</td><td>有效容量和环路稳定性</td></tr>
+      <tr><th scope="row">R5/R6</th><td>453 kΩ / 100 kΩ</td><td>按典型 0.6 V FB 设定约 3.318 V</td><td>容差、基准与实物输出</td></tr>
+    </tbody>
+  </table>
+  <aside class="example">
+    <p><strong>算例 6-1：反馈分压复核。</strong></p>
+    <p><code>V<sub>OUT</sub> = V<sub>FB</sub> × (1 + R5/R6)</code></p>
+    <p><code>= 0.6 V × (1 + 453/100) = 3.318 V</code></p>
+    <p>复核时还应问：0.6 V 是典型值还是全条件保证？电阻容差是多少？FB 引脚偏置电流是否重要？实际输出应在什么负载和温度下测？</p>
+  </aside>
+  <p>开关稳压器选型不能脱离布局。即使元件值完全正确，过大的输入环、<code>BUCK_SW</code> 铜、受噪声污染的反馈或过长地返回都可能造成纹波、EMI、过热或不稳定，而 DRC 不会自动证明这些性能。</p>
+</section>
+
+<section aria-labelledby="section-6-7">
+  <h2 id="section-6-7">6.7 选择 SY6280 负载开关</h2>
+  <p>U4、U5 都采用 SY6280AAC，LCSC <code>C55136</code>，SOT-23-5。选择该器件是为了获得高侧通断、主动高使能、外部可设限流以及预期的过流/热保护，而不是只用一个普通 MOSFET。</p>
+  <p>数据手册给出的典型限流关系为 <code>I<sub>LIMIT</sub>(A) = 6800/R<sub>SET</sub>(Ω)</code>：</p>
+  <aside class="example">
+    <p><strong>算例 6-2：两路设计限流。</strong></p>
+    <ul>
+      <li>U4：R7 = 16.9 kΩ，<code>6800/16900 = 0.40237 A</code>，对应约 400 mA 设计目标。</li>
+      <li>U5：R8 = 27 kΩ，<code>6800/27000 = 0.25185 A</code>，对应约 250 mA 设计目标。</li>
+    </ul>
+    <p>这些是按典型公式得到的<strong>计算值</strong>，不是保证阈值或实测电流。</p>
+  </aside>
+  <p>还必须核对输入范围、导通电阻随温度/电压的变化、启动浪涌、输出电容、热关断及反向电流行为。R9/R10 的 100 kΩ 下拉使使能在 U1 高阻时默认关闭。最终 R1 没有从 U4/U5 引出故障信号到 MCU，因此软件只能知道“发出了使能”，不能直接知道“输出确实正常”。</p>
+</section>
+
+<section aria-labelledby="section-6-8">
+  <h2 id="section-6-8">6.8 选择晶体、电容、电阻与 LED</h2>
+  <table>
+    <caption>关键无源与指示器件的最终选择</caption>
+    <thead>
+      <tr><th scope="col">类别</th><th scope="col">R1 选择</th><th scope="col">选择重点</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">晶体</th><td>Y1 X322512MSB4SI，LCSC <code>C9002</code>，12 MHz、20 pF、3225-4P</td><td>频率、负载、ESR、驱动、尺寸；最终 12 MHz 覆盖提案 8 MHz</td></tr>
+      <tr><th scope="row">晶体负载</th><td>C11/C12 各 12 pF C0G，LCSC <code>C38523</code></td><td>低损耗和稳定温度特性；与 20 pF 标称负载的匹配待验证</td></tr>
+      <tr><th scope="row">高频去耦</th><td>100 nF X7R，C6–C8/C13/C14，LCSC <code>C14663</code></td><td>近端回路、额定电压、介质与封装寄生</td></tr>
+      <tr><th scope="row">复位电容</th><td>C10 = 100 nF X7R，LCSC <code>C14663</code></td><td>与 R12 形成名义 1 ms 时间常数，并靠近 NRST</td></tr>
+      <tr><th scope="row">储能电容</th><td>10 µF X5R 0805，LCSC <code>C440198</code>；C3 为 22 µF，<code>C45783</code></td><td>直流偏压后的有效容量、纹波与浪涌</td></tr>
+      <tr><th scope="row">精密/设定电阻</th><td>R1–R23 为明确的 0603 料号</td><td>阻值、容差、功率、温漂和供应一致性</td></tr>
+      <tr><th scope="row">LED</th><td>D1 19-217/G7C-BK2L2VY/3T，LCSC <code>C264462</code>，黄绿色 0603</td><td>极性、可视性、正向压降与 R13 限流</td></tr>
+    </tbody>
+  </table>
+  <p>晶体是一个重要反例：两个 12 pF 负载电容的理想串联等效只有 6 pF，再加未知杂散；与 Y1 的 20 pF 标称负载是否匹配尚未证明。最终 BOM 可以正确、元件也能焊上，但电气组合仍可能需要复核和实测。</p>
+  <p>对陶瓷电容不能只比较标称 µF。介质、额定电压、封装、直流偏压、温度和可焊性都影响实际效果。对 LED 不能只选颜色，还要核对极性标记、亮度条件与观察方向。</p>
+</section>
+
+<section aria-labelledby="section-6-9">
+  <h2 id="section-6-9">6.9 制造商料号、供应商编码、生命周期与库存</h2>
+  <p><strong>制造商料号（Manufacturer Part Number，MPN）</strong>指向具体器件规格；<strong>供应商编码</strong>指向某供应平台中的采购条目。二者应同时记录，因为同一个通用名称可能对应不同厂商、封装、容差或版本。</p>
+  <table>
+    <caption>R1 关键器件身份示例</caption>
+    <thead>
+      <tr><th scope="col">位号</th><th scope="col">制造商料号</th><th scope="col">LCSC 编码</th><th scope="col">封装/用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">U1</th><td>CH32V203K8T6</td><td>C5372188</td><td>LQFP-32 MCU</td></tr>
+      <tr><th scope="row">J1</th><td>TYPE-C-31-M-12</td><td>C165948</td><td>USB2-only USB-C 插座</td></tr>
+      <tr><th scope="row">U2</th><td>USBLC6-2SC6</td><td>C2687116</td><td>SOT-23-6 USB ESD</td></tr>
+      <tr><th scope="row">U3</th><td>SY8089AAAC</td><td>C78988</td><td>SOT-23-5 Buck</td></tr>
+      <tr><th scope="row">U4/U5</th><td>SY6280AAC</td><td>C55136</td><td>SOT-23-5 负载开关</td></tr>
+      <tr><th scope="row">L1</th><td>SWPA252012S2R2MT</td><td>C23894</td><td>2.2 µH 电感</td></tr>
+      <tr><th scope="row">Y1</th><td>X322512MSB4SI</td><td>C9002</td><td>12 MHz 晶体</td></tr>
+    </tbody>
+  </table>
+  <p>库存是时间相关事实。下单前应重新检查在售状态、可采购数量、最小包装、替代料、交期、生命周期通知和数据手册版本。缺货时不能仅按“相同数值、相同外形”替换；必须重新执行电气、封装、机械与装配核对。</p>
+</section>
+
+<section aria-labelledby="section-6-10">
+  <h2 id="section-6-10">6.10 基础库与扩展库装配器件</h2>
+  <p>PCB 装配服务常把库存器件划分为“基础”与“扩展”等费用类别。基础器件通常换料费较低、库存稳定；扩展器件可能产生额外装料或换线费用。这个分类是制造服务的商业属性，不是器件的电气等级。</p>
+  <ul>
+    <li>同一 MPN 在不同时间、仓库或封装可能改变分类；</li>
+    <li>为了省扩展费用替换器件时，必须重新核对全部规格和封装；</li>
+    <li>小批原型中，少一个扩展器件未必值得增加电气风险或 PCB 改版；</li>
+    <li>J2/J3 采用 DNP 是明确装配策略，不应被误认为“库存缺失”。</li>
+  </ul>
+  <p>R1 的事实库记录了供应商编码，但没有把 2026 年某个时点的基础/扩展分类冻结为永久事实。因此生产报价时应重新查询并把结果记录在该批次的采购资料中。</p>
+</section>
+
+<section aria-labelledby="section-6-11">
+  <h2 id="section-6-11">6.11 阅读绝对最大值、推荐工作条件与典型规格</h2>
+  <table>
+    <caption>数据手册三类数值不能互换</caption>
+    <thead>
+      <tr><th scope="col">类别</th><th scope="col">含义</th><th scope="col">错误用法</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">绝对最大额定值</th><td>超过可能损坏；通常不保证功能，不能长期工作在边界</td><td>把最大允许电压当作正常供电目标</td></tr>
+      <tr><th scope="row">推荐工作条件</th><td>保证器件按规格工作的电压、温度和其他范围</td><td>只要没超过绝对最大值就认为可靠</td></tr>
+      <tr><th scope="row">保证的最小/最大规格</th><td>在注明测试条件下受保证的性能边界</td><td>忽略测试条件或温度范围</td></tr>
+      <tr><th scope="row">典型值</th><td>代表性条件下的常见表现，不一定保证每颗器件</td><td>把典型限流或导通电阻写成精确承诺</td></tr>
+      <tr><th scope="row">典型曲线</th><td>展示趋势和工作点关系</td><td>从曲线读一个点后忽略批次、温度和坐标精度</td></tr>
+    </tbody>
+  </table>
+  <p>R1 的 3.318 V 输出和 0.402/0.252 A 限流都使用典型公式输入，因此属于计算目标。验收时应依据数据手册容差与实测条件定义允许范围，而不是要求每块板恰好等于计算小数。</p>
+  <aside class="warning">
+    <p><strong>绝对最大值不是设计裕量。</strong>长期接近损坏边界会降低对电源波动、温升、批次和瞬态的容忍度。推荐工作范围内仍要进行降额与热设计。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-6-12">
+  <h2 id="section-6-12">6.12 绝不在未核对引脚与尺寸时相信元件库</h2>
+  <p>EDA 库可以节省录入时间，但库对象可能来自不同数据手册版本、不同封装后缀或用户上传。选中一个搜索结果只证明“找到了对象”，不证明它适合制造。</p>
+  <ol>
+    <li><strong>确认身份：</strong>符号和封装绑定的 MPN、后缀与数据手册一致。</li>
+    <li><strong>核对符号：</strong>每个引脚名称、编号、电源/地、NC 与电气方向一致。</li>
+    <li><strong>核对封装：</strong>焊盘编号、形状、间距、孔径、阻焊与钢网符合推荐图。</li>
+    <li><strong>核对方向：</strong>1 脚、极性、连接器开口和顶/底视图没有镜像。</li>
+    <li><strong>核对机械：</strong>本体、固定脚、高度、板边位置和庭院满足装配。</li>
+    <li><strong>核对 3D：</strong>只把模型当辅助；尺寸与原点必须回查二维机械图。</li>
+    <li><strong>做交叉检查：</strong>原理图引脚—PCB 焊盘—BOM MPN—CPL 位号一致。</li>
+  </ol>
+  <p>R1 最终审核确认 48/48 个符号—封装 UUID/唯一 ID 映射，以及 172/172 个引脚—焊盘—网络映射；这说明团队做了系统核对，并不意味着库中所有其他对象也可信。</p>
+  <aside class="error-case">
+    <p><strong>连接器最危险：</strong>若资料给的是插头焊接面而 EDA 封装按插座顶视图绘制，左右可能镜像。即使 DRC 全通过，制成的板也可能无法与真实插头正确配合。</p>
+  </aside>
+</section>
+
+<section class="experiment" aria-labelledby="section-6-13">
+  <h2 id="section-6-13">6.13 实验：用数据手册验证一个符号与封装</h2>
+  <p><strong>目的：</strong>建立“数据手册—符号—封装—PCB—BOM”核对记录。建议选择 J1、U2、U3 或 U1；第一次练习可选引脚较少的 U3。</p>
+  <p><strong>资料与工具：</strong>最终 R1 EasyEDA 工程、对应制造商/供应商数据手册、BOM/CPL、截图或批注工具、直尺/尺寸标注工具。此练习不需要上电。</p>
+  <aside class="warning">
+    <p><strong>资料安全：</strong>只从可信来源打开文档，记录文档编号与版本。不要把搜索结果摘要、商品照片或无版本的第三方封装图当作唯一依据。</p>
+  </aside>
+  <ol>
+    <li>记录位号、完整 MPN、供应商编码、数据手册标题/版本和封装名称。</li>
+    <li>从数据手册建立权威引脚表：引脚号、名称、功能、必须连接方式。</li>
+    <li>逐脚对照 EasyEDA 符号；对每个脚标记“匹配、差异、需解释”。</li>
+    <li>打开数据手册推荐焊盘或机械图，记录节距、本体尺寸、焊盘/孔和 1 脚标记。</li>
+    <li>逐项对照 PCB 封装，特别检查顶视图/底视图与镜像。</li>
+    <li>核对 PCB 上该位号的网络、旋转和板边方向。</li>
+    <li>核对 BOM 中 MPN/封装，以及 CPL 中坐标、面和旋转。</li>
+    <li>若发现差异，不直接“凭经验修正”；先判断是库错误、资料版本差异还是视图方向差异，并保留证据。</li>
+  </ol>
+  <table>
+    <caption>实验 6-1 核对记录</caption>
+    <thead>
+      <tr><th scope="col">检查项</th><th scope="col">数据手册事实</th><th scope="col">EDA/制造数据</th><th scope="col">结论</th><th scope="col">证据页/图</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">器件身份</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">引脚编号与名称</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">电源/地/NC</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">焊盘与节距</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">本体与板边</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">1 脚/极性/方向</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">BOM/CPL 一致性</th><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  <p><strong>通过判据：</strong>所有电气引脚和物理焊盘逐项核对；视图方向有明确说明；至少引用一处引脚表和一处机械尺寸图；未用 3D 外观替代尺寸证据。</p>
+  <p><strong>结果处理：</strong>若完全匹配，结论是“按当前数据手册核对通过”，不是“实物一定正确”。若有差异，停止使用该库对象，记录影响范围，并在修改后重新执行网络、机械、BOM/CPL 和制造检查。</p>
+  <p><strong>思考题：</strong>为什么“焊盘编号都对”仍不能证明 USB-C 连接器能从正确方向插入？</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="summary-6">
+  <h2 id="summary-6">本章小结</h2>
+  <p>选型从必须条件开始，再比较成本、封装、供货和风险。CH32V203K8T6、TYPE-C-31-M-12、USBLC6-2SC6、SY8089、SY6280、2.2 µH 电感和 12 MHz 晶体共同满足 R1 架构，但典型公式与正确 CAD 数据仍不能替代实物验证。任何库器件都要逐脚、逐焊盘、逐尺寸核对。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>本章事实依据：</strong>最终项目源和器件图谱中的 MPN、供应商编码、封装与网络；CH32V203、SY8089、SY6280、USBLC6-2SC6 和晶体资料中的关键选型关系；提案仅用于保留候选方案与设计意图，最终 12 MHz 晶体、50 mm × 24 mm 板和 16.9 kΩ R7 等事实以发布设计为准。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="05-system-architecture.html"><small>上一页</small>5. 系统架构与功能模块（System Architecture and Functional Blocks）</a><a class="next" rel="next" href="07-usb-c-power-cc.html"><small>下一页</small>7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

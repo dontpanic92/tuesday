@@ -1,0 +1,189 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "USB GPIO R1 教材事实库的来源、权威级别和使用边界。",
+  "precedence": [
+    "final-project-archive",
+    "fabrication-manifest",
+    "fabrication-checklist",
+    "final-bom",
+    "final-cpl",
+    "final-schematic-pdf",
+    "final-assembly-pdf",
+    "final-gerbers",
+    "device-datasheets",
+    "proposal",
+    "tutorial-toc",
+    "approved-plan"
+  ],
+  "rules": [
+    "发生冲突时，最终 EasyEDA 项目归档中的位号、值、封装、焊盘网络和 DNP 属性优先于提案。",
+    "制造数量、几何统计、DRC、碰撞检查和文件哈希以 manifest/checklist 为准。",
+    "BOM 的 Value 列为空，元件值必须从项目归档的 DEVICE 元数据读取，不得把空值解释为未知装配值。",
+    "CAD 长度、面积和间距属于 calculated，不属于实物 measured。",
+    "当前没有装配板测量数据；所有电压、纹波、温升、USB 眼图和负载测试均为 unverified。"
+  ],
+  "sources": [
+    {
+      "id": "approved-plan",
+      "kind": "implementation-plan",
+      "path": "/Users/dontpanic/.copilot/session-state/3c21d9de-9060-4567-951b-fb95917be44e/plan.md",
+      "authority": "requirements",
+      "status": "consulted",
+      "used_for": ["数据文件范围", "事实状态定义", "48 个物理元件覆盖要求", "页面映射要求"]
+    },
+    {
+      "id": "tutorial-toc",
+      "kind": "content-outline",
+      "path": "tutorial/toc.md",
+      "authority": "chapter-structure",
+      "status": "consulted",
+      "used_for": ["章节与附录映射", "术语首次出现页", "公式和元件主题索引"]
+    },
+    {
+      "id": "proposal",
+      "kind": "design-intent",
+      "path": "usb_gpio/PROPOSAL.md",
+      "authority": "intent-only",
+      "status": "consulted-with-overrides",
+      "used_for": ["需求", "功能架构", "选型理由", "安全状态", "MCU 外设分配"],
+      "limitations": ["早期尺寸、晶振频率和部分阻值已被最终项目覆盖", "不能单独证明最终网络或装配状态"]
+    },
+    {
+      "id": "fabrication-checklist",
+      "kind": "release-audit",
+      "path": "usb_gpio/fabrication_checklist.md",
+      "authority": "final-release-validation",
+      "status": "consulted",
+      "used_for": ["ERC/DRC", "机械碰撞", "网络一致性", "铜填充", "DNP", "待实物验证清单"]
+    },
+    {
+      "id": "fabrication-manifest",
+      "kind": "release-manifest",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_manifest.txt",
+      "authority": "final-release-metrics",
+      "status": "hash-verified",
+      "used_for": ["板尺寸", "层数", "元件/焊盘/网络数量", "走线/过孔", "USB 几何", "铜面积", "交付物哈希"]
+    },
+    {
+      "id": "final-bom",
+      "kind": "bill-of-materials",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_BOM.csv",
+      "authority": "final-fitted-bom",
+      "encoding": "UTF-16 tab-separated",
+      "sha256": "c1f8965b1e9cfa9eee6bed12ce98a8cd6b0d5aaf8f057e256290b0d154ac8908",
+      "status": "hash-verified",
+      "used_for": ["46 个拟装配位号", "21 个分组行", "制造商料号", "封装"],
+      "limitations": ["Value 列为空", "J2/J3 因 DNP 不在 BOM 中"]
+    },
+    {
+      "id": "final-bom-xlsx",
+      "kind": "bill-of-materials",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_BOM.xlsx",
+      "authority": "duplicate-final-bom",
+      "sha256": "a97009a6cc809470c354c5e5ec9fa95dee6e2ea6344e251df879d146871f9a29",
+      "status": "hash-verified",
+      "used_for": ["制造交付"]
+    },
+    {
+      "id": "final-cpl",
+      "kind": "component-placement-list",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_CPL.csv",
+      "authority": "final-placement",
+      "encoding": "UTF-16 tab-separated",
+      "sha256": "b0a2aa3c513eb7e0b21e271f813a5a3993778f367304b1fec7caf739fe4f3bd5",
+      "status": "hash-verified",
+      "used_for": ["48 个 PCB 位号", "坐标", "旋转", "顶层装配", "J2/J3 PCB 存在性"]
+    },
+    {
+      "id": "final-project-archive",
+      "kind": "easyeda-project-archive",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_project.epro2",
+      "authority": "final-design-source",
+      "sha256": "3e9911c2ee80f79f4a75fceb980dcf14d88b57af99aa1146854ea087f5f261a0",
+      "status": "hash-verified-and-parsed",
+      "archive_entries": ["project2.json", "usb_gpio.epru", "IMAGE/dce0af2c48baae5a.webp", "IMAGE/6658fda3ff83ea67.webp"],
+      "used_for": ["最终值", "器件元数据", "符号/封装", "焊盘网络", "原理图 DNP 属性", "PCB 位号", "网络类别", "最终晶振频率"]
+    },
+    {
+      "id": "final-schematic-pdf",
+      "kind": "schematic-render",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_Schematic.pdf",
+      "authority": "final-human-readable-render",
+      "sha256": "70501c8d913850ad9e2b7988422f06f6d632a7d1d570322c518eca02e2928f85",
+      "status": "hash-verified",
+      "used_for": ["人工导读和图示来源"]
+    },
+    {
+      "id": "final-assembly-pdf",
+      "kind": "assembly-render",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_Assembly.pdf",
+      "authority": "final-human-readable-render",
+      "sha256": "51367cdc810f95f2e69de309e2612dc8ac08604e43bb8f0284adf20333d97d27",
+      "status": "hash-verified",
+      "used_for": ["全部 48 位号的装配定位和方向"]
+    },
+    {
+      "id": "final-gerbers",
+      "kind": "gerber-and-drill-archive",
+      "path": "usb_gpio/fabrication/R1/usb_gpio_R1_Gerber.zip",
+      "authority": "final-fabrication-geometry",
+      "sha256": "7d81f32aaa0c86296a7b39104be11a2de33049ff0b6500de6bfc2f660a6a043f",
+      "status": "hash-verified",
+      "used_for": ["实际制造铜层", "板框", "阻焊/钢网/丝印", "PTH/NPTH/过孔钻孔", "17 个 GND 区域"]
+    },
+    {
+      "id": "release-package",
+      "kind": "release-archive",
+      "path": "usb_gpio/fabrication/USB_GPIO_R1_fabrication.zip",
+      "authority": "final-delivery-container",
+      "sha256": "9338b27dd72e221447259a6c77af5f8c95fc479c06f6b3febff2278b2fd916fd",
+      "status": "hash-verified",
+      "used_for": ["交付完整性"]
+    },
+    {
+      "id": "datasheet-ch32v203",
+      "kind": "manufacturer-datasheet",
+      "url": "https://www.wch-ic.com/downloads/CH32V203DS0_PDF.html",
+      "authority": "device-datasheet",
+      "status": "linked-by-proposal",
+      "used_for": ["U1 工作电压、USB、时钟和外设能力"],
+      "limitations": ["具体固件行为尚未在实物上验证"]
+    },
+    {
+      "id": "datasheet-sy8089",
+      "kind": "manufacturer-datasheet",
+      "url": "https://item.szlcsc.com/datasheet/SY8089AAAC/80125.html",
+      "alternate_url": "https://www.mouser.com/datasheet/2/306/SY8089AAAC-3223250.pdf",
+      "authority": "device-datasheet",
+      "status": "key-equation-reviewed",
+      "used_for": ["0.6 V FB 基准", "反馈公式", "2.2 µH、输入/输出电容选择"]
+    },
+    {
+      "id": "datasheet-sy6280",
+      "kind": "manufacturer-datasheet",
+      "url": "https://item.szlcsc.com/datasheet/SY6280AAC/56162.html",
+      "alternate_url": "https://www.visvie.com/static/upload/file/20230516/1684204685444040.pdf",
+      "authority": "device-datasheet",
+      "status": "current-limit-equation-reviewed",
+      "used_for": ["高电平使能", "I_LIMIT=6800/R_SET", "过流/热保护"]
+    },
+    {
+      "id": "datasheet-usblc6",
+      "kind": "supplier-device-datasheet",
+      "url": "https://atta.szlcsc.com/upload/public/pdf/source/20231109/512642D850D9873E7C519F71E85B9A10.pdf",
+      "alternate_family_reference": "https://www.st.com/resource/en/datasheet/usblc6-2sc6.pdf",
+      "authority": "device-datasheet",
+      "status": "pinout-reviewed",
+      "used_for": ["U2 双线 USB ESD 拓扑和低电容用途"]
+    },
+    {
+      "id": "datasheet-crystal",
+      "kind": "supplier-datasheet",
+      "url": "https://item.szlcsc.com/datasheet/X322512MSB4SI/9522.html",
+      "authority": "device-datasheet",
+      "status": "metadata-cross-checked",
+      "used_for": ["Y1 12 MHz、20 pF、3225-4P"],
+      "limitations": ["板级杂散电容未知，实际负载匹配和起振裕量未验证"]
+    }
+  ]
+}

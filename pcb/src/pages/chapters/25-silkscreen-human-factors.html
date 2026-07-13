@@ -1,0 +1,134 @@
+<section class="notice" aria-labelledby="chapter-25-goals">
+  <h2 id="chapter-25-goals">学习目标</h2>
+  <p>丝印和装配信息是人与 PCB 的接口。完成本章后，你应能为用户、装配者和维修者分别提供必要信息，正确标出版本、方向、电压与接口，同时避免文字压焊盘、方向误导和密集位号降低可用性。</p>
+  <ul>
+    <li>选择板名、修订、警告和连接器标签；</li>
+    <li>标记 1 脚、极性、信号方向与连接器朝向；</li>
+    <li>检查丝印与焊盘、孔、器件本体和板边的关系；</li>
+    <li>区分用户板面标签与完整装配图；</li>
+    <li>用 2D、3D、真实插接和探针访问四种视角审核人因。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-25-1">
+  <h2 id="section-25-1">25.1 板名、修订、警告与连接器标签</h2>
+  <p>一块脱离包装和电脑屏幕的 PCB 仍应能回答“我是谁、哪一版、接口在哪里、有什么危险”。R1 顶层最终有 13 个经过组织的功能丝印字符串，包含 <code>USB GPIO</code>、<code>REV R1</code>、<code>3V3 LOGIC</code>、<code>USB-C</code>、<code>SWD</code>、<code>GND</code>、<code>5V/3V3</code>、G0–G7、<code>TX/RX</code> 与 <code>RST</code> 等信息。</p>
+  <ol>
+    <li>板名和修订放在装配后仍可见的位置；</li>
+    <li>在外部 I/O 附近标明 <code>3V3 LOGIC</code>，防止把 5V_SW 误解成 5 V GPIO；</li>
+    <li>连接器标签贴近对应接口，但不跨越板边或壳体；</li>
+    <li>电源标签明确 GND、5V_SW 与 3V3_SW，不只写“POWER”；</li>
+    <li>警告简短、面向实际错误，例如逻辑电压、极性或非隔离共享地；</li>
+    <li>发布前把丝印文字与原理图、引脚表和用户说明逐字核对。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="section-25-2">
+  <h2 id="section-25-2">25.2 1 脚、极性、方向与朝向标记</h2>
+  <p>方向标记的目的不是装饰，而是防止不可逆的装反或误接。至少覆盖：</p>
+  <ul>
+    <li>U1 LQFP-32 的 1 脚点/角标，与装配图和 CPL 旋转一致；</li>
+    <li>D1 LED 的阳极/阴极或清楚极性符号；</li>
+    <li>J2、J3 的 1 脚标记与引脚编号方向；</li>
+    <li>UART 的 TX/RX 以“板端方向”定义，并在文档中解释；</li>
+    <li>J1 的 USB-C 开口朝板外，连接器图形不得暗示错误方向；</li>
+    <li>受控电源输出与 GND 的位置不能只靠颜色区分。</li>
+  </ul>
+  <aside class="warning">
+    <p>若丝印箭头与真实封装方向冲突，应修复设计数据，而不是在装配说明中写“请反着装”。J1 早期朝下的错误说明，方向必须由本体、插头和引脚扇出共同验证。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-25-3">
+  <h2 id="section-25-3">25.3 让油墨远离暴露焊盘与孔</h2>
+  <p>丝印制造会裁剪或移除落在阻焊开窗上的油墨，但不能依赖板厂自动裁剪来保证可读性。设计阶段就应保持文字和线条远离：</p>
+  <ul>
+    <li>SMD 焊盘、测试点和 J1 细间距引脚；</li>
+    <li>PTH/NPTH 孔、连接器固定脚和过孔开窗；</li>
+    <li>器件本体会覆盖的位置；</li>
+    <li>板边铣切区和有意外伸的连接器壳体；</li>
+    <li>需要显微镜检查的焊点区域；</li>
+    <li>高密度返修区域，避免油墨掩盖焊盘边界。</li>
+  </ul>
+  <ol>
+    <li>运行丝印到阻焊/焊盘间距检查；</li>
+    <li>叠加顶层装配和真实本体，检查装配后可见性；</li>
+    <li>以板厂最小线宽、字高和字符间距审核可制造性；</li>
+    <li>在 Gerber 中确认被裁剪后的最终文字仍可理解。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="section-25-4">
+  <h2 id="section-25-4">25.4 密集位号何时降低可用性</h2>
+  <p>在 50 mm × 24 mm 的板上强行显示 48 个位号，可能让文字压到焊盘、相互重叠或缩小到不可读。R1 最终选择隐藏板面密集位号，只保留用户需要的功能标签。</p>
+  <table>
+    <caption>保留或移除板面位号的判断</caption>
+    <thead><tr><th scope="col">场景</th><th scope="col">建议</th><th scope="col">补偿证据</th></tr></thead>
+    <tbody>
+      <tr><td>稀疏、可读、便于返修</td><td>可保留位号</td><td>Gerber 与装配后可见性检查</td></tr>
+      <tr><td>压焊盘、跨多个器件或必须极小字号</td><td>移除板面位号</td><td>完整装配图、BOM、CPL 和项目数据</td></tr>
+      <tr><td>极性/1 脚关键器件</td><td>保留方向标记，即使省略完整位号</td><td>装配图与首件检查</td></tr>
+      <tr><td>用户接口</td><td>功能名优先于内部位号</td><td>引脚表和用户说明</td></tr>
+    </tbody>
+  </table>
+  <p>“隐藏位号”必须是有意策略，不能导致器件身份丢失。R1 的全部 48 个位号仍保存在工程、CPL 和七页装配 PDF 中，46 个拟装配位号还在 BOM 中。</p>
+</section>
+
+<section aria-labelledby="section-25-5">
+  <h2 id="section-25-5">25.5 分开用户丝印与装配图</h2>
+  <p>用户和装配者需要不同信息：</p>
+  <table>
+    <caption>两类信息载体的职责</caption>
+    <thead><tr><th scope="col">载体</th><th scope="col">主要读者</th><th scope="col">应包含</th></tr></thead>
+    <tbody>
+      <tr><td>板面丝印</td><td>用户、实验者、现场维修</td><td>板名、版本、接口功能、电压、方向、极性和必要警告</td></tr>
+      <tr><td>装配图</td><td>贴片厂、检验和返修人员</td><td>全部位号、封装轮廓、1 脚、装配面、DNP 与方向</td></tr>
+      <tr><td>BOM</td><td>采购与装配</td><td>拟安装器件、数量、料号、封装和位号</td></tr>
+      <tr><td>CPL</td><td>贴片与机械核对</td><td>48 个物理元件的坐标、旋转和顶层装配面</td></tr>
+    </tbody>
+  </table>
+  <p>J2/J3 的处理说明了这种分工：它们存在于 PCB、CPL 和装配图，但不在拟采购 BOM 中。仅看板面丝印或 BOM 都不足以恢复完整装配意图。</p>
+</section>
+
+<section aria-labelledby="section-25-6">
+  <h2 id="section-25-6">25.6 为 G0–G7、UART、复位、SWD、GND 与受控电源加标签</h2>
+  <p>接口标签应与连接器引脚顺序一致，并让用户在插线时不必旋转整板或查找内部位号。</p>
+  <ol>
+    <li>沿 J2 的物理顺序标出 G0–G7，避免视觉顺序与引脚编号相反；</li>
+    <li>把 TX/RX 放在对应引脚附近，并在文档说明“TX 是板向目标发送”；</li>
+    <li>标出 RST，避免与普通 GPIO 混淆；</li>
+    <li>J3 附近标明 SWD，并清楚标出 3V3、GND、SWDIO、SWCLK、NRST 的 1 脚方向；</li>
+    <li>电源区域同时标出 GND、5V 与 3V3，必要时注明两路为受控输出；</li>
+    <li>在显眼位置保留 <code>3V3 LOGIC</code>，阻止用户把 5 V 电源能力外推到信号引脚。</li>
+  </ol>
+  <aside class="example">
+    <p><strong>同伴测试：</strong>给一名未看过原理图的同学一张 1:1 板面图，让其指出 USB、GND、G0、TX、RST 和 SWD。任何需要猜测或把板翻转多次才能判断的标签，都应重新设计。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-25-7">
+  <h2 id="section-25-7">25.7 2D、3D、插接与探针访问审核</h2>
+  <p>最终人因审核应分四次进行，因为每种视图会暴露不同问题：</p>
+  <ol>
+    <li><strong>2D 层叠：</strong>检查文字与焊盘、孔、阻焊开窗、板边和器件轮廓；</li>
+    <li><strong>3D 视图：</strong>检查装配后可见性、本体遮挡、连接器朝向和高度关系；</li>
+    <li><strong>插接审查：</strong>用 USB-C、J2/J3 配合件或准确模型检查插头、线缆和手指空间；</li>
+    <li><strong>探针/返修审查：</strong>检查电源、GND、SWD、复位及关键焊点能否安全接触；</li>
+    <li><strong>Gerber 审查：</strong>确认制造输出中的实际丝印没有被裁剪成误导信息；</li>
+    <li><strong>1:1 打印：</strong>打印板面并放置真实连接器/探头，快速发现字号和方向问题。</li>
+  </ol>
+  <aside class="checkpoint">
+    <p><strong>放行问题：</strong>用户能否在不上电时正确插线？装配者能否找到 1 脚？维修者能否接触 GND 和复位而不短路相邻焊盘？若任一答案依赖“他应该知道”，人因设计尚未完成。</p>
+  </aside>
+  <h3 id="section-25-7-exercise">练习：五分钟接口可用性审核</h3>
+  <p>让同伴在五分钟内仅凭板面图完成：识别版本；指出 J1 插入方向；连接 GND、G0 与 UART；找到 SWD 1 脚和 RST；说明哪些电源是受控输出。记录每次犹豫、误判和被遮挡标签，并给出修订方案。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-25-summary">
+  <h2 id="chapter-25-summary">本章小结</h2>
+  <p>丝印的价值在于减少人的错误，而不是填满空白。R1 用功能标签代替密集板面位号，并把完整器件身份保存在装配图、BOM、CPL 和工程中。最终审核必须同时看 2D、3D、真实插接、探针访问和 Gerber，才能让板既可制造又可理解。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>R1 丝印、制造清单、检查清单、BOM/CPL 和装配 PDF。标签数量与内容为发布事实；实物可读性、插拔手感和探针访问仍需原型验证。</p>
+</footer>

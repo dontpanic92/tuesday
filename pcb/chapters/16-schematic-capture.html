@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="16. 绘制原理图（Capturing the Schematic） — USB GPIO PCB 离线教程">
+  <title>16. 绘制原理图（Capturing the Schematic） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-16">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html" aria-current="page">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</li><li aria-current="page">16. 绘制原理图（Capturing the Schematic）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</p>
+          <h1>16. 绘制原理图（Capturing the Schematic）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#chapter-16-goals">学习目标</a></li><li class="toc-level-2"><a href="#section-16-1">16.1 放置 USB-C 与保护功能块</a></li><li class="toc-level-2"><a href="#section-16-2">16.2 放置 Buck 变换器功能块</a></li><li class="toc-level-2"><a href="#section-16-3">16.3 放置受控电源功能块</a></li><li class="toc-level-2"><a href="#section-16-4">16.4 放置 MCU、去耦、时钟、复位与调试功能块</a></li><li class="toc-level-2"><a href="#section-16-5">16.5 放置 GPIO、PWM、UART 与连接器</a></li><li class="toc-level-2"><a href="#section-16-6">16.6 按功能连线并使用显式网络标签</a></li><li class="toc-level-2"><a href="#section-16-7">16.7 分配数值、封装、供应商数据与 DNP 状态</a></li><li class="toc-level-2"><a href="#section-16-8">16.8 注释位号</a></li><li class="toc-level-2"><a href="#section-16-9">16.9 把原理图写成技术交流文档</a></li><li class="toc-level-2"><a href="#section-16-10">16.10 避免电源符号造成意外网络合并</a></li><li class="toc-level-3"><a href="#collapsed-rails-case">真实案例：电源轨塌缩</a></li><li class="toc-level-2"><a href="#section-16-11">16.11 练习：追踪每条电源轨与外部信号</a></li><li class="toc-level-2"><a href="#chapter-16-summary">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="chapter-16-goals">
+  <h2 id="chapter-16-goals">学习目标</h2>
+  <p>原理图捕获不是把器件图标摆满画布，而是把需求、数据手册和网络关系转换成一份可审计的技术文档。完成本章后，你应能按功能块放置 R1 的全部电路，使用显式网络名表达每个电气节点，并为 PCB、BOM、装配与审核保留一致的数据。</p>
+  <ul>
+    <li>按能量流与信号流顺序捕获 USB、电源、MCU 和外部接口；</li>
+    <li>正确处理串联器件两侧网络、USB-C 重复引脚和独立 CC 下拉；</li>
+    <li>填写值、封装、供应商数据和 DNP 状态，并完成位号注释；</li>
+    <li>避免全局电源符号或含糊网络标记造成电源轨塌缩；</li>
+    <li>把原理图排版成另一位工程师能够阅读和复核的技术说明。</li>
+  </ul>
+</section>
+
+<figure class="project-evidence" aria-labelledby="fig-16-1-caption">
+  <img src="../assets/images/usb-gpio-r1-schematic.png" alt="USB GPIO R1 单页原理图预览，展示 USB-C 输入、保护、Buck 电源、MCU、受控电源和外部接口功能块。" width="1800" height="1303">
+  <figcaption id="fig-16-1-caption">图 16-1　USB GPIO R1 最终单页原理图概览。来源：<code>usb_gpio/fabrication/R1/usb_gpio_R1_Schematic.pdf</code>（R1，1 页）的本地预览。本图是项目文件证据，用于核对逻辑连接与排版，不是对成品板的物理测量。</figcaption>
+</figure>
+
+<section aria-labelledby="section-16-1">
+  <h2 id="section-16-1">16.1 放置 USB-C 与保护功能块</h2>
+  <p>从外部世界进入电路的接口先画。将 J1 放在功能块左侧，使信号方向与最终“USB 主机 → 板内电路”一致。随后放置 R1、R2、U2、R3 和 R4。</p>
+  <ol>
+    <li>把 J1 的 A6/B6 合并到 D+ 路径，把 A7/B7 合并到 D− 路径；</li>
+    <li>CC1 与 CC2 分别经 R1、R2 的 5.1 kΩ 下拉到 GND，不能把两条 CC 线直接短接；</li>
+    <li>把连接器侧数据命名为 <code>USB_DP_CONN</code>/<code>USB_DM_CONN</code>；</li>
+    <li>经 U2 后改名为 <code>USB_DP_ESD</code>/<code>USB_DM_ESD</code>；</li>
+    <li>经 R3/R4 后改名为 <code>USB_DP_MCU</code>/<code>USB_DM_MCU</code>，连接 U1 的 PA12/PA11；</li>
+    <li>把 J1 的 VBUS 引脚连接到 <code>VBUS_IN</code>，外壳与地的处理按已冻结设计表达。</li>
+  </ol>
+  <p>三个分段网络不是多余命名。它们明确了 U2 和串联电阻位于信号路径中，并阻止 PCB 工具用一根铜线绕过器件。</p>
+</section>
+
+<section aria-labelledby="section-16-2">
+  <h2 id="section-16-2">16.2 放置 Buck 变换器功能块</h2>
+  <p>U3 SY8089、L1、C2、C3、R5 与 R6 构成从 <code>VBUS_IN</code> 到 <code>3V3_SYS</code> 的降压电源。原理图应让输入、开关节点、输出和反馈回路一眼可辨。</p>
+  <ol>
+    <li>U3 输入和 C2 接 <code>VBUS_IN</code>，C2 的另一端接 GND；</li>
+    <li>U3 开关输出与 L1 输入之间命名为 <code>BUCK_SW</code>；</li>
+    <li>L1 输出、C3 与负载侧连接 <code>3V3_SYS</code>；</li>
+    <li>R5 453 kΩ 从 <code>3V3_SYS</code> 接到 <code>BUCK_FB</code>，R6 100 kΩ 从 <code>BUCK_FB</code> 接 GND；</li>
+    <li>核对 U3 的 EN、GND、FB、SW 与 IN 引脚编号，而不是凭 SOT-23-5 外观猜测。</li>
+  </ol>
+  <aside class="warning">
+    <p>提案中的旧文字曾讨论 LDO 和 8 MHz 晶振；最终设计采用 U3 Buck 与 12 MHz Y1。捕获原理图时以最终器件和数据手册为准，不能把早期提案当作最终网络表。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-16-3">
+  <h2 id="section-16-3">16.3 放置受控电源功能块</h2>
+  <p>U4 从 <code>VBUS_IN</code> 生成 <code>5V_SW</code>，U5 从 <code>3V3_SYS</code> 生成 <code>3V3_SW</code>。两条输出在电气上和命名上都必须保持独立。</p>
+  <ul>
+    <li>U4 的使能网为 <code>EN_5V</code>，限流设置网为 <code>ISET_5V</code>；R7 最终值为 16.9 kΩ。</li>
+    <li>U5 的使能网为 <code>EN_3V3</code>，限流设置网为 <code>ISET_3V3</code>；R8 最终值为 27 kΩ。</li>
+    <li>使能下拉 R9/R10 使两路输出在 MCU 复位、高阻和 USB 挂起策略下保持默认关闭。</li>
+    <li>输入/输出电容分别接对应电源与 GND，不要把 <code>3V3_SYS</code> 与 <code>3V3_SW</code> 画成同名电源。</li>
+  </ul>
+  <p>U4/U5 的最终器件没有连接到 MCU 的故障输出网络，因此原理图中不得凭提案设想添加一个并不存在的 POWER_FAULT 信号。</p>
+</section>
+
+<section aria-labelledby="section-16-4">
+  <h2 id="section-16-4">16.4 放置 MCU、去耦、时钟、复位与调试功能块</h2>
+  <p>把 U1 放在中心，围绕相应引脚放置为它服务的器件，而不是把所有电容排在纸面角落。</p>
+  <ol>
+    <li>将 U1 所有电源脚接 <code>3V3_SYS</code>，地脚接 GND；</li>
+    <li>C6、C7、C8 的 100 nF 分别连接 <code>3V3_SYS</code> 与 GND，C9 作为较低频储能；</li>
+    <li>Y1 最终为 12 MHz，连接 <code>OSC_IN</code>/<code>OSC_OUT</code>，C11/C12 各 12 pF 到 GND；</li>
+    <li>R12 10 kΩ 与 C10 100 nF 构成 NRST 网络，名义时间常数为 1 ms；</li>
+    <li>R11 100 kΩ 将 BOOT0 默认拉低；</li>
+    <li>J3 按 3V3_SYS、GND、SWDIO、SWCLK、NRST 排列，并标为 DNP。</li>
+  </ol>
+  <p>原理图只能证明这些器件逻辑上连接正确，不能证明 C6–C8 的高频回路足够短；那是布局章节要回答的问题。</p>
+</section>
+
+<section aria-labelledby="section-16-5">
+  <h2 id="section-16-5">16.5 放置 GPIO、PWM、UART 与连接器</h2>
+  <p>R14–R23 位于 MCU 与 J2 之间。每个串联电阻把 MCU 侧网络和外部侧网络分开，便于识别保护边界与测量位置。</p>
+  <table>
+    <caption>J2 目标接口的最终逻辑分配</caption>
+    <thead><tr><th scope="col">引脚</th><th scope="col">网络</th><th scope="col">说明</th></tr></thead>
+    <tbody>
+      <tr><td>1、2</td><td>GND</td><td>共同参考与返回</td></tr>
+      <tr><td>3、4</td><td><code>5V_SW</code>、<code>3V3_SW</code></td><td>受控电源输出，不是 5 V GPIO</td></tr>
+      <tr><td>5–8</td><td><code>GPIO0_PWM0</code>–<code>GPIO3_PWM3</code></td><td>TIM3 四通道，共用频率</td></tr>
+      <tr><td>9–12</td><td><code>GPIO4</code>–<code>GPIO7</code></td><td>普通 3.3 V GPIO</td></tr>
+      <tr><td>13、14</td><td><code>UART_TX</code>、<code>UART_RX</code></td><td>3.3 V CMOS/TTL，方向按板端命名</td></tr>
+      <tr><td>15、16</td><td>NRST、未连接</td><td>16 脚应明确标记为有意未连接</td></tr>
+    </tbody>
+  </table>
+  <p>J2 在 PCB 和坐标表中存在，但最终 BOM 不安装。DNP 是制造属性，不是删除器件；否则用户将失去孔位、机械预留和装配定位信息。</p>
+</section>
+
+<section aria-labelledby="section-16-6">
+  <h2 id="section-16-6">16.6 按功能连线并使用显式网络标签</h2>
+  <p>导线表示局部几何连接，网络标签表示电气身份。EasyEDA 源格式中的导线带有 NET 属性；因此网络名会进入连接图、PCB 焊盘映射和后续检查，而不是仅作为旁注文字。</p>
+  <ol>
+    <li>短距离、同一功能块内部用清晰导线连接，交点处确认结点；</li>
+    <li>跨功能块连接使用显式网络标签，标签必须与目标端完全同名；</li>
+    <li>串联电阻、ESD 器件和电感两侧使用不同网络名；</li>
+    <li>重复的 USB-C A/B 引脚只在应合并的功能节点上合并；</li>
+    <li>所有电源和地标签贴到实际导线端点，不能悬空放在附近；</li>
+    <li>完成后生成网络清单，抽查每条网络包含的引脚数是否合理。</li>
+  </ol>
+  <aside class="example">
+    <p><strong>路径示例：</strong><code>PA6 → GPIO0_MCU → R14 → GPIO0_PWM0 → J2-5</code>。如果 R14 两端被误标为同一网络，PCB 可能把电阻旁路；如果末端拼成 <code>GPIOO_PWM0</code>（字母 O），连接会被拆成两个网络。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-16-7">
+  <h2 id="section-16-7">16.7 分配数值、封装、供应商数据与 DNP 状态</h2>
+  <p>每个器件实例至少要有唯一位号、值/型号、已验证封装和装配状态。需要采购的器件还应记录制造商料号与供应商料号。不能因为最终 BOM 的 Value 列为空，就把工程源中的器件值解释为未知；R1 的权威值来自最终工程器件元数据。</p>
+  <ul>
+    <li>R1/R2：5.1 kΩ、R0603；R3/R4：22 Ω、R0603；</li>
+    <li>U1：CH32V203K8T6、LQFP-32；U2：USBLC6-2SC6、SOT-23-6；</li>
+    <li>U3：SY8089AAAC、SOT-23-5；U4/U5：SY6280AAC、SOT-23-5；</li>
+    <li>L1：2.2 µH；Y1：12 MHz、3225-4P；</li>
+    <li>J2/J3：<code>Add into BOM = no</code>，但仍加入 PCB 与 CPL。</li>
+  </ul>
+  <p>任何封装改变都要重新检查引脚—焊盘编号、机械包络、PCB 规则和装配输出，不能把它当作只改一个下拉列表。</p>
+</section>
+
+<section aria-labelledby="section-16-8">
+  <h2 id="section-16-8">16.8 注释位号</h2>
+  <p>位号必须唯一且稳定。推荐按功能块放置完成后统一注释，再进行人工审读，避免删除元件后留下重复或跳转到错误器件。</p>
+  <ol>
+    <li>先冻结功能块和器件类别，再执行自动注释；</li>
+    <li>检查 R、C、U、J、L、D、Y 前缀是否与器件类型一致；</li>
+    <li>确认文档中没有重复位号或问号位号；</li>
+    <li>把位号与 BOM、封装属性和后续 PCB 元件身份绑定；</li>
+    <li>发布后若更换器件值而功能相同，优先保留位号；若新增器件，不重排全部既有位号。</li>
+  </ol>
+  <p>R1 最终 PCB 有 48 个物理位号，其中 46 个进入装配 BOM，J2/J3 为 DNP。这个差异是有意制造策略，而不是位号丢失。</p>
+</section>
+
+<section aria-labelledby="section-16-9">
+  <h2 id="section-16-9">16.9 把原理图写成技术交流文档</h2>
+  <p>可读性直接影响审核质量。读者应能在不拖动元件、不打开属性面板的情况下识别电源流、信号方向、器件值、网络名和功能边界。</p>
+  <ul>
+    <li>按输入在左、输出在右，电源在上、地在下的惯例组织，但以减少交叉为优先；</li>
+    <li>同类通道对齐，GPIO0–GPIO7 保持一致的阅读顺序；</li>
+    <li>不要用跨整页长线代替网络标签，也不要用标签掩盖功能关系；</li>
+    <li>在电源输出、逻辑电平、DNP 和安全状态处添加简短设计说明；</li>
+    <li>避免文字覆盖导线、结点、引脚号或器件值；</li>
+    <li>打印或导出 PDF 后再审一遍，因为缩放后的可读性常与编辑器画面不同。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-16-10">
+  <h2 id="section-16-10">16.10 避免电源符号造成意外网络合并</h2>
+  <aside class="error-case" aria-labelledby="collapsed-rails-case">
+    <h3 id="collapsed-rails-case">真实案例：电源轨塌缩</h3>
+    <table>
+      <thead><tr><th scope="col">阶段</th><th scope="col">观察与处置</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">现象</th><td>本应独立的 <code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>3V3_SW</code> 和 <code>5V_SW</code> 在连接图中被错误合并或失去清楚边界。</td></tr>
+        <tr><th scope="row">原因</th><td>重复使用含糊的全局电源符号、网络标志或复制后的标签，使“看起来不同”的图形共享了同一电气身份。</td></tr>
+        <tr><th scope="row">检测</th><td>检查网络清单、每个电源引脚所属网络和轨间隔离；确认最终有 47 个命名网络，并验证没有 5 V 网络直接连接 3.3 V MCU I/O。</td></tr>
+        <tr><th scope="row">修复</th><td>删除含糊标志，给每段导线重新施加显式且唯一的网络名，保存后重建连接图，再逐器件核对电源引脚。</td></tr>
+        <tr><th scope="row">预防</th><td>复制功能块后立即改名；把五条电源/参考网络列为发布门项目；不要因为 ERC 没报错就认为逻辑上自洽的错误合并是安全的。</td></tr>
+      </tbody>
+    </table>
+  </aside>
+  <p>ERC 对引脚类型和未连接问题很有价值，但如果一个错误网络在工具看来仍然“自洽”，它可能不会报告。网络命名审核和端到端电源追踪因此是人工必做项。</p>
+</section>
+
+<section class="experiment" aria-labelledby="section-16-11">
+  <h2 id="section-16-11">16.11 练习：追踪每条电源轨与外部信号</h2>
+  <p><strong>目标：</strong>不依赖高亮整板命令，手工证明每条关键路径的起点、串联器件、终点与返回网络。</p>
+  <ol>
+    <li>分别追踪 <code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>5V_SW</code>、<code>3V3_SW</code>，写出源、控制器件、负载和 GND 返回；</li>
+    <li>追踪 D+、D− 的连接器—ESD—电阻—MCU 三段网络；</li>
+    <li>任选 GPIO0 与 UART_TX，写出 MCU 引脚、MCU 侧网络、串联电阻、外部侧网络和 J2 引脚；</li>
+    <li>检查 J2-16 和 MCU 的有意未连接引脚是否明确标记；</li>
+    <li>交换同伴，要求对方只看原理图复核你的路径表。</li>
+  </ol>
+  <p><strong>通过判据：</strong>四条电源轨没有合并，USB A/B 重复引脚合并正确，串联器件没有被同名网络旁路，方向和 J2 引脚号与最终分配一致。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-16-summary">
+  <h2 id="chapter-16-summary">本章小结</h2>
+  <p>高质量原理图同时保存电气连接、器件身份和设计意图。按功能块捕获、使用显式网络名、核对串联器件两侧、保留 DNP 属性并整理排版，可以让后续 ERC、PCB 同步和人工审核基于同一份可追溯事实。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>最终工程归档、最终原理图和项目事实库。网络、位号和值为最终设计事实；电源、时钟和接口的实物性能仍待装配板验证。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="15-easyeda-project.html"><small>上一页</small>15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a><a class="next" rel="next" href="17-schematic-review-erc.html"><small>下一页</small>17. 原理图审查与 ERC（Schematic Review and ERC）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

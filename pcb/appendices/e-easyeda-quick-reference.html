@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference） — USB GPIO PCB 离线教程">
+  <title>附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="appendix-e">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="../chapters/01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="../chapters/02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="../chapters/03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="../chapters/04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="../chapters/05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="../chapters/06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="../chapters/07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="../chapters/08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="../chapters/09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="../chapters/10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="../chapters/11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="../chapters/12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="../chapters/13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="../chapters/14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="../chapters/15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="../chapters/16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="../chapters/17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="../chapters/18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="../chapters/19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="../chapters/20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="../chapters/21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="../chapters/22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="../chapters/23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="../chapters/24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="../chapters/25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="../chapters/26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="../chapters/27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="../chapters/28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="../chapters/29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="../chapters/30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="../chapters/31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="../chapters/32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="../chapters/33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="../chapters/34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="../chapters/35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="../chapters/36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="../chapters/37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="e-easyeda-quick-reference.html" aria-current="page">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>附录（Appendices）</li><li aria-current="page">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">附录（Appendices）</p>
+          <h1>附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#e-scope">E.1 适用范围与版本</a></li><li class="toc-level-2"><a href="#e-project">E.2 工程、文档与版本管理</a></li><li class="toc-level-2"><a href="#e-library">E.3 放置器件前的库核对</a></li><li class="toc-level-2"><a href="#e-schematic">E.4 原理图捕获速查</a></li><li class="toc-level-2"><a href="#e-erc-sync">E.5 ERC 与原理图—PCB 同步</a></li><li class="toc-level-2"><a href="#e-board-rules">E.6 板框、层叠与规则</a></li><li class="toc-level-2"><a href="#e-placement">E.7 布局速查</a></li><li class="toc-level-2"><a href="#e-routing">E.8 布线与连通性</a></li><li class="toc-level-2"><a href="#e-pours">E.9 铺铜的强制四步规则</a></li><li class="toc-level-2"><a href="#e-final-checks">E.10 最终检查、状态刷新与发布</a></li><li class="toc-level-2"><a href="#e-troubleshooting">E.11 常见现象—检查位置</a></li><li class="toc-level-2"><a href="#e-one-page">E.12 一页发布门</a></li></ul></nav>
+        <section aria-labelledby="e-scope">
+  <h2 id="e-scope">E.1 适用范围与版本</h2>
+  <p>本速查表面向 EasyEDA 中的项目组织、原理图、PCB、检查和发布流程。USB GPIO R1 最终项目归档记录的编辑器版本为 3.2.166；不同语言、版本和工作区的菜单名称可能变化，因此本页使用“操作目的 + 成功证据”，不编造固定菜单路径或快捷键。</p>
+  <aside class="notice">
+    <p><strong>核心原则：</strong>界面上“看起来正确”不是发布证据。每一步都要知道由哪一种检查证明：ERC 证明原理图规则，DRC 证明配置过的 PCB 规则，机械审核证明实体与方向，Gerber 查看器证明实际制造几何。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="e-project">
+  <h2 id="e-project">E.2 工程、文档与版本管理</h2>
+  <table>
+    <caption>表 E-1　开始编辑前</caption>
+    <thead><tr><th scope="col">动作</th><th scope="col">目的</th><th scope="col">完成证据</th></tr></thead>
+    <tbody>
+      <tr><td>确认当前项目、板、原理图页和活动文档</td><td>避免在错误项目或文档类型中修改。</td><td>名称、版本、项目 UUID/PCB UUID 与任务一致。</td></tr>
+      <tr><td>写入板名、修订号和变更说明</td><td>让源文件、丝印、输出包和清单可追溯。</td><td>R1 等修订标识在项目元数据和输出中一致。</td></tr>
+      <tr><td>在重大操作前保存并导出项目归档</td><td>提供可恢复的设计源快照。</td><td>归档可打开，包含当前原理图、PCB、元数据和预览。</td></tr>
+      <tr><td>使用稳定的网络名和功能分区</td><td>减少跨页/跨块误接，便于搜索和审核。</td><td>网络名能表达电源域、保护阶段和 MCU/连接器两侧。</td></tr>
+      <tr><td>固定单位与网格策略</td><td>避免 mm/mil 混淆和不可控偏移。</td><td>尺寸记录带单位；转换使用 1 mil=0.0254 mm。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="e-library">
+  <h2 id="e-library">E.3 放置器件前的库核对</h2>
+  <ol>
+    <li>用完整可订购型号搜索器件，不只按通用名称选“长得像”的符号。</li>
+    <li>核对符号针号、针名和电气类型；对 MCU、USB-C、ESD、稳压器和负载开关逐针比对数据手册。</li>
+    <li>核对 footprint 的焊盘号、间距、孔径、外形、pin 1、极性、连接器插接方向和板边伸出量。</li>
+    <li>核对制造商料号、供应商代码、封装和 DNP 属性；把“加入 BOM”和“加入 PCB”视为两个不同决定。</li>
+    <li>对关键器件保存本地或项目级可追溯版本，避免公共库条目更新后静默改变设计。</li>
+  </ol>
+  <div class="error-case">
+    <p><strong>不要这样做：</strong>仅凭 3D 模型或缩略图判断 footprint 正确。3D 外形、铜焊盘、孔和针号可以彼此不一致。</p>
+  </div>
+</section>
+
+<section aria-labelledby="e-schematic">
+  <h2 id="e-schematic">E.4 原理图捕获速查</h2>
+  <table>
+    <caption>表 E-2　从功能块到可审核原理图</caption>
+    <thead><tr><th scope="col">顺序</th><th scope="col">操作</th><th scope="col">人工检查</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">1</th><td>按 USB-C、USB 保护、Buck、受控电源、MCU、时钟/复位、外部接口分块放置。</td><td>每块有明确输入、输出、电源、地和配置元件。</td></tr>
+      <tr><th scope="row">2</th><td>先连接电源和地，再连接高速/敏感信号，再连接普通控制信号。</td><td><code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>3V3_SW</code>、<code>5V_SW</code> 不被误合并。</td></tr>
+      <tr><th scope="row">3</th><td>对跨块连接使用明确网络标签。</td><td>标签拼写唯一；MCU 侧与连接器侧网络通过串联器件有意分名。</td></tr>
+      <tr><th scope="row">4</th><td>填写位号、标称值、料号、footprint、DNP/BOM 属性。</td><td>全部位号唯一；J2/J3 为 PCB 存在、BOM 排除。</td></tr>
+      <tr><th scope="row">5</th><td>对不用的引脚明确放置 no-connect 或记录设计理由。</td><td>未连接数可解释；R1 最终为 9 个刻意未连接引脚。</td></tr>
+      <tr><th scope="row">6</th><td>整理文字、连接点和信号流向。</td><td>交叉线、结点、总线和标签不会产生视觉歧义。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="e-erc-sync">
+  <h2 id="e-erc-sync">E.5 ERC 与原理图—PCB 同步</h2>
+  <ol>
+    <li>运行严格 ERC，按“错误、警告、已解释例外”分类；不要批量忽略。</li>
+    <li>人工复核 ERC 不理解的内容：USB-C 重复针、MCU 复用、默认状态、器件数值和符号—footprint 针号。</li>
+    <li>确认电源输出冲突、未驱动电源、悬空输入、意外 no-connect 和网络名拼写。</li>
+    <li>同步到 PCB 前保存；同步后查看新增、删除、网络变化和 footprint 变化清单。</li>
+    <li>核对组件、针脚、焊盘和网络数量。R1 发布基线为 48 个组件、172 个映射针脚/焊盘、47 个命名网络、原理图与 PCB 网络差异为 0。</li>
+  </ol>
+  <p>R1 发布时严格 ERC 为 0 错误、2 个非阻塞提示；API 未暴露提示文本，因此教材只记录其存在，不能虚构内容。</p>
+</section>
+
+<section aria-labelledby="e-board-rules">
+  <h2 id="e-board-rules">E.6 板框、层叠与规则</h2>
+  <table>
+    <caption>表 E-3　开始布局布线前必须冻结的项目</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">做法</th><th scope="col">R1 发布基线</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">板框</th><td>使用一个显式闭合、可锁定的边界；检查重复和断裂片段。</td><td>50 mm × 24 mm 名义尺寸；Gerber 49.999900 mm × 24.000460 mm。</td></tr>
+      <tr><th scope="row">层数</th><td>按制造商叠层和能力设置，不从默认值猜测。</td><td>2 层：Top + Bottom copper。</td></tr>
+      <tr><th scope="row">普通信号</th><td>建立默认线宽/间距规则。</td><td>6 mil 线宽。</td></tr>
+      <tr><th scope="row">USB</th><td>建立差分对、宽度、间距和参考面要求；实际阻抗需生产叠层。</td><td>D+/D− 8 mil；几何匹配不等于阻抗认证。</td></tr>
+      <tr><th scope="row">电源/地</th><td>按电流、压降、热和回流设置不同宽度。</td><td>GND 12 mil；BUCK_SW 14；3V3/5V_SW 16；3V3_SYS 20；VBUS 主干 24 mil。</td></tr>
+      <tr><th scope="row">过孔/孔</th><td>核对钻径、焊盘和制造能力。</td><td>过孔 12 mil 钻 / 24 mil 盘。</td></tr>
+      <tr><th scope="row">板边</th><td>设置并单独检查铜、焊盘、过孔、走线到板边的间距。</td><td>最终计算最小值分别为 12.9、16.9、17.5 mil。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="e-placement">
+  <h2 id="e-placement">E.7 布局速查</h2>
+  <ol>
+    <li><strong>机械优先：</strong>先放 J1、J2、J3 和板边约束；验证插拔、排线、探针和外壳空间。</li>
+    <li><strong>入口保护：</strong>U2 靠近 J1，缩短未保护的 USB 段；CC 电阻靠近连接器。</li>
+    <li><strong>电源回路：</strong>U3、C2、L1、C3 紧凑；限制 <code>BUCK_SW</code> 面积，反馈远离噪声。</li>
+    <li><strong>本地去耦：</strong>电容靠近所服务的电源脚，而不是只排得整齐。</li>
+    <li><strong>时钟：</strong>Y1、C11、C12 靠近 U1，短、对称、无支路，避开开关节点。</li>
+    <li><strong>重复通道：</strong>R14–R21 按 GPIO 顺序排列，保留可读性和一致间距。</li>
+    <li><strong>机械审核：</strong>同时检查实体包络、courtyard/组件形状、板边、连接器方向和高度；电气 DRC 不能替代。</li>
+  </ol>
+  <p>R1 的历史失误包括 J1 朝向、R1 与连接器实体关系、C8/C9 重叠；最终 1,128 对组件的实体和 courtyard 检查均为 0 重叠。</p>
+</section>
+
+<section aria-labelledby="e-routing">
+  <h2 id="e-routing">E.8 布线与连通性</h2>
+  <table>
+    <caption>表 E-4　推荐布线顺序</caption>
+    <thead><tr><th scope="col">优先级</th><th scope="col">网络</th><th scope="col">关键检查</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">1</th><td>USB D+/D−</td><td>正确器件顺序、对称、无支路、少换层、连续地参考、段长与过孔。</td></tr>
+      <tr><th scope="row">2</th><td>晶振 OSC_IN/OUT</td><td>短、对称、远离 BUCK_SW 和快速数字线。</td></tr>
+      <tr><th scope="row">3</th><td>Buck 与电源</td><td>输入环、开关节点、输出环、反馈路径、压降和散热。</td></tr>
+      <tr><th scope="row">4</th><td>复位、SWD、使能</td><td>避免噪声耦合；保留调试访问。</td></tr>
+      <tr><th scope="row">5</th><td>GPIO/PWM/UART</td><td>通道对应、串联电阻两侧网络、共同回流。</td></tr>
+      <tr><th scope="row">6</th><td>GND 与缝合</td><td>回流连续、层间转换附近有地过孔、无孤立铜。</td></tr>
+    </tbody>
+  </table>
+  <p>移动元件后不要假定旧走线仍有效。删除/重布受影响路径，运行连接检查，并用独立网络几何分析或网络计数复核；R1 最终为 608 条 track、130 个过孔、47/47 网络几何连通。</p>
+</section>
+
+<section aria-labelledby="e-pours">
+  <h2 id="e-pours">E.9 铺铜的强制四步规则</h2>
+  <ol>
+    <li><strong>优先使用可重铺的原生铺铜区域。</strong>设置正确网络、层、间距、热焊盘、优先级和孤岛策略。</li>
+    <li><strong>检查边界。</strong>铺铜边界及其 bounding box 必须位于闭合板框的预期范围内；边界不得越板或使用错误坐标系。</li>
+    <li><strong>每次几何或规则变化后重铺。</strong>移动器件、改线、改板框、改间距或改层后都要 repour；不能相信旧填充。</li>
+    <li><strong>在 Gerber 中确认实际铜。</strong>可见的边界对象不等于制造铜。导出后检查目标铜层中确实存在区域、间距、热连接和无孤岛。</li>
+  </ol>
+  <aside class="warning">
+    <p>R1 最终项目有 0 个原生 POUR、17 个连接到 GND 的静态 FILL（顶层 11、底层 6）。两个畸形越板原生铺铜边界已删除。静态填充不会自动随规则重算；今后任何 PCB 几何变化都必须重新生成并完整审核，未来版本应优先改用经验证的原生铺铜。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="e-final-checks">
+  <h2 id="e-final-checks">E.10 最终检查、状态刷新与发布</h2>
+  <ol>
+    <li>保存原理图和 PCB；关闭并重新打开 PCB，以刷新 EasyEDA 的连接图和活动文档状态。</li>
+    <li>运行最终 ERC、DRC，并分别记录 connection、clearance、differential-pair 和其他规则结果。</li>
+    <li>运行独立机械检查：实体、courtyard、板边、连接器方向、刻意伸出、探针和装配空间。</li>
+    <li>复核原理图—PCB：组件、针脚、焊盘、网络、DNP 和未连接项。</li>
+    <li>重铺/重建铜，检查所有电源、地和回流路径；再导出 Gerber。</li>
+    <li>导出并检查 BOM、CPL、装配图、原理图 PDF、Gerber/钻孔和项目归档。</li>
+    <li>用独立 Gerber 查看器检查铜、阻焊、锡膏、丝印、板框、PTH、NPTH 和过孔钻孔。</li>
+    <li>生成 manifest：版本、数量、尺寸、规则结果、文件列表、SHA-256 和未完成的实物验证。</li>
+  </ol>
+  <div class="checkpoint">
+    <p><strong>变更失效规则：</strong>原理图、PCB、footprint、BOM、CPL 或制造输出有任何变化，旧签核全部失效；必须从受影响的最早阶段重新执行到最终 Gerber 与哈希。</p>
+  </div>
+</section>
+
+<section aria-labelledby="e-troubleshooting">
+  <h2 id="e-troubleshooting">E.11 常见现象—检查位置</h2>
+  <table>
+    <caption>表 E-5　编辑器工作流排障</caption>
+    <thead><tr><th scope="col">现象</th><th scope="col">优先检查</th><th scope="col">不要误判</th></tr></thead>
+    <tbody>
+      <tr><td>原理图看似连接，PCB 却有飞线</td><td>网络标签拼写、串联器件两侧网名、同步差异、保存后重开。</td><td>不要仅靠缩放后“线碰到引脚”的视觉印象。</td></tr>
+      <tr><td>DRC=0，但器件相撞</td><td>实体、courtyard、3D、连接器插接方向和高度。</td><td>DRC 通常不证明机械可装配。</td></tr>
+      <tr><td>铺铜边界可见但没有地铜</td><td>网络、层、边界、优先级、重铺结果和 Gerber G36/G37 区域。</td><td>边界不是制造铜。</td></tr>
+      <tr><td>移动器件后连接检查异常</td><td>删除失效旧线、保存、关闭重开、重跑连接与 DRC。</td><td>不要保留与旧位置相关的铜并假设缓存会自动修复。</td></tr>
+      <tr><td>BOM 少两个连接器</td><td>检查 J2/J3 的 Add into BOM=no、CPL 和 PCB 是否仍有位置。</td><td>DNP 是预期策略，不一定是导出错误。</td></tr>
+      <tr><td>USB 长度匹配但仍不工作</td><td>针脚映射、U2/R3/R4 拓扑、供电、时钟、复位、阻抗与焊接。</td><td>长度匹配不是 USB 功能认证。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="e-one-page">
+  <h2 id="e-one-page">E.12 一页发布门</h2>
+  <table>
+    <caption>打印后逐项签名</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">质量门</th><th scope="col">证据/文件</th><th scope="col">签名/日期</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>身份、版本、备份正确</td><td>项目归档 / UUID / 修订</td><td>________</td></tr>
+      <tr><td>□</td><td>库针脚与 footprint 已核对</td><td>数据手册 / 核对记录</td><td>________</td></tr>
+      <tr><td>□</td><td>ERC 与人工原理图审核完成</td><td>错误、警告、解释清单</td><td>________</td></tr>
+      <tr><td>□</td><td>同步和数量一致</td><td>组件/针脚/焊盘/网络计数</td><td>________</td></tr>
+      <tr><td>□</td><td>布局和机械审核完成</td><td>实体、courtyard、板边、方向</td><td>________</td></tr>
+      <tr><td>□</td><td>布线、回流和独立连通检查完成</td><td>DRC / 网络分析</td><td>________</td></tr>
+      <tr><td>□</td><td>铺铜边界、重铺和 Gerber 实铜确认</td><td>铜层查看记录</td><td>________</td></tr>
+      <tr><td>□</td><td>BOM/CPL/DNP/装配图一致</td><td>交叉核对记录</td><td>________</td></tr>
+      <tr><td>□</td><td>制造包、manifest、哈希完成</td><td>发布目录</td><td>________</td></tr>
+      <tr><td>□</td><td>未完成的实物验证已明确列出</td><td>验证登记表</td><td>________</td></tr>
+    </tbody>
+  </table>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="d-equations.html"><small>上一页</small>附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a><a class="next" rel="next" href="f-checklists.html"><small>下一页</small>附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

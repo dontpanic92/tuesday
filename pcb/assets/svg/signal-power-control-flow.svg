@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" role="img" aria-labelledby="title desc">
+  <title id="title">控制流、功率流与状态流必须分别验证</title>
+  <desc id="desc">控制命令从主机经 MCU 到负载开关，功率从 USB VBUS 经负载开关到目标，状态可返回主机；由于 R1 没有负载开关故障反馈，命令成功不能证明输出电压存在。</desc>
+  <defs>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#0b5cab"/>
+    </marker>
+    <marker id="red-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#b33a3a"/>
+    </marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#247a45"/>
+    </marker>
+    <style>
+      text{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans CJK SC",sans-serif;fill:#17202a}
+      .lane{fill:#fff;stroke:#ccd3dc;stroke-width:1.5}
+      .label{font-size:18px;font-weight:700}
+      .node{font-size:16px;font-weight:700;text-anchor:middle}
+      .sub{font-size:13px;fill:#586474;text-anchor:middle}
+    </style>
+  </defs>
+  <rect width="960" height="460" rx="18" fill="#f7fafc"/>
+  <text x="480" y="38" font-size="24" font-weight="700" text-anchor="middle">“命令成功”不等于“功率结果已发生”</text>
+  <g transform="translate(25 75)">
+    <rect class="lane" width="910" height="90" rx="12"/>
+    <text class="label" x="25" y="34" fill="#0b5cab">控制流</text>
+    <text x="25" y="58" font-size="13" fill="#586474">决定开关状态</text>
+    <g transform="translate(180 18)">
+      <rect width="130" height="54" rx="9" fill="#eef6ff" stroke="#0b5cab"/><text class="node" x="65" y="33">主机命令</text>
+      <rect x="210" width="130" height="54" rx="9" fill="#eef6ff" stroke="#0b5cab"/><text class="node" x="275" y="33">U1 固件</text>
+      <rect x="420" width="160" height="54" rx="9" fill="#eef6ff" stroke="#0b5cab"/><text class="node" x="500" y="25">EN_5V / EN_3V3</text><text class="sub" x="500" y="44">负载开关使能</text>
+      <line x1="130" y1="27" x2="205" y2="27" stroke="#0b5cab" stroke-width="3" marker-end="url(#blue-arrow)"/>
+      <line x1="340" y1="27" x2="415" y2="27" stroke="#0b5cab" stroke-width="3" marker-end="url(#blue-arrow)"/>
+    </g>
+  </g>
+  <g transform="translate(25 180)">
+    <rect class="lane" width="910" height="90" rx="12"/>
+    <text class="label" x="25" y="34" fill="#b33a3a">功率流</text>
+    <text x="25" y="58" font-size="13" fill="#586474">输送实际能量</text>
+    <g transform="translate(180 18)">
+      <rect width="130" height="54" rx="9" fill="#fff0f0" stroke="#b33a3a"/><text class="node" x="65" y="33">USB VBUS</text>
+      <rect x="210" width="130" height="54" rx="9" fill="#fff0f0" stroke="#b33a3a"/><text class="node" x="275" y="25">U4 / U5</text><text class="sub" x="275" y="44">负载开关</text>
+      <rect x="420" width="160" height="54" rx="9" fill="#fff0f0" stroke="#b33a3a"/><text class="node" x="500" y="25">J2 与外部负载</text><text class="sub" x="500" y="44">5V_SW / 3V3_SW</text>
+      <line x1="130" y1="27" x2="205" y2="27" stroke="#b33a3a" stroke-width="4" marker-end="url(#red-arrow)"/>
+      <line x1="340" y1="27" x2="415" y2="27" stroke="#b33a3a" stroke-width="4" marker-end="url(#red-arrow)"/>
+    </g>
+  </g>
+  <g transform="translate(25 285)">
+    <rect class="lane" width="910" height="90" rx="12"/>
+    <text class="label" x="25" y="34" fill="#247a45">状态流</text>
+    <text x="25" y="58" font-size="13" fill="#586474">报告已知状态</text>
+    <g transform="translate(180 18)">
+      <rect width="160" height="54" rx="9" fill="#eaf5ee" stroke="#247a45"/><text class="node" x="80" y="25">U1 命令状态</text><text class="sub" x="80" y="44">已接受 / 已设置</text>
+      <rect x="250" width="160" height="54" rx="9" fill="#eaf5ee" stroke="#247a45"/><text class="node" x="330" y="33">返回主机</text>
+      <line x1="160" y1="27" x2="245" y2="27" stroke="#247a45" stroke-width="3" marker-end="url(#green-arrow)"/>
+      <rect x="500" width="210" height="54" rx="9" fill="#fff4dd" stroke="#9a5b00" stroke-dasharray="6 4"/>
+      <text class="node" x="605" y="23">缺少硬件故障反馈</text><text class="sub" x="605" y="43">R1 无负载开关故障输出</text>
+    </g>
+  </g>
+  <path d="M755 375V410H610" fill="none" stroke="#9a5b00" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <rect x="245" y="398" width="365" height="42" rx="10" fill="#fff4dd" stroke="#9a5b00" stroke-width="2"/>
+  <text x="427.5" y="424" font-size="16" font-weight="700" fill="#7a4700" text-anchor="middle">必须用电压、电流或独立反馈验证真实输出</text>
+</svg>

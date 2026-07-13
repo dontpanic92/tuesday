@@ -1,0 +1,14 @@
+@page { margin: 18mm; }
+body { color: #000; background: #fff; font-size: 10.5pt; }
+.site-header, .site-sidebar, .breadcrumbs, .page-navigation, .site-footer, .on-this-page { display: none !important; }
+.site-layout, main, .tutorial-page { display: block; max-width: none; margin: 0; padding: 0; }
+.page-header h1 { font-size: 22pt; }
+a { color: inherit; text-decoration: none; }
+a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 8pt; overflow-wrap: anywhere; }
+h1, h2, h3 { break-after: avoid; }
+figure, table, pre, .notice, .definition, .example, .warning, .experiment, .checkpoint, .error-case { break-inside: avoid; }
+figure { margin: 5mm 0; }
+figure img, figure svg { max-height: 220mm; object-fit: contain; box-shadow: none; }
+figcaption { font-size: 8.5pt; }
+.project-evidence { padding: 3mm; }
+thead { display: table-header-group; }

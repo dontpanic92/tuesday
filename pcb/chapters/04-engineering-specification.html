@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification） — USB GPIO PCB 离线教程">
+  <title>4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-04">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html" aria-current="page">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</li><li aria-current="page">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</p>
+          <h1>4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#learning-goals-4">学习目标</a></li><li class="toc-level-2"><a href="#section-4-1">4.1 定义用户问题</a></li><li class="toc-level-2"><a href="#section-4-2">4.2 功能需求：USB、GPIO、PWM、UART 与受控电源</a></li><li class="toc-level-2"><a href="#section-4-3">4.3 电气限制以及 3.3 V 与 5 V 逻辑</a></li><li class="toc-level-2"><a href="#section-4-4">4.4 USB 总线供电与电流预算</a></li><li class="toc-level-2"><a href="#section-4-5">4.5 复位、启动、断开与 USB 挂起时的安全状态</a></li><li class="toc-level-2"><a href="#section-4-6">4.6 成本、尺寸、可得性、装配与可维修性的权衡</a></li><li class="toc-level-2"><a href="#section-4-7">4.7 分离 Revision A 要求与未来功能</a></li><li class="toc-level-2"><a href="#section-4-8">4.8 建立可测量的验收标准</a></li><li class="toc-level-2"><a href="#section-4-9">4.9 练习：编写并评审一页式板级规格</a></li><li class="toc-level-2"><a href="#summary-4">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="learning-goals-4">
+  <h2 id="learning-goals-4">学习目标</h2>
+  <p>本章说明怎样把“做一块 USB GPIO 板”的愿望改写成可设计、可审核、可测试的工程规格。学完后，你应能识别模糊需求、写出边界条件，并把每一项要求连接到验证方法。</p>
+  <ul>
+    <li>从用户任务提炼功能、接口、环境和失败后果；</li>
+    <li>区分 3.3 V 逻辑与 5 V 电源输出；</li>
+    <li>建立 USB 供电预算，而不把限流设定误当作可保证的负载能力；</li>
+    <li>定义复位、启动、断开和 USB 挂起时的安全状态；</li>
+    <li>把 R1 要求、最终实现、计算结果和待实物验收项目分开记录。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-4-1">
+  <h2 id="section-4-1">4.1 定义用户问题</h2>
+  <p>工程问题不应从“选哪颗 MCU”开始，而应从用户要完成的任务开始。R1 的用户问题可以表述为：</p>
+  <blockquote>
+    <p>需要一块小型、低成本、由 USB 供电的开发与自动化工具，使电脑能够通过标准串口式接口控制若干 3.3 V 数字信号、PWM、目标 UART 和两路受控电源，同时在复位和通信中断时保持可预测的安全状态。</p>
+  </blockquote>
+  <p>这个表述包含用户、连接对象、主要功能和安全目标，但仍需进一步量化。以下问题若不回答，后续选型就会依赖猜测：</p>
+  <ul>
+    <li>“若干”究竟是多少路？哪些必须同时工作？</li>
+    <li>GPIO 是输入、推挽输出、开漏还是都要支持？</li>
+    <li>PWM 的通道数、频率关系和分辨率有什么约束？</li>
+    <li>目标电源允许多大电流？过载后怎样表现？</li>
+    <li>板与目标是否隔离？哪一侧定义地参考？</li>
+    <li>USB 断开、固件崩溃或 MCU 复位时，输出应处于什么状态？</li>
+  </ul>
+  <aside class="definition">
+    <p><strong>需求</strong>描述必须达到的用户结果和边界；<strong>实现</strong>描述用什么电路达到它。把“使用 CH32V203”写成最初需求，会过早排除其他可行方案。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-4-2">
+  <h2 id="section-4-2">4.2 功能需求：USB、GPIO、PWM、UART 与受控电源</h2>
+  <table>
+    <caption>R1 冻结的核心功能</caption>
+    <thead>
+      <tr><th scope="col">功能</th><th scope="col">R1 要求</th><th scope="col">最终设计对应</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">主机接口</th><td>USB Type-C、USB 2.0 Full-Speed 设备、CDC ACM 虚拟串口</td><td>J1、U2、R3/R4 与 U1 原生 USB</td></tr>
+      <tr><th scope="row">GPIO</th><td>8 路 3.3 V 通用数字 I/O</td><td>GPIO0–GPIO7，经 R14–R21 到 J2</td></tr>
+      <tr><th scope="row">PWM</th><td>4 路可同时输出</td><td>GPIO0–GPIO3 复用 TIM3_CH1–CH4；四路共享一个频率、占空比独立</td></tr>
+      <tr><th scope="row">目标 UART</th><td>一路 3.3 V CMOS/TTL 串口</td><td>PA2/PA3 经 R22/R23 到 J2-13/J2-14</td></tr>
+      <tr><th scope="row">受控 5 V</th><td>默认关闭，设计目标约 400 mA</td><td>U4、R7、R9 形成 <code>5V_SW</code></td></tr>
+      <tr><th scope="row">受控 3.3 V</th><td>默认关闭，设计目标约 250 mA</td><td>U5、R8、R10 形成 <code>3V3_SW</code></td></tr>
+      <tr><th scope="row">调试恢复</th><td>保留编程、复位与恢复访问</td><td>J3 提供 3V3、GND、SWDIO、SWCLK、NRST，默认 DNP</td></tr>
+    </tbody>
+  </table>
+  <p>“4 路 PWM”必须补充“同时”和“共享频率”，否则用户可能误以为每路能设置任意独立频率。类似地，“400 mA 电源”必须写成设计目标并说明 USB 总预算、线缆、开关压降和热条件。</p>
+</section>
+
+<section aria-labelledby="section-4-3">
+  <h2 id="section-4-3">4.3 电气限制以及 3.3 V 与 5 V 逻辑</h2>
+  <p>R1 的 MCU 与外部数字接口按 3.3 V 逻辑工作。逻辑电压描述信号高低电平；电源电压描述可向负载供给能量的电源轨。两者不能因为数值相同或连接器相邻就混用。</p>
+  <aside class="warning">
+    <p><strong>关键边界：</strong><code>5V_SW</code> 是受控电源，不是 5 V GPIO。J2 上的 GPIO0–GPIO7、UART_TX 与 UART_RX 都按 3.3 V CMOS/TTL 使用。最终事实库没有确认 J2-14 对 5 V 输入的板级容限，因此不得把早期“若引脚确认可耐受 5 V”的条件句写成已实现保证。</p>
+  </aside>
+  <p>规格至少应包含：</p>
+  <ul>
+    <li>输入高低阈值及最大允许引脚电压来自 U1 数据手册；</li>
+    <li>GPIO 单脚与端口组允许电流，而不仅是串联电阻计算；</li>
+    <li>外部设备在 R1 断电时是否仍会驱动信号；</li>
+    <li>电源轨与信号之间是否存在钳位二极管导致的反向供电路径；</li>
+    <li>线缆长度、电容和外部上拉对 PWM/UART 边沿的影响。</li>
+  </ul>
+  <p>R14–R23 的 220 Ω 能在冲突驱动或瞬态下限制电流并减缓边沿，但不能把任意过压变成安全电压，也不能替代电平转换器或完整 ESD 保护。</p>
+</section>
+
+<section aria-labelledby="section-4-4">
+  <h2 id="section-4-4">4.4 USB 总线供电与电流预算</h2>
+  <p>USB 端口、线缆、连接器、板上电源转换和目标负载共同组成供电链。负载开关的限流设定只说明开关试图把电流限制在某个典型范围，不能创造电源能力。</p>
+  <p>R1 的设计目标为 <code>5V_SW</code> 约 400 mA、<code>3V3_SW</code> 约 250 mA，并采用保守的共享 USB 输入预算。实际可用能力还取决于：</p>
+  <ul>
+    <li>主机端口和 Type-C 供电声明；R1 不实现 USB Power Delivery；</li>
+    <li>USB 线缆与 J1 的电阻和压降；</li>
+    <li>R1 自身 MCU、稳压器、LED 与其他电路消耗；</li>
+    <li>U3 转换效率、U4/U5 导通压降与温升；</li>
+    <li>两路负载是否同时开启，以及负载启动浪涌。</li>
+  </ul>
+  <aside class="example">
+    <p><strong>算例 4-1：为什么不能简单相加。</strong>若某目标计划从 <code>5V_SW</code> 取 0.30 A，并从 <code>3V3_SW</code> 取 0.15 A，则 3.3 V 负载的输出功率为 <code>3.3 V × 0.15 A = 0.495 W</code>。它对应的 USB 输入电流必须除以 U3 的实际效率并加上板上消耗。由于效率和板上电流尚未实测，不能从这两个负载数直接宣称 USB 输入电流合格；正确结论是“需要建立预算并实测”。</p>
+  </aside>
+  <p>规格应分别给出设计目标、计算方法和验收条件。例如“在指定主机/线缆、环境温度和负载阶跃下，电源轨不低于某限值且器件温度不过限”才是可测试要求；R1 当前尚未完成此类硬件验收。</p>
+</section>
+
+<section aria-labelledby="section-4-5">
+  <h2 id="section-4-5">4.5 复位、启动、断开与 USB 挂起时的安全状态</h2>
+  <p>安全状态必须覆盖控制器尚未运行和通信丢失的时间。若只规定“固件启动后关闭电源”，上电早期的浮空使能脚仍可能让负载短暂开启。</p>
+  <table>
+    <caption>R1 的安全状态要求</caption>
+    <thead>
+      <tr><th scope="col">事件</th><th scope="col">要求</th><th scope="col">实现线索</th><th scope="col">验证状态</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">复位/上电</th><td>GPIO 高阻、PWM 停止、UART TX 配置前高阻</td><td>固件初始化顺序</td><td>预期，待固件与实物验证</td></tr>
+      <tr><th scope="row">复位/上电</th><td><code>5V_SW</code>、<code>3V3_SW</code> 关闭</td><td>R9/R10 100 kΩ 下拉 + 固件</td><td>硬件设计存在，动态行为待测</td></tr>
+      <tr><th scope="row">USB 挂起</th><td>两路受控电源关闭</td><td>固件策略</td><td>要求已冻结，待验证</td></tr>
+      <tr><th scope="row">USB 断开</th><td>在没有目标侧反向供电时，板失去总线电源并关闭</td><td>总线供电架构</td><td>物理预期；放电过程和反向供电风险待测</td></tr>
+      <tr><th scope="row">无效命令/CRC</th><td>不得改变输出</td><td>通信协议与固件</td><td>协议要求，待固件测试</td></tr>
+    </tbody>
+  </table>
+  <p>规格还应定义“恢复”：故障清除后是否自动重启电源、是否需要主机确认、状态能否查询。R1 最终 U4/U5 没有接入故障输出网络，因此不能把“MCU 可直接读取开关故障脚”写成现有能力。</p>
+</section>
+
+<section aria-labelledby="section-4-6">
+  <h2 id="section-4-6">4.6 成本、尺寸、可得性、装配与可维修性的权衡</h2>
+  <p>优化某一指标常会增加另一项成本。工程规格应说明优先级，而不是要求“最小、最便宜、性能最高、最易焊、保护最多”同时成立。</p>
+  <table>
+    <caption>R1 的实际权衡</caption>
+    <thead>
+      <tr><th scope="col">决策</th><th scope="col">得到的好处</th><th scope="col">付出的代价</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">U3 使用 Buck 而非早期 LDO</th><td>降低 5 V 到 3.3 V、较高负载下的热耗散，增加电流裕量</td><td>增加 L1、反馈网络、开关噪声和布局难度</td></tr>
+      <tr><th scope="row">U1 使用 LQFP-32</th><td>易目检和返修，原生 USB 与外设资源满足需求</td><td>面积大于更紧凑无引脚封装</td></tr>
+      <tr><th scope="row">两层、顶面装配</th><td>原型成本低，装配和检查简单</td><td>回流、布线与地连续性约束更紧</td></tr>
+      <tr><th scope="row">J2 为 2.54 mm 且 DNP</th><td>原型接线方便，用户按需安装</td><td>占板面积；出厂不能直接插接</td></tr>
+      <tr><th scope="row">U4/U5 使用保护型负载开关</th><td>受控通断和可设限流</td><td>器件成本、压降和热约束高于简单铜连接</td></tr>
+      <tr><th scope="row">最终尺寸 50 mm × 24 mm</th><td>容纳连接器、保护、布线和机械间距</td><td>大于早期约 45 mm × 20 mm 目标</td></tr>
+    </tbody>
+  </table>
+  <p>可得性也会变化。供应商编码有助于复现 R1，但库存和“基础/扩展”装配分类应在下单时重新核对，不能把某一天的状态写成永久电气属性。</p>
+</section>
+
+<section aria-labelledby="section-4-7">
+  <h2 id="section-4-7">4.7 分离 Revision A 要求与未来功能</h2>
+  <p>第一版硬件应优先验证核心风险。把所有设想都塞入 R1，会增加元件、网络、固件状态和测试组合，使第一次成功的概率下降。</p>
+  <table>
+    <caption>R1 已冻结范围与后续候选</caption>
+    <thead>
+      <tr><th scope="col">R1 范围</th><th scope="col">未来版本候选</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>8 路 3.3 V GPIO、4 路共享频率 PWM</td><td>更多独立定时器频率、ADC 或中断专用通道</td></tr>
+      <tr><td>一路 3.3 V UART，无硬件流控</td><td>RTS/CTS、电平转换或隔离 UART</td></tr>
+      <tr><td>非隔离、USB 总线供电</td><td>电源/信号隔离、自供电或 USB-PD</td></tr>
+      <tr><td>USB 数据 ESD 保护</td><td>外部 GPIO 的专用 ESD 阵列与更强浪涌保护</td></tr>
+      <tr><td>J2/J3 默认 DNP</td><td>量产连接器、测试夹具或更紧凑接口</td></tr>
+      <tr><td>12 MHz 外部晶体</td><td>在跨温度、跨电压 USB 验证后评估内部时钟降本</td></tr>
+    </tbody>
+  </table>
+  <p>“未来功能”不能悄悄成为当前承诺。最终 R1 没有外部 GPIO ESD 阵列、负载开关故障输出、USB-PD、隔离或 ADC 测量，因此规格和教程都必须明确写成未实现。</p>
+</section>
+
+<section aria-labelledby="section-4-8">
+  <h2 id="section-4-8">4.8 建立可测量的验收标准</h2>
+  <p>可测量的标准包含对象、条件、动作、期望结果和证据。避免“USB 要稳定”“温度不能太高”“布局要好”这类无法判定的句子。</p>
+  <table>
+    <caption>从模糊愿望到可验证标准</caption>
+    <thead>
+      <tr><th scope="col">模糊表达</th><th scope="col">可验证表达示例</th><th scope="col">R1 当前证据</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>板子要小</td><td>板框名义 50 mm × 24 mm，连接器外伸按机械图审核</td><td>设计与 Gerber 已验证</td></tr>
+      <tr><td>所有线都连好</td><td>原理图与 PCB 网络零差异，47/47 命名网络几何连通</td><td>CAD/发布审核已验证</td></tr>
+      <tr><td>元件不能碰撞</td><td>全部 1,128 对器件按本体和封装包络检查，重叠为 0</td><td>机械计算已验证</td></tr>
+      <tr><td>3.3 V 要正确</td><td>在规定 USB 输入、负载和温度下测 <code>3V3_SYS</code> 范围、纹波与启动</td><td>反馈计算 3.318 V；硬件待验证</td></tr>
+      <tr><td>USB 要能用</td><td>多种线缆/主机下枚举、持续传输、挂起/恢复，并记录错误率</td><td>数据路径和 CAD 几何已验证；功能待测</td></tr>
+      <tr><td>安全启动</td><td>示波器观察复位、启动和挂起期间 GPIO 与电源使能，不出现未允许脉冲</td><td>硬件下拉存在；固件/动态行为待测</td></tr>
+    </tbody>
+  </table>
+  <p>验收表必须保留失败记录。若测试失败，工程输出不是“把数据改成通过”，而是记录条件、定位原因、修改设计并重新执行受影响的检查。</p>
+</section>
+
+<section class="experiment" aria-labelledby="section-4-9">
+  <h2 id="section-4-9">4.9 练习：编写并评审一页式板级规格</h2>
+  <p><strong>目的：</strong>把一个模糊的控制板想法压缩成一页、可追踪、可测试的规格，并通过同伴评审发现隐藏假设。</p>
+  <p><strong>任务：</strong>可以使用 R1，也可以选择一块“USB 控制若干低压信号”的自拟板。规格必须包含以下栏目：</p>
+  <ol>
+    <li>用户问题与不在范围内的用途；</li>
+    <li>主机、目标和供电接口；</li>
+    <li>功能数量、并发关系和电平；</li>
+    <li>正常、复位、启动、断开和故障状态；</li>
+    <li>电流、尺寸、成本与装配约束；</li>
+    <li>每项要求的验收方法和证据形式；</li>
+    <li>未来版本候选，明确标注“不属于本版”。</li>
+  </ol>
+  <table>
+    <caption>练习 4-1 需求追踪表</caption>
+    <thead>
+      <tr><th scope="col">ID</th><th scope="col">要求</th><th scope="col">理由/风险</th><th scope="col">验证方法</th><th scope="col">状态</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">F-01</th><td></td><td></td><td></td><td>草案</td></tr>
+      <tr><th scope="row">E-01</th><td></td><td></td><td></td><td>草案</td></tr>
+      <tr><th scope="row">S-01</th><td></td><td></td><td></td><td>草案</td></tr>
+      <tr><th scope="row">M-01</th><td></td><td></td><td></td><td>草案</td></tr>
+    </tbody>
+  </table>
+  <p><strong>评审问题：</strong>同伴应逐项问：数值相对于什么条件？“支持”是否包含并发？失败时是什么状态？验证需要什么仪器？是否把器件型号误写成用户需求？是否把未来功能写成当前承诺？</p>
+  <p><strong>通过判据：</strong>每个“必须”都有可执行验证方法；3.3 V 逻辑与 5 V 电源没有混淆；没有把设计目标或计算值写成实测；范围外功能明确。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="summary-4">
+  <h2 id="summary-4">本章小结</h2>
+  <p>工程规格把用户问题转换为数量、并发、电平、供电、安全状态和验收方法。限流设定不等于电源保证，串联电阻不等于电平转换，发布审核不等于实物性能。R1 的核心范围已经冻结，但 USB、热、时钟、固件和接口性能仍须按明确条件测量。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>本章事实依据：</strong>USB GPIO 提案用于设计意图，最终项目源和 R1 发布资料用于覆盖尺寸、晶体、阻值与已实现功能；硬件待验证清单来自制造检查表。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="03-essential-components.html"><small>上一页</small>3. 常用元器件及其作用（Essential Components and What They Do）</a><a class="next" rel="next" href="05-system-architecture.html"><small>下一页</small>5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists） — USB GPIO PCB 离线教程">
+  <title>附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="appendix-f">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="../chapters/01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="../chapters/02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="../chapters/03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="../chapters/04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="../chapters/05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="../chapters/06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="../chapters/07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="../chapters/08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="../chapters/09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="../chapters/10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="../chapters/11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="../chapters/12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="../chapters/13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="../chapters/14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="../chapters/15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="../chapters/16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="../chapters/17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="../chapters/18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="../chapters/19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="../chapters/20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="../chapters/21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="../chapters/22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="../chapters/23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="../chapters/24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="../chapters/25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="../chapters/26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="../chapters/27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="../chapters/28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="../chapters/29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="../chapters/30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="../chapters/31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="../chapters/32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="../chapters/33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="../chapters/34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="../chapters/35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="../chapters/36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="../chapters/37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="f-checklists.html" aria-current="page">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>附录（Appendices）</li><li aria-current="page">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">附录（Appendices）</p>
+          <h1>附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#f-use">F.1 使用说明</a></li><li class="toc-level-2"><a href="#f-identity">F.2 发布身份与源文件</a></li><li class="toc-level-2"><a href="#f-erc">F.3 原理图与 ERC</a></li><li class="toc-level-2"><a href="#f-symbol-footprint">F.4 符号、footprint、器件数据与网表</a></li><li class="toc-level-2"><a href="#f-mechanical">F.5 机械、布局与装配可达性</a></li><li class="toc-level-2"><a href="#f-outline">F.6 板框、板边与钻孔</a></li><li class="toc-level-2"><a href="#f-drc-routing">F.7 DRC、布线与独立连通性</a></li><li class="toc-level-2"><a href="#f-usb">F.8 USB 专项检查</a></li><li class="toc-level-2"><a href="#f-pour">F.9 地、铺铜与 Gerber 实铜规则</a></li><li class="toc-level-2"><a href="#f-mask-silk">F.10 阻焊、锡膏、丝印与装配信息</a></li><li class="toc-level-2"><a href="#f-fabrication">F.11 Gerber、钻孔与制造包</a></li><li class="toc-level-2"><a href="#f-bom-cpl">F.12 BOM、CPL、DNP 与装配</a></li><li class="toc-level-2"><a href="#f-release">F.13 发布、哈希与批准</a></li><li class="toc-level-2"><a href="#f-post-fab">F.14 不能在制造前勾选的样机验证</a></li></ul></nav>
+        <section aria-labelledby="f-use">
+  <h2 id="f-use">F.1 使用说明</h2>
+  <p>本附录把自动检查、人工检查和制造输出分成独立质量门。每个“□”只能在证据已经查看并记录后勾选；“DRC=0”不能替代原理图、机械、热、信号完整性或实物验证。</p>
+  <aside class="warning">
+    <p><strong>签核失效：</strong>原理图、PCB、footprint、规则、BOM、CPL 或任一制造输出发生变化，旧签核与旧哈希立即失效。应从受影响的最早质量门重新执行到最终 Gerber 审核。</p>
+  </aside>
+  <table>
+    <caption>表 F-1　审核封面</caption>
+    <tbody>
+      <tr><th scope="row">项目 / 板版本</th><td>________________________</td><th scope="row">审核日期</th><td>________________</td></tr>
+      <tr><th scope="row">项目 UUID</th><td>________________________</td><th scope="row">PCB UUID</th><td>________________</td></tr>
+      <tr><th scope="row">EasyEDA 版本</th><td>________________________</td><th scope="row">审核人</th><td>________________</td></tr>
+      <tr><th scope="row">制造商 / 规则版本</th><td colspan="3">____________________________________________________________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="f-identity">
+  <h2 id="f-identity">F.2 发布身份与源文件</h2>
+  <table>
+    <caption>表 F-2　源文件质量门</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">证据 / 备注</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>项目名、板名、修订号与本次发布一致。</td><td>________________</td></tr>
+      <tr><td>□</td><td>项目 UUID、PCB UUID 和活动文档已记录。</td><td>________________</td></tr>
+      <tr><td>□</td><td>原理图、PCB 和项目元数据均已保存。</td><td>________________</td></tr>
+      <tr><td>□</td><td>最终检查前已关闭并重新打开 PCB，以刷新连接状态。</td><td>________________</td></tr>
+      <tr><td>□</td><td>项目归档可打开，包含当前原理图、PCB、元数据和预览。</td><td>________________</td></tr>
+      <tr><td>□</td><td>变更说明列出本版修改、风险、回退点和需重跑的检查。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="f-erc">
+  <h2 id="f-erc">F.3 原理图与 ERC</h2>
+  <table>
+    <caption>表 F-3　ERC 不能代替人工审图</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">结果 / 解释</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>严格 ERC 已运行；错误数、警告数和规则配置已记录。</td><td>错误____　警告____</td></tr>
+      <tr><td>□</td><td>每条警告都有“修复、保留并解释、或规则不适用”的书面决定。</td><td>________________</td></tr>
+      <tr><td>□</td><td>电源输出冲突、悬空输入、未驱动电源和意外 no-connect 已检查。</td><td>________________</td></tr>
+      <tr><td>□</td><td>USB-C A/B 重复 D+/D− 针脚合并正确；CC1/CC2 各有独立下拉。</td><td>________________</td></tr>
+      <tr><td>□</td><td>MCU USB、时钟、复位、BOOT、SWD、UART、PWM、GPIO 和电源分配逐针复核。</td><td>________________</td></tr>
+      <tr><td>□</td><td><code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>3V3_SW</code>、<code>5V_SW</code> 和 GND 保持为不同网络。</td><td>________________</td></tr>
+      <tr><td>□</td><td>5 V 电源未直接接到 3.3 V MCU I/O；UART/GPIO 电压边界已标明。</td><td>________________</td></tr>
+      <tr><td>□</td><td>U4/U5 使能有默认关闭偏置；R1 不存在未实现却被声称存在的 fault 网络。</td><td>________________</td></tr>
+      <tr><td>□</td><td>DNP 属性明确；J2/J3 加入 PCB、排除采购 BOM。</td><td>________________</td></tr>
+      <tr><td>□</td><td>所有刻意未连接引脚有记录；R1 基线为 9 个。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>ERC 0 错误、2 个非阻塞提示；提示文本未由 API 暴露，不得补写猜测。</p>
+</section>
+
+<section aria-labelledby="f-symbol-footprint">
+  <h2 id="f-symbol-footprint">F.4 符号、footprint、器件数据与网表</h2>
+  <table>
+    <caption>表 F-4　库与同步检查</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>每个符号的针号与 footprint 焊盘号按数据手册核对。</td><td>____/____</td></tr>
+      <tr><td>□</td><td>所有拟装配器件有值/型号、制造商料号和有效封装。</td><td>________________</td></tr>
+      <tr><td>□</td><td>极性、pin 1、连接器方向、晶振脚和有源器件旋转可从装配资料识别。</td><td>________________</td></tr>
+      <tr><td>□</td><td>PTH、NPTH 和过孔类型正确，未把机械孔误设为金属化孔。</td><td>________________</td></tr>
+      <tr><td>□</td><td>原理图与 PCB 组件集合一致；DNP 差异有意且可解释。</td><td>组件 ____/____</td></tr>
+      <tr><td>□</td><td>全部针脚按组件身份、针号和网络映射到焊盘。</td><td>针/盘 ____/____</td></tr>
+      <tr><td>□</td><td>原理图—PCB 网络表差异为 0，全部命名网络在 PCB 中存在。</td><td>差异____　网络____</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>48/48 组件映射、172/172 针脚到焊盘、47 个命名网络、网表差异 0。</p>
+</section>
+
+<section aria-labelledby="f-mechanical">
+  <h2 id="f-mechanical">F.5 机械、布局与装配可达性</h2>
+  <table>
+    <caption>表 F-5　电气 DRC 之外的机械质量门</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">证据 / 最小裕量</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>对所有组件对执行实体包络碰撞检查。</td><td>对数____　重叠____</td></tr>
+      <tr><td>□</td><td>独立执行 footprint component-shape/courtyard 碰撞检查。</td><td>对数____　重叠____</td></tr>
+      <tr><td>□</td><td>最小器件间距满足装配、返修和检验要求。</td><td>最小____ mm</td></tr>
+      <tr><td>□</td><td>C8/C9、R1/J1 等历史高风险位置已单独复核。</td><td>________________</td></tr>
+      <tr><td>□</td><td>J1 插口朝外，板边伸出是有意且不改变板框。</td><td>________________</td></tr>
+      <tr><td>□</td><td>J2/J3、SWD、复位、目标排针和测试位置有插接/探针空间。</td><td>________________</td></tr>
+      <tr><td>□</td><td>器件实体、courtyard、丝印、焊盘、孔和板边无不可制造冲突。</td><td>________________</td></tr>
+      <tr><td>□</td><td>所有方向敏感器件在装配图中可识别。</td><td>________________</td></tr>
+      <tr><td>□</td><td>电缆、外壳、工具和返修空间按真实实物或可靠机械数据检查。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>1,128 对组件，实体重叠 0、courtyard/形状重叠 0、0.25 mm 以下实体间隙 0；C8/C9 实体间隙 49.650 mil、形状间隙 45.709 mil；最小接受裕量 10.748 mil。</p>
+</section>
+
+<section aria-labelledby="f-outline">
+  <h2 id="f-outline">F.6 板框、板边与钻孔</h2>
+  <table>
+    <caption>表 F-6　机械制造数据</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>板框由一个锁定、显式闭合的轮廓构成，无重复或断裂片段。</td><td>片段____</td></tr>
+      <tr><td>□</td><td>设计尺寸与 Gerber 实际边界尺寸分别记录并在公差内一致。</td><td>设计____　Gerber____</td></tr>
+      <tr><td>□</td><td>焊盘、过孔和走线到板边的最小距离分别检查。</td><td>pad____　via____　track____</td></tr>
+      <tr><td>□</td><td>PTH、NPTH、过孔钻孔文件分开且刀具尺寸正确。</td><td>________________</td></tr>
+      <tr><td>□</td><td>无未声明的铣槽、盲埋孔或特殊工艺。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>50 mm × 24 mm 名义板；Gerber 49.999900 mm × 24.000460 mm；两个 0.750011 mm NPTH；过孔 130 个、0.304800 mm 钻孔。</p>
+</section>
+
+<section aria-labelledby="f-drc-routing">
+  <h2 id="f-drc-routing">F.7 DRC、布线与独立连通性</h2>
+  <table>
+    <caption>表 F-7　PCB 电气质量门</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>DRC 规则与目标制造商能力、层叠和电气需求一致。</td><td>规则版本____</td></tr>
+      <tr><td>□</td><td>connection、clearance、differential-pair、edge 和其他规则分别记录。</td><td>____ / ____ / ____ / ____</td></tr>
+      <tr><td>□</td><td>独立几何连通性分析覆盖每个命名网络，而不只依赖飞线消失。</td><td>连通____/____</td></tr>
+      <tr><td>□</td><td>移动器件或重布后无旧铜、悬空支路、重复走线和错误换层。</td><td>________________</td></tr>
+      <tr><td>□</td><td>普通信号、USB、GND、BUCK_SW、3V3_SYS、5V_SW、3V3_SW、VBUS 使用正确规则。</td><td>________________</td></tr>
+      <tr><td>□</td><td>晶振、复位、SWD、UART、PWM 和 GPIO 均到达预定针脚。</td><td>________________</td></tr>
+      <tr><td>□</td><td>电源路径按电流、压降和热需求复核；窄颈有意且足够短。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>608 条 track（Top 427、Bottom 181）、130 个过孔；47/47 网络连通；最终 connection、clearance、differential-pair 和其他 DRC 均为 0。</p>
+</section>
+
+<section aria-labelledby="f-usb">
+  <h2 id="f-usb">F.8 USB 专项检查</h2>
+  <table>
+    <caption>表 F-8　USB 只在完整链条中审核</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">记录</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>路径顺序为 J1 → U2 → R3/R4 → U1，D+ 与 D− 未交叉。</td><td>________________</td></tr>
+      <tr><td>□</td><td>U2 靠近入口，未保护段、钳位回路和支路足够短。</td><td>________________</td></tr>
+      <tr><td>□</td><td>差分对宽度、间距、参考面和生产叠层要求已定义。</td><td>________________</td></tr>
+      <tr><td>□</td><td>三段 D+/D− 长度与偏斜已分别记录，未用总长度掩盖局部不对称。</td><td>________________</td></tr>
+      <tr><td>□</td><td>换层附近有连续地参考和合适地过孔；无平面缝隙下穿。</td><td>________________</td></tr>
+      <tr><td>□</td><td>报告明确区分“CAD 长度匹配”与“受控阻抗/眼图/EMI/ESD 通过”。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>三段最大几何偏斜为 0.000058 mil；USB 过孔到最近地转换的最大记录距离为 155.33 mil。受控阻抗、眼图、EMI 和 ESD 仍未验证。</p>
+</section>
+
+<section aria-labelledby="f-pour">
+  <h2 id="f-pour">F.9 地、铺铜与 Gerber 实铜规则</h2>
+  <aside class="warning">
+    <p><strong>不可删减的发布规则：</strong>未来设计优先使用可重铺的 EasyEDA 原生铺铜。接受铺铜前必须检查边界坐标和 bounding box 是否在闭合板框内；任何布局、布线、规则或板框变化后必须 repour；导出后必须在目标铜层 Gerber 中确认实际生成的铜。可见边界本身绝不是制造铜的证据。若不得不使用静态 FILL，每次几何变化后都要重新生成并重新审核全部填充。</p>
+  </aside>
+  <table>
+    <caption>表 F-9　铺铜检查清单</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>每个原生铺铜的层、网络、间距、热连接、优先级和孤岛策略正确。</td><td>________________</td></tr>
+      <tr><td>□</td><td>每个边界都在闭合板框预期范围内，无越板、畸形或错误坐标。</td><td>________________</td></tr>
+      <tr><td>□</td><td>在最终保存状态执行重铺；无陈旧填充。</td><td>________________</td></tr>
+      <tr><td>□</td><td>实际铜与 GND 连通，快速信号和换层处有连续回流。</td><td>________________</td></tr>
+      <tr><td>□</td><td>无孤立铜、意外细颈、封闭间距或热焊盘异常。</td><td>________________</td></tr>
+      <tr><td>□</td><td>Gerber Top/Bottom copper 中可见预期区域数量和形状。</td><td>Top____　Bottom____</td></tr>
+      <tr><td>□</td><td>铺铜/静态填充与最终 DRC、连通性和板边规则同时通过。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>0 个原生 POUR；已删除畸形越板 ID <code>5296498eb95b5e66</code>、<code>d420c7c130568fae</code>；17 个静态 GND FILL（Top 11、Bottom 6），Gerber 分别有 11/6 个 G36/G37 区域。它们在本版制造文件中有效，但维护性低于原生铺铜。</p>
+</section>
+
+<section aria-labelledby="f-mask-silk">
+  <h2 id="f-mask-silk">F.10 阻焊、锡膏、丝印与装配信息</h2>
+  <table>
+    <caption>表 F-10　表面层检查</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>顶/底阻焊开窗与焊盘、过孔处理和连接器外壳一致。</td><td>________________</td></tr>
+      <tr><td>□</td><td>顶层锡膏开口存在；顶面装配时底层无意外锡膏。</td><td>________________</td></tr>
+      <tr><td>□</td><td>PTH 焊盘不依赖锡膏层才能制造。</td><td>________________</td></tr>
+      <tr><td>□</td><td>丝印不覆盖裸焊盘、孔、极性标志和关键装配区域。</td><td>________________</td></tr>
+      <tr><td>□</td><td>板名、修订、USB-C、SWD、GND、受控电源、G0–G7、TX/RX、RST 等标签可读。</td><td>________________</td></tr>
+      <tr><td>□</td><td>若板上省略密集位号，完整位号仍在 BOM、CPL、装配图和项目源中。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="f-fabrication">
+  <h2 id="f-fabrication">F.11 Gerber、钻孔与制造包</h2>
+  <table>
+    <caption>表 F-11　输出文件完整性</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">文件/检查</th><th scope="col">存在 / 结果</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>Top copper / Bottom copper</td><td>________________</td></tr>
+      <tr><td>□</td><td>Top/Bottom solder mask</td><td>________________</td></tr>
+      <tr><td>□</td><td>Top paste；Bottom paste 按装配策略处理</td><td>________________</td></tr>
+      <tr><td>□</td><td>Top/Bottom silkscreen</td><td>________________</td></tr>
+      <tr><td>□</td><td>闭合 board outline</td><td>________________</td></tr>
+      <tr><td>□</td><td>PTH、NPTH、via drill 文件与刀具/孔数</td><td>________________</td></tr>
+      <tr><td>□</td><td>独立 Gerber 查看：焊盘、外壳、孔、板边、间距、铜区、文字</td><td>________________</td></tr>
+      <tr><td>□</td><td>压缩包完整性测试通过；文件名、单位和版本明确</td><td>________________</td></tr>
+      <tr><td>□</td><td>项目归档、原理图 PDF、装配 PDF、BOM、CPL、manifest 同版</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 Gerber 基线：</strong>14 个条目，包括 2 铜、2 丝印、2 阻焊、1 顶层锡膏、1 板框、1 文档层、3 钻孔、飞针测试元数据和下单说明。</p>
+</section>
+
+<section aria-labelledby="f-bom-cpl">
+  <h2 id="f-bom-cpl">F.12 BOM、CPL、DNP 与装配</h2>
+  <table>
+    <caption>表 F-12　装配数据交叉检查</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">检查项</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>BOM 可读，分组数量之和等于拟装配位号数。</td><td>行____　位号____</td></tr>
+      <tr><td>□</td><td>每个 BOM 项有制造商料号、封装和可采购来源。</td><td>________________</td></tr>
+      <tr><td>□</td><td>CPL 位号唯一，位置、旋转、面和 footprint 与 PCB 一致。</td><td>行____　重复____</td></tr>
+      <tr><td>□</td><td>BOM、CPL、PCB、原理图和装配图的 DNP 策略一致。</td><td>________________</td></tr>
+      <tr><td>□</td><td>J2/J3 若由用户后焊，连接器方向、料号和工艺另有说明。</td><td>________________</td></tr>
+      <tr><td>□</td><td>下单前重新检查库存、生命周期、替代料参数和基础/扩展分类。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+  <p><strong>R1 已发布基线：</strong>BOM 21 个分组行/46 个拟装配位号；CPL 48 行；全部顶层；J2/J3 只在 CPL/PCB/装配图中。</p>
+</section>
+
+<section aria-labelledby="f-release">
+  <h2 id="f-release">F.13 发布、哈希与批准</h2>
+  <table>
+    <caption>表 F-13　最终发布记录</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">项目</th><th scope="col">记录</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>所有文件生成时间、版本和来源一致。</td><td>________________</td></tr>
+      <tr><td>□</td><td>每个交付物记录 SHA-256，重新计算后完全匹配。</td><td>________________</td></tr>
+      <tr><td>□</td><td>外层发布 ZIP 条目与源发布目录逐字节一致。</td><td>________________</td></tr>
+      <tr><td>□</td><td>manifest 记录尺寸、数量、规则、机械、USB、铜区、DNP 和限制。</td><td>________________</td></tr>
+      <tr><td>□</td><td>发布决定只写“可送原型制造”，未冒充电气/热/USB/固件验证完成。</td><td>________________</td></tr>
+      <tr><td>□</td><td>未完成的样机验证进入后续测试登记表。</td><td>________________</td></tr>
+      <tr><td>□</td><td>审核人和批准人签名。</td><td>审核____　批准____　日期____</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="f-post-fab">
+  <h2 id="f-post-fab">F.14 不能在制造前勾选的样机验证</h2>
+  <p>以下项目不属于 Gerber 接受条件，必须在装配板上单独执行：</p>
+  <table>
+    <caption>表 F-14　样机验证登记</caption>
+    <thead><tr><th scope="col">状态</th><th scope="col">验证项目</th><th scope="col">所需证据</th></tr></thead>
+    <tbody>
+      <tr><td>□ 未完成</td><td>外观、焊点、桥连、开路、极性、连接器对位</td><td>照片 / 检验记录 / 必要时 X-ray</td></tr>
+      <tr><td>□ 未完成</td><td>断电电阻与限流首次上电</td><td>VBUS/GND、3V3/GND 电阻；输入电流和各电源电压</td></tr>
+      <tr><td>□ 未完成</td><td>Buck 启动、纹波、负载瞬态、稳定性、温升</td><td>示波器原始波形、探头接法、负载和温度</td></tr>
+      <tr><td>□ 未完成</td><td>5V_SW/3V3_SW 使能、关断、压降、限流、恢复</td><td>电压/电流曲线与停止条件</td></tr>
+      <tr><td>□ 未完成</td><td>12 MHz 晶振起振、频率和裕量</td><td>低负载测量方法与波形</td></tr>
+      <tr><td>□ 未完成</td><td>USB 枚举、传输、挂起/恢复、线缆变化</td><td>主机日志、持续传输记录；需要时眼图/EMI</td></tr>
+      <tr><td>□ 未完成</td><td>GPIO/PWM/UART 与安全启动状态</td><td>逻辑电平、频率、占空比、误码、复位/挂起波形</td></tr>
+      <tr><td>□ 未完成</td><td>ESD/预一致性与多板一致性</td><td>受控测试计划、样本数量和原始结果</td></tr>
+    </tbody>
+  </table>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="e-easyeda-quick-reference.html"><small>上一页</small>附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a><a class="next" rel="next" href="g-laboratory-worksheets.html"><small>下一页</small>附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

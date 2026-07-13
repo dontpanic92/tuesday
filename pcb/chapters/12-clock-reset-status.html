@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="12. 时钟、复位与状态指示（Clock, Reset, and Status Indication） — USB GPIO PCB 离线教程">
+  <title>12. 时钟、复位与状态指示（Clock, Reset, and Status Indication） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-12">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html" aria-current="page">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</li><li aria-current="page">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</p>
+          <h1>12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch12-learning-objectives">学习目标与最终设计校正</a></li><li class="toc-level-2"><a href="#ch12-12-1">12.1 数字逻辑为什么需要时钟</a></li><li class="toc-level-2"><a href="#ch12-12-2">12.2 Y1：最终 R1 的 12 MHz 石英晶振</a></li><li class="toc-level-2"><a href="#ch12-12-3">12.3 C11 与 C12：晶振两侧的负载电容</a></li><li class="toc-level-2"><a href="#ch12-12-4">12.4 含杂散电容的负载计算</a></li><li class="toc-level-2"><a href="#ch12-12-5">12.5 晶振走线要短、对称、安静</a></li><li class="toc-level-2"><a href="#ch12-12-6">12.6 R12 与 C10：复位上拉、滤波和时间常数</a></li><li class="toc-level-2"><a href="#ch12-12-7">12.7 R11：BOOT0 默认低电平</a></li><li class="toc-level-2"><a href="#ch12-12-8">12.8 D1 与 R13：由 PB5 控制的状态灯</a></li><li class="toc-level-2"><a href="#ch12-12-9">12.9 LED 电流公式与 GPIO 驱动边界</a></li><li class="toc-level-2"><a href="#ch12-12-10">12.10 实验：测量时钟、复位和 LED 电流</a></li><li class="toc-level-3"><a href="#ch12-experiment-equipment">器材</a></li><li class="toc-level-3"><a href="#ch12-experiment-safety">安全与停止条件</a></li><li class="toc-level-3"><a href="#ch12-experiment-procedure">步骤</a></li><li class="toc-level-2"><a href="#ch12-summary">本章小结</a></li><li class="toc-level-2"><a href="#ch12-sources">事实来源</a></li></ul></nav>
+        <section class="notice" aria-labelledby="ch12-learning-objectives">
+  <h2 id="ch12-learning-objectives">学习目标与最终设计校正</h2>
+  <p>本章解释 Y1/C11/C12 的振荡网络、R12/C10 的复位网络、R11 的 BOOT0 偏置，以及 D1/R13 的状态指示。</p>
+  <p><strong>频率校正：</strong><code>toc.md</code> 的 12.2 保留了早期“8 MHz”文字；最终 R1 工程明确采用 <strong>Y1 = 12 MHz</strong>。教材必须以最终源为准，并把这一差异作为设计迭代记录。</p>
+  <p><strong>事实状态：</strong>器件值和网络为【设计】；1 ms、6 pF 和 3.3 mA 上限为【计算】；真实起振、频率、复位释放和 LED 电流为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch12-12-1">
+  <h2 id="ch12-12-1">12.1 数字逻辑为什么需要时钟</h2>
+  <p>时钟为 CPU 和同步外设提供统一的时间基准。每个时钟边沿推动状态机前进一步；USB、定时器、UART 波特率和指令执行都依赖由时钟树派生的频率。频率不正确、抖动过大或振荡未启动，可能造成固件不运行、通信定时错误或 USB 无法工作【预期】。</p>
+  <p>晶振不是独立输出方波的有源模块。Y1 与 U1 内部振荡放大器、C11/C12 和板级寄生共同构成闭环振荡器，因此器件值与毫米级布局不可分割。</p>
+</section>
+
+<section aria-labelledby="ch12-12-2">
+  <h2 id="ch12-12-2">12.2 Y1：最终 R1 的 12 MHz 石英晶振</h2>
+  <p>Y1 是 X322512MSB4SI、3225 四焊盘无源晶振，标称 <strong>12 MHz、20 pF 负载电容</strong>【设计】。焊盘 1 接 <code>OSC_IN</code>，焊盘 3 接 <code>OSC_OUT</code>，焊盘 2/4 接 <code>GND</code>。</p>
+  <p>最终 12 MHz 覆盖了提案和目录中旧的 8 MHz。不能一边焊 12 MHz 器件、一边按 8 MHz 配置固件时钟；原理图值、BOM 料号、固件时钟树和 USB 时序必须一致。</p>
+  <p>Y1 开路、虚焊或错装时外部时钟可能不起振；错频率或负载不匹配时可能出现频偏、起振裕量不足或 USB 时钟问题【预期】。这些行为尚无板级测量。</p>
+</section>
+
+<section aria-labelledby="ch12-12-3">
+  <h2 id="ch12-12-3">12.3 C11 与 C12：晶振两侧的负载电容</h2>
+  <table>
+    <caption>晶振负载元件【设计】</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">值与网络</th><th scope="col">布局</th><th scope="col">失效影响【预期】</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>C11</td>
+        <td>12 pF、C0603、C0G；<code>OSC_IN</code>—GND</td>
+        <td>紧靠 Y1/U1，地回路短，与 C12 尽量对称。</td>
+        <td>开路会减小负载；短路或错大可能重载 OSC_IN，增加不起振风险。</td>
+      </tr>
+      <tr>
+        <td>C12</td>
+        <td>12 pF、C0603、C0G；<code>OSC_OUT</code>—GND</td>
+        <td>与 C11 对称，远离 BUCK_SW 和快速数字线。</td>
+        <td>开路会改变频偏；短路或错大可能重载 OSC_OUT。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>C0G 介质适合小容量、稳定性要求较高的谐振网络，但“介质正确”不自动保证负载匹配。引脚、焊盘、走线和邻近铜都贡献杂散电容。</p>
+</section>
+
+<section aria-labelledby="ch12-12-4">
+  <h2 id="ch12-12-4">12.4 含杂散电容的负载计算</h2>
+  <figure class="example" id="ch12-crystal-load-calculation">
+    <figcaption>晶振看到的近似负载</figcaption>
+    <p><var>C</var><sub>L</sub> ≈ (<var>C</var><sub>11</sub> × <var>C</var><sub>12</sub>) / (<var>C</var><sub>11</sub> + <var>C</var><sub>12</sub>) + <var>C</var><sub>STRAY</sub></p>
+    <dl>
+      <dt><var>C</var><sub>L</sub></dt><dd>晶振看到的等效负载，单位 pF。</dd>
+      <dt><var>C</var><sub>11</sub>、<var>C</var><sub>12</sub></dt><dd>各为 12 pF【设计】。</dd>
+      <dt><var>C</var><sub>STRAY</sub></dt><dd>U1 引脚、Y1 封装、焊盘、走线和邻近铜的总杂散电容，单位 pF。</dd>
+    </dl>
+    <p>不含杂散时：(12 × 12) / (12 + 12) = <strong>6 pF</strong>【计算】。</p>
+    <p>Y1 元数据标称负载 20 pF，但 <var>C</var><sub>STRAY</sub> 和 U1 振荡器模型未知，因此不能仅凭“6 pF + 未知量”判断一定匹配或一定不匹配。频偏、起振时间和裕量均为【待验证】。</p>
+  </figure>
+  <aside class="warning">
+    <strong>不要反向猜数：</strong>不能为了让公式凑成 20 pF，就宣称板上杂散必定是 14 pF。杂散必须由模型、提取或测量支持。
+  </aside>
+</section>
+
+<section aria-labelledby="ch12-12-5">
+  <h2 id="ch12-12-5">12.5 晶振走线要短、对称、安静</h2>
+  <p><code>OSC_IN</code> 和 <code>OSC_OUT</code> 是高阻、低能量的模拟节点，容易受开关噪声影响。布局原则包括：</p>
+  <ul>
+    <li>Y1 靠近 U1 的 2/3 脚，走线短、无支路、少过孔；</li>
+    <li>C11/C12 紧靠对应晶振端，地回路短且对称；</li>
+    <li>不要让 BUCK_SW、PWM、USB 或时钟之外的快速线从其下方或附近经过；</li>
+    <li>晶振下方和周围保持可理解的地参考，避免高电流回流穿越；</li>
+    <li>测试点和长探针会增加电容，不应随意挂在振荡节点。</li>
+  </ul>
+  <p>Y1、C11、C12 的布局等级均为关键【设计】。即使 ERC/DRC 为零，也不能证明振荡器有足够负阻裕量。</p>
+</section>
+
+<section aria-labelledby="ch12-12-6">
+  <h2 id="ch12-12-6">12.6 R12 与 C10：复位上拉、滤波和时间常数</h2>
+  <p>R12 是 10 kΩ，从 <code>3V3_SYS</code> 上拉 <code>NRST</code>；C10 是 100 nF，从 <code>NRST</code> 接 GND【设计】。上电时 C10 起初近似未充电，使 NRST 上升受限；随后通过 R12 充电，NRST 逐步释放。</p>
+  <figure class="example" id="ch12-reset-rc-calculation">
+    <figcaption>复位 RC 名义时间常数</figcaption>
+    <p>&tau; = <var>R</var> × <var>C</var></p>
+    <p><var>R</var> = 10 kΩ = 10,000 Ω，<var>C</var> = 100 nF = 100 × 10<sup>−9</sup> F。</p>
+    <p>&tau; = 10,000 × 100 × 10<sup>−9</sup> = 0.001 s = <strong>1 ms</strong>【计算】。</p>
+    <p><strong>假设：</strong>理想阶跃电源、理想 R/C、无内部上拉和漏电。实际复位释放时刻取决于 NRST 阈值、3V3_SYS 上升斜率、U1 内部复位电路和外部调试器，因此不等于简单的 1 ms。</p>
+  </figure>
+  <p>R12 开路时 NRST 可能悬空；C10 开路时抗噪和上电延时减弱；C10 短路或 NRST 对地短路会使 U1 保持复位【预期】。二者都应靠近 U1，复位线避开 BUCK_SW。</p>
+</section>
+
+<section aria-labelledby="ch12-12-7">
+  <h2 id="ch12-12-7">12.7 R11：BOOT0 默认低电平</h2>
+  <p>R11 是 100 kΩ，从 <code>BOOT0</code> 接 GND【设计】，使 U1 默认进入正常启动路径。阻值足够大，便于调试器或测试夹具在需要时覆盖，又能避免引脚悬空。</p>
+  <p>R11 开路时 BOOT0 可能受噪声影响而进入错误启动模式；误短到高电平或装错网络可能使板持续进入引导模式【预期】。R11 应靠近 U1 的 BOOT0 脚，且不能把“进入引导模式”误诊为 MCU 已损坏。</p>
+</section>
+
+<section aria-labelledby="ch12-12-8">
+  <h2 id="ch12-12-8">12.8 D1 与 R13：由 PB5 控制的状态灯</h2>
+  <p>U1 的 PB5/封装脚 28 输出 <code>STATUS_LED</code>，经 R13 到 <code>LED_A</code>，再通过 D1 回到 GND【设计】。</p>
+  <table>
+    <caption>状态指示元件</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">设计事实</th><th scope="col">布局与失效</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>R13</td>
+        <td>1 kΩ、0603；<code>STATUS_LED</code>—<code>LED_A</code>，限制 LED/GPIO 电流。</td>
+        <td>靠近 D1 便于识别。开路或错大：灯不亮；短路或错小：D1/U1 电流可能过大【预期】。</td>
+      </tr>
+      <tr>
+        <td>D1</td>
+        <td>19-217/G7C-BK2L2VY/3T，0603 黄绿色 LED；阳极 <code>LED_A</code>，阴极 GND。</td>
+        <td>必须检查极性和可视方向。反装/开路时不亮；短路时经 R13 持续拉低 STATUS_LED【预期】。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>状态灯是诊断工具，不是系统正常的充分证据：LED 能闪不证明 USB、时钟精度或所有 GPIO 已通过；LED 不亮也可能只是 D1/R13 极性、焊接或固件问题。</p>
+</section>
+
+<section aria-labelledby="ch12-12-9">
+  <h2 id="ch12-12-9">12.9 LED 电流公式与 GPIO 驱动边界</h2>
+  <figure class="example" id="ch12-led-current-calculation">
+    <figcaption>状态 LED 电流</figcaption>
+    <p><var>I</var><sub>LED</sub> = (<var>V</var><sub>OH</sub> − <var>V</var><sub>F</sub>) / <var>R</var><sub>13</sub></p>
+    <dl>
+      <dt><var>I</var><sub>LED</sub></dt><dd>LED 电流，单位 A。</dd>
+      <dt><var>V</var><sub>OH</sub></dt><dd>PB5 带载高电平，单位 V。</dd>
+      <dt><var>V</var><sub>F</sub></dt><dd>D1 在该电流和温度下的正向压降，单位 V。</dd>
+      <dt><var>R</var><sub>13</sub></dt><dd>1 kΩ。</dd>
+    </dl>
+    <p>事实库没有最终板的 <var>V</var><sub>OH</sub> 或 <var>V</var><sub>F</sub> 实测。若只取极端数学假设 <var>V</var><sub>F</sub> = 0、<var>V</var><sub>OH</sub> = 3.3 V，则 <var>I</var><sub>LED</sub> ≤ 3.3/1000 = <strong>3.3 mA</strong>【理论上界】。真实 LED 电流会更低，但具体数值必须测量。</p>
+  </figure>
+  <p>检查 GPIO 能否驱动 LED 时，必须查推荐工作条件和输出高电平随电流变化的数据，而不能用绝对最大额定值作为日常工作点。R13 既保护 LED，也限制 U1 引脚电流。</p>
+</section>
+
+<section class="experiment" aria-labelledby="ch12-12-10">
+  <h2 id="ch12-12-10">12.10 实验：测量时钟、复位和 LED 电流</h2>
+  <h3 id="ch12-experiment-equipment">器材</h3>
+  <p>限流电源、万用表、示波器、低电容有源探头或合适的时钟测量方法、短地弹簧、调试器和温度记录工具。</p>
+  <h3 id="ch12-experiment-safety">安全与停止条件</h3>
+  <ul>
+    <li>普通 10× 探头的电容可能改变晶振负载甚至令其停振；没有低电容探头时，不直接探 OSC_IN/OSC_OUT。</li>
+    <li>不要把示波器地夹接到晶振信号；只接确认过的 GND。</li>
+    <li>不要把电流表串入微小晶振回路。LED 电流优先通过测 R13 两端压降计算。</li>
+    <li>若 3V3_SYS 异常、U1 过热、NRST 长期低或探头使系统停止，立即断电。</li>
+  </ul>
+  <h3 id="ch12-experiment-procedure">步骤</h3>
+  <ol>
+    <li>先记录上电时 3V3_SYS 与 NRST 波形，测量 NRST 达到逻辑释放条件的时间；不要直接把它写成 1 ms。</li>
+    <li>通过 MCU 输出时钟功能、调试器或低电容探测方法验证系统时钟；记录方法和负载影响。</li>
+    <li>让固件分别关闭和点亮 D1，测 R13 两端电压 <var>V</var><sub>R13</sub>。</li>
+    <li>按 <var>I</var> = <var>V</var><sub>R13</sub>/1 kΩ 计算 LED 电流，并记录 LED 极性与亮度的主观观察。</li>
+  </ol>
+  <table>
+    <caption>实验 12-1 记录表</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">设计/计算参考</th><th scope="col">测量方法</th><th scope="col">实测</th><th scope="col">备注</th></tr></thead>
+    <tbody>
+      <tr><td>时钟频率</td><td>Y1 = 12 MHz【设计】</td><td>待填</td><td>待填</td><td>记录探头负载</td></tr>
+      <tr><td>NRST 释放</td><td>&tau; = 1 ms【计算】</td><td>待填</td><td>待填</td><td>阈值/电源斜率</td></tr>
+      <tr><td>R13 压降</td><td>R13 = 1 kΩ【设计】</td><td>待填</td><td>待填</td><td>LED 开/关状态</td></tr>
+      <tr><td>LED 电流</td><td>理论上界 3.3 mA【计算】</td><td>由压降计算</td><td>待填</td><td>不得预填</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch12-summary">
+  <h2 id="ch12-summary">本章小结</h2>
+  <ul>
+    <li>最终 Y1 是 12 MHz、20 pF 标称负载，不是目录遗留的 8 MHz。</li>
+    <li>C11/C12 各 12 pF，理想串联等效 6 pF；加入未知杂散后的匹配仍待验证。</li>
+    <li>R12/C10 的名义时间常数为 1 ms，R11 以 100 kΩ 把 BOOT0 默认拉低。</li>
+    <li>D1 为黄绿色 0603 LED，R13 为 1 kΩ；实际 LED 电流必须由压降测量。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch12-sources">
+  <h2 id="ch12-sources">事实来源</h2>
+  <p>最终 EasyEDA 工程中的 Y1、C10–C12、R11–R13、D1 网络和值；结构化事实库的时钟/复位和公式；Y1 元数据与晶振资料。目录和早期提案中的 8 MHz 已由最终 12 MHz 设计覆盖。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="11-microcontroller-core.html"><small>上一页</small>11. 微控制器核心（The Microcontroller Core）</a><a class="next" rel="next" href="13-interfaces-protection.html"><small>下一页</small>13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

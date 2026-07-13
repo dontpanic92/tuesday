@@ -1,0 +1,153 @@
+<section aria-labelledby="c-rules">
+  <h2 id="c-rules">C.1 使用针脚表前的三条规则</h2>
+  <ol>
+    <li><strong>针脚号不等于阅读方向。</strong>连接器正视、背视、焊接面和 PCB 顶视可能互为镜像；必须同时核对 footprint pin 1 标记、装配图和实物方向。</li>
+    <li><strong>网络名不等于电气容限。</strong><code>GPIO*</code> 和 <code>UART_*</code> 是 3.3 V 逻辑；本表不把任何引脚推断为 5 V 容限。<code>5V_SW</code> 只是电源输出。</li>
+    <li><strong>DNP 不等于无连接。</strong>J2、J3 在最终 PCB 和 CPL 中存在，但标准采购 BOM 不装排针；使用前需焊接合适连接器或准备测试夹具。</li>
+  </ol>
+  <aside class="warning" aria-label="接线警告">
+    <p>接线前断电，用连续性档确认地与 pin 1；不要让调试器、目标板和 USB 主机的电源在方向未确认时互相驱动。任何外部信号都应先建立共同 GND。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="connector-j2">
+  <h2 id="connector-j2">C.2 J2 目标接口：2×8、2.54 mm、DNP</h2>
+  <table>
+    <caption>表 C-1　J2 完整针脚映射</caption>
+    <thead><tr><th scope="col">针脚</th><th scope="col">网络</th><th scope="col">相对本板方向</th><th scope="col">用途与限制</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">1</th><td><code>GND</code></td><td>参考/回流</td><td>目标系统共同地；接线时优先连接。</td></tr>
+      <tr><th scope="row">2</th><td><code>GND</code></td><td>参考/回流</td><td>第二个地脚，降低回流共用阻抗并便于排线分配。</td></tr>
+      <tr><th scope="row">3</th><td><code>5V_SW</code></td><td>本板输出</td><td>U4 受控 5 V 电源；设计限流约 0.402 A，实际压降、阈值和热行为待测。</td></tr>
+      <tr><th scope="row">4</th><td><code>3V3_SW</code></td><td>本板输出</td><td>U5 受控 3.3 V 电源；设计限流约 0.252 A，实际能力待测。</td></tr>
+      <tr><th scope="row">5</th><td><code>GPIO0_PWM0</code></td><td>双向 / PWM 输出</td><td>经 R14 接 U1 PA6 / TIM3_CH1。</td></tr>
+      <tr><th scope="row">6</th><td><code>GPIO1_PWM1</code></td><td>双向 / PWM 输出</td><td>经 R15 接 U1 PA7 / TIM3_CH2。</td></tr>
+      <tr><th scope="row">7</th><td><code>GPIO2_PWM2</code></td><td>双向 / PWM 输出</td><td>经 R16 接 U1 PB0 / TIM3_CH3。</td></tr>
+      <tr><th scope="row">8</th><td><code>GPIO3_PWM3</code></td><td>双向 / PWM 输出</td><td>经 R17 接 U1 PB1 / TIM3_CH4。</td></tr>
+      <tr><th scope="row">9</th><td><code>GPIO4</code></td><td>双向</td><td>经 R18 接 U1 PA0。</td></tr>
+      <tr><th scope="row">10</th><td><code>GPIO5</code></td><td>双向</td><td>经 R19 接 U1 PA1。</td></tr>
+      <tr><th scope="row">11</th><td><code>GPIO6</code></td><td>双向</td><td>经 R20 接 U1 PA4。</td></tr>
+      <tr><th scope="row">12</th><td><code>GPIO7</code></td><td>双向</td><td>经 R21 接 U1 PA5。</td></tr>
+      <tr><th scope="row">13</th><td><code>UART_TX</code></td><td>本板到目标</td><td>经 R22 接 U1 PA2 / USART2_TX；3.3 V CMOS/TTL，不是 RS-232。</td></tr>
+      <tr><th scope="row">14</th><td><code>UART_RX</code></td><td>目标到本板</td><td>经 R23 接 U1 PA3 / USART2_RX；不得假定 5 V 容限。</td></tr>
+      <tr><th scope="row">15</th><td><code>NRST</code></td><td>复位网络</td><td>与 U1、R12、C10、J3 共网；外部驱动方式必须与复位电路兼容。</td></tr>
+      <tr><th scope="row">16</th><td>NC</td><td>无</td><td>最终设计刻意未连接，保留给未来版本；不得用作地或电源。</td></tr>
+    </tbody>
+  </table>
+  <div class="notice">
+    <p>四路 PWM 来自同一个 TIM3，因而共享频率、可有独立占空比。GPIO0–GPIO7 与 UART 都经过 220 Ω 串联电阻；这些电阻降低部分故障电流并调节边沿，但不提供隔离或完整 ESD 防护。</p>
+  </div>
+</section>
+
+<section aria-labelledby="connector-j3">
+  <h2 id="connector-j3">C.3 J3 调试接口：1×5、1.27 mm、DNP</h2>
+  <table>
+    <caption>表 C-2　J3 SWD / 恢复接口</caption>
+    <thead><tr><th scope="col">针脚</th><th scope="col">网络</th><th scope="col">典型角色</th><th scope="col">接线检查</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">1</th><td><code>3V3_SYS</code></td><td>目标电压参考/按调试方案供电</td><td>先确认调试器该脚是检测、输入还是供电输出，避免双电源冲突。</td></tr>
+      <tr><th scope="row">2</th><td><code>GND</code></td><td>共同参考</td><td>应先接、后断。</td></tr>
+      <tr><th scope="row">3</th><td><code>SWDIO</code></td><td>双向调试数据</td><td>接 U1 pin 23。</td></tr>
+      <tr><th scope="row">4</th><td><code>SWCLK</code></td><td>调试时钟</td><td>接 U1 pin 24；与 SWDIO 不可交换。</td></tr>
+      <tr><th scope="row">5</th><td><code>NRST</code></td><td>目标复位</td><td>与 J2 pin 15、R12、C10 和 U1 pin 4 同网。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="connector-j1">
+  <h2 id="connector-j1">C.4 J1 USB-C 逻辑针脚组</h2>
+  <p>最终 footprint 把部分对称焊盘以组合名称表示。下表按电气功能列出，不用于替代连接器数据手册的机械视图。</p>
+  <table>
+    <caption>表 C-3　J1 USB 2.0-only Type-C 连接</caption>
+    <thead><tr><th scope="col">J1 焊盘</th><th scope="col">网络</th><th scope="col">功能</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">A1、A12、B1、B12</th><td><code>GND</code></td><td>USB 地和回流。</td></tr>
+      <tr><th scope="row">A4、A9、B4、B9</th><td><code>VBUS_IN</code></td><td>USB 总线电源输入。</td></tr>
+      <tr><th scope="row">A5</th><td><code>CC1</code></td><td>经 R1 5.1 kΩ 独立下拉到地。</td></tr>
+      <tr><th scope="row">B5</th><td><code>CC2</code></td><td>经 R2 5.1 kΩ 独立下拉到地。</td></tr>
+      <tr><th scope="row">A6、B6</th><td><code>USB_DP_CONN</code></td><td>可翻转连接后的 USB D+，进入 U2。</td></tr>
+      <tr><th scope="row">A7、B7</th><td><code>USB_DM_CONN</code></td><td>可翻转连接后的 USB D−，进入 U2。</td></tr>
+      <tr><th scope="row">A8、B8</th><td>NC</td><td>SBU 引脚在 R1 中刻意未使用。</td></tr>
+      <tr><th scope="row">外壳/固定焊盘 1–4</th><td><code>GND</code></td><td>机械固定与外壳接地路径。</td></tr>
+    </tbody>
+  </table>
+  <p>R1 不包含 SuperSpeed 差分对、USB Power Delivery 控制器或 USB-C 主机功能；它是 USB 2.0 设备和受电端。</p>
+</section>
+
+<section aria-labelledby="mcu-u1-full-map">
+  <h2 id="mcu-u1-full-map">C.5 U1 CH32V203K8T6 全部 32 个封装针脚</h2>
+  <table>
+    <caption>表 C-4　U1 LQFP-32 完整针脚—网络—R1 功能映射</caption>
+    <thead><tr><th scope="col">封装针脚</th><th scope="col">符号针名</th><th scope="col">最终网络</th><th scope="col">R1 中的用途</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">1</th><td><code>VDD</code></td><td><code>3V3_SYS</code></td><td>数字电源。</td></tr>
+      <tr><th scope="row">2</th><td><code>OSC_IN/PD0</code></td><td><code>OSC_IN</code></td><td>Y1 12 MHz 晶振输入端。</td></tr>
+      <tr><th scope="row">3</th><td><code>OSC_OUT/PD1</code></td><td><code>OSC_OUT</code></td><td>Y1 12 MHz 晶振输出端。</td></tr>
+      <tr><th scope="row">4</th><td><code>NRST</code></td><td><code>NRST</code></td><td>外部复位；连接 R12、C10、J2、J3。</td></tr>
+      <tr><th scope="row">5</th><td><code>VDDA</code></td><td><code>3V3_SYS</code></td><td>模拟电源域供电。</td></tr>
+      <tr><th scope="row">6</th><td><code>PA0/WKUP/ADC0</code></td><td><code>GPIO4_MCU</code></td><td>GPIO4，经 R18 到 J2 pin 9。</td></tr>
+      <tr><th scope="row">7</th><td><code>PA1/ADC1</code></td><td><code>GPIO5_MCU</code></td><td>GPIO5，经 R19 到 J2 pin 10。</td></tr>
+      <tr><th scope="row">8</th><td><code>PA2/ADC2</code></td><td><code>UART_TX_MCU</code></td><td>USART2_TX，经 R22 到 J2 pin 13。</td></tr>
+      <tr><th scope="row">9</th><td><code>PA3/ADC3</code></td><td><code>UART_RX_MCU</code></td><td>USART2_RX，经 R23 到 J2 pin 14。</td></tr>
+      <tr><th scope="row">10</th><td><code>PA4/ADC4</code></td><td><code>GPIO6_MCU</code></td><td>GPIO6，经 R20 到 J2 pin 11。</td></tr>
+      <tr><th scope="row">11</th><td><code>PA5/ADC5</code></td><td><code>GPIO7_MCU</code></td><td>GPIO7，经 R21 到 J2 pin 12。</td></tr>
+      <tr><th scope="row">12</th><td><code>PA6/ADC6</code></td><td><code>GPIO0_MCU</code></td><td>TIM3_CH1 / GPIO0，经 R14 到 J2 pin 5。</td></tr>
+      <tr><th scope="row">13</th><td><code>PA7/ADC7</code></td><td><code>GPIO1_MCU</code></td><td>TIM3_CH2 / GPIO1，经 R15 到 J2 pin 6。</td></tr>
+      <tr><th scope="row">14</th><td><code>PB0/ADC8</code></td><td><code>GPIO2_MCU</code></td><td>TIM3_CH3 / GPIO2，经 R16 到 J2 pin 7。</td></tr>
+      <tr><th scope="row">15</th><td><code>PB1/ADC9</code></td><td><code>GPIO3_MCU</code></td><td>TIM3_CH4 / GPIO3，经 R17 到 J2 pin 8。</td></tr>
+      <tr><th scope="row">16</th><td><code>VSS</code></td><td><code>GND</code></td><td>地。</td></tr>
+      <tr><th scope="row">17</th><td><code>VDD</code></td><td><code>3V3_SYS</code></td><td>数字电源。</td></tr>
+      <tr><th scope="row">18</th><td><code>PA8</code></td><td>NC</td><td>R1 刻意未使用。</td></tr>
+      <tr><th scope="row">19</th><td><code>PA9</code></td><td>NC</td><td>R1 刻意未使用。</td></tr>
+      <tr><th scope="row">20</th><td><code>PA10</code></td><td>NC</td><td>R1 刻意未使用。</td></tr>
+      <tr><th scope="row">21</th><td><code>PA11/USB1DM</code></td><td><code>USB_DM_MCU</code></td><td>USB D−。</td></tr>
+      <tr><th scope="row">22</th><td><code>PA12/USB1DP</code></td><td><code>USB_DP_MCU</code></td><td>USB D+。</td></tr>
+      <tr><th scope="row">23</th><td><code>PA13/SWDIO</code></td><td><code>SWDIO</code></td><td>SWD 调试数据，J3 pin 3。</td></tr>
+      <tr><th scope="row">24</th><td><code>PA14/SWCLK</code></td><td><code>SWCLK</code></td><td>SWD 调试时钟，J3 pin 4。</td></tr>
+      <tr><th scope="row">25</th><td><code>PA15</code></td><td>NC</td><td>R1 刻意未使用。</td></tr>
+      <tr><th scope="row">26</th><td><code>PB3</code></td><td><code>EN_5V</code></td><td>U4 / 5V_SW 使能；R9 默认下拉。</td></tr>
+      <tr><th scope="row">27</th><td><code>PB4</code></td><td><code>EN_3V3</code></td><td>U5 / 3V3_SW 使能；R10 默认下拉。</td></tr>
+      <tr><th scope="row">28</th><td><code>PB5</code></td><td><code>STATUS_LED</code></td><td>经 R13 驱动 D1。</td></tr>
+      <tr><th scope="row">29</th><td><code>PB6</code></td><td>NC</td><td>R1 刻意未使用。</td></tr>
+      <tr><th scope="row">30</th><td><code>PB7</code></td><td>NC</td><td>R1 刻意未使用。</td></tr>
+      <tr><th scope="row">31</th><td><code>PB8/BOOT0</code></td><td><code>BOOT0</code></td><td>启动选择；R11 100 kΩ 默认下拉。</td></tr>
+      <tr><th scope="row">32</th><td><code>VSS</code></td><td><code>GND</code></td><td>地。</td></tr>
+    </tbody>
+  </table>
+  <p>U1 的六个未使用 I/O（18、19、20、25、29、30），加上 J1 的 A8/B8 和 J2 pin 16，构成最终审核记录的九个刻意未连接引脚。</p>
+</section>
+
+<section aria-labelledby="mcu-external-bridge">
+  <h2 id="mcu-external-bridge">C.6 MCU 与 J2 之间的串联器件对照</h2>
+  <table>
+    <caption>表 C-5　十条外部数字信号的完整桥接关系</caption>
+    <thead><tr><th scope="col">U1 pin / 功能</th><th scope="col">MCU 侧网</th><th scope="col">电阻</th><th scope="col">J2 侧网 / pin</th></tr></thead>
+    <tbody>
+      <tr><td>12 / TIM3_CH1</td><td><code>GPIO0_MCU</code></td><td>R14，220 Ω</td><td><code>GPIO0_PWM0</code> / 5</td></tr>
+      <tr><td>13 / TIM3_CH2</td><td><code>GPIO1_MCU</code></td><td>R15，220 Ω</td><td><code>GPIO1_PWM1</code> / 6</td></tr>
+      <tr><td>14 / TIM3_CH3</td><td><code>GPIO2_MCU</code></td><td>R16，220 Ω</td><td><code>GPIO2_PWM2</code> / 7</td></tr>
+      <tr><td>15 / TIM3_CH4</td><td><code>GPIO3_MCU</code></td><td>R17，220 Ω</td><td><code>GPIO3_PWM3</code> / 8</td></tr>
+      <tr><td>6 / PA0</td><td><code>GPIO4_MCU</code></td><td>R18，220 Ω</td><td><code>GPIO4</code> / 9</td></tr>
+      <tr><td>7 / PA1</td><td><code>GPIO5_MCU</code></td><td>R19，220 Ω</td><td><code>GPIO5</code> / 10</td></tr>
+      <tr><td>10 / PA4</td><td><code>GPIO6_MCU</code></td><td>R20，220 Ω</td><td><code>GPIO6</code> / 11</td></tr>
+      <tr><td>11 / PA5</td><td><code>GPIO7_MCU</code></td><td>R21，220 Ω</td><td><code>GPIO7</code> / 12</td></tr>
+      <tr><td>8 / USART2_TX</td><td><code>UART_TX_MCU</code></td><td>R22，220 Ω</td><td><code>UART_TX</code> / 13</td></tr>
+      <tr><td>9 / USART2_RX</td><td><code>UART_RX_MCU</code></td><td>R23，220 Ω</td><td><code>UART_RX</code> / 14</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="c-connection-record">
+  <h2 id="c-connection-record">C.7 接线前记录卡</h2>
+  <table>
+    <caption>打印后填写；不得把空白栏当作默认值</caption>
+    <tbody>
+      <tr><th scope="row">板版本 / 序列号</th><td>________________</td><th scope="row">日期 / 操作者</th><td>________________</td></tr>
+      <tr><th scope="row">J2/J3 实装型号与 pin 1 方向</th><td colspan="3">____________________________________________________________</td></tr>
+      <tr><th scope="row">目标板逻辑电压</th><td>________ V</td><th scope="row">共同地连续性</th><td>□ 已确认　□ 未确认</td></tr>
+      <tr><th scope="row">供电来源与方向</th><td colspan="3">____________________________________________________________</td></tr>
+      <tr><th scope="row">首次连接的信号</th><td colspan="3">____________________________________________________________</td></tr>
+      <tr><th scope="row">限流值 / 停止条件</th><td colspan="3">____________________________________________________________</td></tr>
+    </tbody>
+  </table>
+</section>

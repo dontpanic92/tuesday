@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="20. 功能化布局（Functional Placement） — USB GPIO PCB 离线教程">
+  <title>20. 功能化布局（Functional Placement） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-20">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html" aria-current="page">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</li><li aria-current="page">20. 功能化布局（Functional Placement）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</p>
+          <h1>20. 功能化布局（Functional Placement）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#chapter-20-goals">学习目标</a></li><li class="toc-level-2"><a href="#section-20-1">20.1 先放连接器与机械约束</a></li><li class="toc-level-2"><a href="#section-20-2">20.2 把 ESD 保护放在入口处</a></li><li class="toc-level-2"><a href="#section-20-3">20.3 把 Buck 变换器放成紧凑电流环</a></li><li class="toc-level-2"><a href="#section-20-4">20.4 把去耦电容放到其服务引脚旁</a></li><li class="toc-level-2"><a href="#section-20-5">20.5 晶振器件应近、短、对称</a></li><li class="toc-level-2"><a href="#section-20-6">20.6 把负载开关放在输出连接器附近</a></li><li class="toc-level-2"><a href="#section-20-7">20.7 把 GPIO 电阻组织成可读通道</a></li><li class="toc-level-2"><a href="#section-20-8">20.8 用受控间距对齐重复无源器件</a></li><li class="toc-level-2"><a href="#section-20-9">20.9 在紧凑、可布线、热与检查之间权衡</a></li><li class="toc-level-2"><a href="#section-20-10">20.10 完成机械审核后才锁定布局</a></li><li class="toc-level-2"><a href="#section-20-11">20.11 案例：修正 J1 方向与 C8/C9 重叠</a></li><li class="toc-level-2"><a href="#chapter-20-summary">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="chapter-20-goals">
+  <h2 id="chapter-20-goals">学习目标</h2>
+  <p>功能布局把原理图关系变成电流回路、信号路径、热路径和可装配空间。完成本章后，你应能按照“机械固定对象 → 入口保护 → 关键回路 → 重复通道”的顺序布局，并在锁定位置前完成机械审核和受影响布线清理。</p>
+  <ul>
+    <li>先固定连接器和机械约束，再放电气关键元件；</li>
+    <li>缩小 USB 未保护段、Buck 高 di/dt 回路和去耦回路；</li>
+    <li>让晶振、负载开关和重复 GPIO 通道具有清晰的功能邻接；</li>
+    <li>用统一间距组织无源器件，而不是只追求最小面积；</li>
+    <li>从 J1、R1、C8/C9 和陈旧走线案例建立变更纪律。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-20-1">
+  <h2 id="section-20-1">20.1 先放连接器与机械约束</h2>
+  <p>J1、J2、J3 决定线缆从哪里进入、用户从哪里操作，也决定许多信号与电源的起点。它们应在高密度器件之前放置并约束。</p>
+  <ol>
+    <li>J1 固定在左边缘，开口朝左、旋转 −90°，只保留有意壳体外伸；</li>
+    <li>J2 固定在右边缘，旋转和 1 脚方向与目标线束一致；</li>
+    <li>J3 放在上边缘附近，给调试插头或探针留出垂直空间；</li>
+    <li>标出 USB 插头、目标线束、探针、手指和未来外壳的禁止区；</li>
+    <li>锁定经过机械审核的连接器，后续移动必须触发重新审核。</li>
+  </ol>
+  <p>R1 最终 J1 中心为 (200.5, 472) mil，J2 约为 (1850, 472) mil，J3 位于上方调试区。坐标不是布局原则本身；关键是方向、板边和外部配合。</p>
+  <figure class="project-evidence" aria-labelledby="fig-20-1-caption">
+    <img src="../assets/images/usb-gpio-r1-assembly-first-page.png" alt="USB GPIO R1 装配资料第一页预览，显示矩形板框、顶面元件位号和连接器的相对放置。" width="1800" height="904">
+    <figcaption id="fig-20-1-caption">图 20-1　USB GPIO R1 顶面放置概览。来源：<code>usb_gpio/fabrication/R1/usb_gpio_R1_Assembly.pdf</code>（R1，7 页）的第一页 Quick Look 预览；它不是完整的 7 页装配 PDF。本图只作为项目布局与装配证据，不是对成品板位置或尺寸的物理测量。</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="section-20-2">
+  <h2 id="section-20-2">20.2 把 ESD 保护放在入口处</h2>
+  <p>U2 的职责是在外部静电事件进入长板内走线之前提供低电感泄放路径。因此放置顺序是 J1 → U2 → R3/R4 → U1，而不是先围绕 MCU 填满器件后再找空位。</p>
+  <ul>
+    <li>缩短 J1 到 U2 的 <code>USB_DP_CONN</code>/<code>USB_DM_CONN</code> 未保护段；</li>
+    <li>让 D+、D− 到 U2 的拓扑对称，避免支路和测试焊盘形成桩线；</li>
+    <li>让 U2 的 GND 回路短、宽，并就近连接连续地参考；</li>
+    <li>不要让 ESD 电流先经过 MCU 区域或细长地线再到地；</li>
+    <li>同时给 J1 外壳固定脚和 USB 扇出留出制造间距。</li>
+  </ul>
+  <p>最终 U2 位于 (545, 350) mil。这个坐标是组织化布局的结果，不代表只要复制坐标就自动得到同样的回流和阻抗。</p>
+</section>
+
+<section aria-labelledby="section-20-3">
+  <h2 id="section-20-3">20.3 把 Buck 变换器放成紧凑电流环</h2>
+  <p>Buck 布局至少有四条不同性质的路径：输入脉冲环、<code>BUCK_SW</code> 开关节点、L1—C3 输出环和高阻抗反馈路径。把它们画成原理图上的一个方框不够，必须在 PCB 上分开优化。</p>
+  <ol>
+    <li>C2 紧靠 U3 的 VIN/GND，缩小输入脉冲电流环；</li>
+    <li>L1 紧靠 U3 SW，引脚间 <code>BUCK_SW</code> 铜短且面积小；</li>
+    <li>C3 靠近 L1 输出和 U3 地返回，形成短输出环；</li>
+    <li>R5/R6 与 FB 引脚靠近，反馈线从安静输出点取样；</li>
+    <li>让 <code>BUCK_SW</code> 远离 USB、晶振、NRST 和反馈；</li>
+    <li>预留输入/输出主干宽度和 U3/L1 的散热铜，而不把开关节点无限铺大。</li>
+  </ol>
+  <aside class="warning">
+    <p>布局紧凑不是把所有器件任意挤在一起。若 C2/C3 的焊盘或本体与 U3/L1 冲突，实际装配和电流路径都会变差；机械间距与电气回路必须同时满足。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-20-4">
+  <h2 id="section-20-4">20.4 把去耦电容放到其服务引脚旁</h2>
+  <p>去耦的评价对象是“电源脚 → 电容 → 地 → 芯片地脚”的高频回路，而不是电容中心到 MCU 中心的直线距离。每个电源脚优先拥有自己的近端 100 nF 路径，再由 C9 承担较低频储能。</p>
+  <p>R1 最终 CAD 记录的 C6/C7/C8 到 MCU 最短 3V3 路径为 6.65/6.71/8.99 mm，C9 储能路径为 13.82 mm。它们是几何记录，不是“去耦已优秀”的证明；较长路径需要在纹波、瞬态和 EMI 实测中复核。</p>
+  <ol>
+    <li>把每个电容分配给具体 U1 电源脚，而不是只写“靠近 MCU”；</li>
+    <li>优先缩短电源脚到电容再到地的完整环；</li>
+    <li>避免在电容与地之间插入长细线或多个无关过孔；</li>
+    <li>不要让快速信号穿过电容的高频回流区域；</li>
+    <li>对 C9 的位置同时考虑储能、电源主干和 C8 的机械间距。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="section-20-5">
+  <h2 id="section-20-5">20.5 晶振器件应近、短、对称</h2>
+  <p>Y1、C11、C12 与 U1 的 OSC_IN/OSC_OUT 构成小信号振荡网络。它应远离 U3/L1 的开关区域和快速 USB 线，且不允许形成测试支路。</p>
+  <ul>
+    <li>Y1 靠近 U1 的振荡引脚，两个信号路径短且几何相近；</li>
+    <li>C11/C12 对称放置，地端就近返回安静地；</li>
+    <li>避免其他信号或分割地从晶振回路中间穿过；</li>
+    <li>在周边保留地参考，但不要未经验证添加改变负载的任意铜结构；</li>
+    <li>最终布线后重新检查 12 MHz 值与 1 脚/封装方向。</li>
+  </ul>
+  <p>最终组织坐标中 Y1 位于 (850, 140) mil，C11/C12 位于 (660, 140)/(1040, 140) mil。实际起振与负载匹配仍需上电测量。</p>
+</section>
+
+<section aria-labelledby="section-20-6">
+  <h2 id="section-20-6">20.6 把负载开关放在输出连接器附近</h2>
+  <p>U4/U5 应位于其电源来源和 J2 输出之间，使 IN/OUT 主电流路径短而宽，同时让输出电容靠近负载开关和连接器。</p>
+  <ul>
+    <li>U4 的 <code>VBUS_IN → U4 → 5V_SW → J2</code> 路径避免绕过整板；</li>
+    <li>U5 的 <code>3V3_SYS → U5 → 3V3_SW → J2</code> 路径考虑 U3 总负载；</li>
+    <li>ISET 与 EN 是小信号，远离高 di/dt 电源铜；</li>
+    <li>C4/C5/C13/C14 按各自输入/输出角色靠近相关引脚；</li>
+    <li>保留 U4/U5 和电源走线散热空间，但不要假设铜面积已经完成热验证。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-20-7">
+  <h2 id="section-20-7">20.7 把 GPIO 电阻组织成可读通道</h2>
+  <p>R14–R23 是重复接口通道。按 J2 引脚顺序排列，可以减少交叉、简化审图和测量，也让错误通道更容易定位。</p>
+  <ol>
+    <li>让 R14–R21 按 GPIO0–GPIO7 顺序排列；</li>
+    <li>R22/R23 对应 UART_TX/UART_RX，方向与 J2 标签一致；</li>
+    <li>保持相同器件方向和统一中心间距；</li>
+    <li>MCU 侧和连接器侧网络名在布局标注或高亮中保持可追踪；</li>
+    <li>为探针接触焊盘留出空间，不让丝印遮挡。</li>
+  </ol>
+  <p>整齐排列不是美化目的本身；它降低布线分叉和人工检查复杂度，但不能以牺牲走线回流、板边或装配间距为代价。</p>
+</section>
+
+<section aria-labelledby="section-20-8">
+  <h2 id="section-20-8">20.8 用受控间距对齐重复无源器件</h2>
+  <p>R1 最终把 C6–C9 对齐在 x = 680 mil 的竖直列，Y 坐标依次为 260、350、440、530 mil。R1/R2 分别位于 (399, 400)/(399, 544) mil。统一网格让机械间距和布线通道更容易复核。</p>
+  <p>对齐时应先确定：</p>
+  <ul>
+    <li>本体最大尺寸与庭院宽度；</li>
+    <li>相邻焊盘之间所需铜和阻焊间距；</li>
+    <li>走线从哪一侧进入、地回流从哪一侧离开；</li>
+    <li>元件值和位号在装配图中是否易辨；</li>
+    <li>返修工具能否接触每个元件两端。</li>
+  </ul>
+  <p>若统一间距导致 C8 离 U1 电源脚更远，应记录并在性能测试中复核，而不是把视觉整齐写成电气最优。</p>
+</section>
+
+<section aria-labelledby="section-20-9">
+  <h2 id="section-20-9">20.9 在紧凑、可布线、热与检查之间权衡</h2>
+  <table>
+    <caption>布局权衡不能只优化单一指标</caption>
+    <thead><tr><th scope="col">目标</th><th scope="col">过度追求的风险</th><th scope="col">平衡方法</th></tr></thead>
+    <tbody>
+      <tr><td>面积最小</td><td>本体重叠、无法探测或返修、回流被切断</td><td>设置机械与操作裕量后再压缩</td></tr>
+      <tr><td>路径最短</td><td>高噪声和敏感网络被迫相邻</td><td>按回路性质分区，而不是只比较欧氏距离</td></tr>
+      <tr><td>铜最宽</td><td>挤占地参考、扩大 BUCK_SW 天线面积</td><td>按电流、压降、热和噪声分别设计</td></tr>
+      <tr><td>排列最整齐</td><td>关键电容离引脚变远</td><td>关键回路优先，重复通道次之</td></tr>
+      <tr><td>过孔最少</td><td>走线绕远、切割地或造成拥堵</td><td>比较完整回路和层转换成本</td></tr>
+    </tbody>
+  </table>
+  <p>布局评审应让电气、机械、制造和测试角色共同参与。单一视角优化通常把问题推迟到更昂贵的阶段。</p>
+</section>
+
+<section aria-labelledby="section-20-10">
+  <h2 id="section-20-10">20.10 完成机械审核后才锁定布局</h2>
+  <p>锁定位置表示“任何移动都需要变更流程”，不是“以后绝不修改”。在锁定前必须完成：</p>
+  <ul>
+    <li>全部 1,128 元件对的本体与庭院检查；</li>
+    <li>J1/J2/J3 方向、外伸、插拔和外部配合审核；</li>
+    <li>C8/C9、R1/J1 等历史问题的专门回归检查；</li>
+    <li>USB、Buck、晶振、去耦和受控电源回路评审；</li>
+    <li>板边、孔、探针、丝印与装配访问检查；</li>
+    <li>删除或标记所有与旧位置相连的铜，再进入布线。</li>
+  </ul>
+  <aside class="warning">
+    <p>移动器件后，旧走线不会自动变成正确的新走线。即使铜仍在同一网络上，它也可能悬空、穿过新器件、产生错误支路或连接旧焊盘位置。必须按受影响网络执行 rip-up、重新布线和完整 DRC。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-20-11">
+  <h2 id="section-20-11">20.11 案例：修正 J1 方向与 C8/C9 重叠</h2>
+  <aside class="error-case">
+    <table>
+      <caption>R1 组织化重布局的“现象—原因—检测—修复—预防”</caption>
+      <thead><tr><th scope="col">阶段</th><th scope="col">J1 / R1</th><th scope="col">C8 / C9</th><th scope="col">旧布线</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">现象</th><td>J1 朝下，R1 与壳体冲突</td><td>电容脚位/实体仍重叠</td><td>元件移动后出现大量间距、差分对和连接错误</td></tr>
+        <tr><th scope="row">根因</th><td>只看中心/焊盘，没有审核真实开口和壳体</td><td>只凭视觉移动，没有统一本体间距与列布局</td><td>保留了针对旧坐标生成的铜</td></tr>
+        <tr><th scope="row">检测</th><td>3D、数据手册包络、插头方向</td><td>本体/庭院全对检查</td><td>DRC、独立连通分析和旧坐标铜审计</td></tr>
+        <tr><th scope="row">修复</th><td>J1 旋转 −90°朝左，R1/R2 移到安全列</td><td>C6–C9 在 x=680 mil 按统一 Y 间距排列</td><td>清除受影响铜，按新坐标完整重布并重开文档复核</td></tr>
+        <tr><th scope="row">预防</th><td>连接器优先、导入外部配合件</td><td>先定义包络和接收间距</td><td>布局变更单必须列出受影响网络和重布范围</td></tr>
+      </tbody>
+    </table>
+  </aside>
+  <p>最终机械审核得到 48 个元件、0 本体重叠、0 庭院/形状重叠、最小接收裕量 10.748 mil；J1 只保留 −5.055 mil 的有意左侧外伸。随后旧铜被完整重布，最终路由为 608 条走线、130 个过孔，DRC 各类错误为 0。</p>
+  <p><strong>设计练习：</strong>选择一个需要移动的元件，写出其本体约束、受影响网络、需要删除的旧铜、回归检查和制造输出失效范围。未列出受影响网络前，不允许在发布板上移动。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-20-summary">
+  <h2 id="chapter-20-summary">本章小结</h2>
+  <p>功能布局从固定连接器开始，依次保护入口、缩小关键回路、组织重复通道，并用机械全对审核收尾。元件位置一旦改变，旧铜和旧审核同时失效；只有重新布线并重跑电气、机械和制造检查，才形成新的可信基线。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>最终 CPL、元件事实图谱、制造清单与检查清单。路径长度和间隙为 CAD 计算值；热、纹波、EMI 和实物插接仍待验证。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="19-footprints-mechanics.html"><small>上一页</small>19. 封装与机械现实（Footprints and Mechanical Reality）</a><a class="next" rel="next" href="21-routing-fundamentals.html"><small>下一页</small>21. 布线基础（Routing Fundamentals）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

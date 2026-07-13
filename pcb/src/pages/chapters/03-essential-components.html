@@ -1,0 +1,226 @@
+<section class="notice" aria-labelledby="learning-goals-3">
+  <h2 id="learning-goals-3">学习目标</h2>
+  <p>本章从“电荷、能量和材料如何响应”解释常用元件，而不把元件只当作符号。学完后，你应能说明每类元件为什么存在、它改变了哪种电气行为，以及省略、错值或错装的工程后果。</p>
+  <ul>
+    <li>解释电阻、电容和电感分别如何消耗或储存能量；</li>
+    <li>说明二极管、LED 与 ESD 抑制器的导通方向和保护边界；</li>
+    <li>理解晶体振荡器需要有源电路、负载电容和合适布局；</li>
+    <li>根据容差、额定值、温度和封装筛选器件；</li>
+    <li>用 R1 的真实位号、数值和网络举例，同时标明哪些结论仍待实测。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-3-1">
+  <h2 id="section-3-1">3.1 电阻：限流、分压、偏置、上拉与下拉</h2>
+  <p>电阻通过材料中载流子与晶格、杂质和缺陷的相互作用限制电流，并把电能转换成热。在适用的线性范围内，欧姆定律为 <code>V = I × R</code>；功耗可写为 <code>P = V × I = I²R = V²/R</code>。</p>
+  <table>
+    <caption>R1 中电阻的主要角色</caption>
+    <thead>
+      <tr><th scope="col">角色</th><th scope="col">实例</th><th scope="col">物理作用与后果</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">USB-C 偏置</th><td>R1、R2，各 5.1 kΩ</td><td>分别把 CC1、CC2 拉向 GND，声明受电端；开路可能使一个插头方向无法识别</td></tr>
+      <tr><th scope="row">串联阻尼</th><td>R3、R4，各 22 Ω</td><td>改变 USB 边沿与振铃；值过大削弱边沿，开路会中断数据</td></tr>
+      <tr><th scope="row">反馈分压</th><td>R5 = 453 kΩ，R6 = 100 kΩ</td><td>把 <code>3V3_SYS</code> 的一部分送到 U3 FB，决定输出设定</td></tr>
+      <tr><th scope="row">限流设置</th><td>R7 = 16.9 kΩ，R8 = 27 kΩ</td><td>设置 U4/U5 的典型电流限制</td></tr>
+      <tr><th scope="row">默认偏置</th><td>R9/R10/R11 = 100 kΩ，R12 = 10 kΩ</td><td>建立电源关闭、正常启动和复位释放等确定状态</td></tr>
+      <tr><th scope="row">LED 限流</th><td>R13 = 1 kΩ</td><td>限制 D1 与 U1 GPIO 电流</td></tr>
+      <tr><th scope="row">外部接口保护</th><td>R14–R23，各 220 Ω</td><td>在故障电流、边沿速度和负载能力之间折中</td></tr>
+    </tbody>
+  </table>
+  <aside class="example">
+    <p><strong>算例 3-1：R13 的电流上界。</strong>LED 电流近似为 <code>I = (V<sub>OH</sub> − V<sub>F</sub>)/1 kΩ</code>。因为最终板上 GPIO 高电平和 D1 正向压降尚未测量，不能写出“实测电流”。若只为得到绝对保守上界而令 <code>V<sub>F</sub> = 0</code> 且 <code>V<sub>OH</sub> = 3.3 V</code>，则 <code>I ≤ 3.3 mA</code>。真实 LED 电流预期更低，但必须测量。</p>
+  </aside>
+  <p>上拉或下拉不是“强制永远为高/低”。它们在没有更强驱动时建立默认电位；当 U1 主动驱动时，电阻同时产生静态电流。阻值太大时抗漏电和噪声能力下降，太小时则增加功耗与驱动负担。</p>
+</section>
+
+<section aria-labelledby="section-3-2">
+  <h2 id="section-3-2">3.2 电容：储存电荷、去耦、滤波、储能与定时</h2>
+  <p>电容由两块导体和中间介质构成。电压使两侧积累等量异号电荷，储能近似为 <code>E = ½CV²</code>。电容电压不能在理想情况下瞬间改变，所以它能在负载电流突然变化时暂时供给或吸收电流。</p>
+  <p>理想电容对正弦信号的容抗为 <code>X<sub>C</sub> = 1/(2πfC)</code>：频率越高或电容量越大，理想容抗越小。但真实电容还有 ESR、ESL、直流偏压降容、温度与老化效应，因此“100 nF”不等于在所有频率下都是理想短路。</p>
+  <table>
+    <caption>R1 电容按功能分类</caption>
+    <thead>
+      <tr><th scope="col">用途</th><th scope="col">位号与设计值</th><th scope="col">布局重点</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">电源入口/受控输出储能</th><td>C1、C2、C4、C5，各 10 µF</td><td>靠近所服务的电源入口或输出负载，缩小高电流环</td></tr>
+      <tr><th scope="row">Buck 输出</th><td>C3 = 22 µF</td><td>靠近 L1/U3 输出回路；有效电容量和稳定性待实测</td></tr>
+      <tr><th scope="row">MCU 高频去耦</th><td>C6–C8，各 100 nF</td><td>应靠近 U1 电源脚，电源与地路径同时要短</td></tr>
+      <tr><th scope="row">MCU 区域储能</th><td>C9 = 10 µF</td><td>服务较低频负载变化，并与 C8 保持机械间隙</td></tr>
+      <tr><th scope="row">复位定时/滤波</th><td>C10 = 100 nF，与 R12 = 10 kΩ</td><td>靠近 NRST；名义时间常数 1 ms</td></tr>
+      <tr><th scope="row">晶体负载</th><td>C11、C12，各 12 pF C0G</td><td>靠近 Y1/U1，短、对称并远离开关节点</td></tr>
+      <tr><th scope="row">负载开关高频旁路</th><td>C13、C14，各 100 nF</td><td>靠近 U4/U5 的输入和 GND</td></tr>
+    </tbody>
+  </table>
+  <aside class="example">
+    <p><strong>算例 3-2：复位 RC。</strong><code>τ = R × C = 10,000 Ω × 100 nF = 1 ms</code>。这是名义时间常数，不等于 U1 精确在 1 ms 时退出复位；真实释放时刻还取决于上电斜率、NRST 阈值和 MCU 内部电路。</p>
+  </aside>
+  <p>去耦的关键不是“原理图上并联了电容”，而是让瞬态电流在负载、电容和地之间形成小回路。R1 审核记录 C6、C7、C8 到 MCU 的最短 3.3 V 路径约为 6.65、6.71、8.99 mm，C9 大容量路径约 13.82 mm；这些是 CAD 路径数据，去耦效果仍待波形验证。</p>
+</section>
+
+<section aria-labelledby="section-3-3">
+  <h2 id="section-3-3">3.3 电感：磁场储能与开关变换器滤波</h2>
+  <p>电感中的电流产生磁场，储能近似为 <code>E = ½LI²</code>。电感电流不能瞬间改变；当开关节点电压快速切换时，电感把脉冲电压转换成较连续的电流。电容倾向于抵抗电压突变，电感倾向于抵抗电流突变，两者组合可完成滤波和能量传递。</p>
+  <p>R1 的 L1 是 2.2 µH SWPA252012S2R2MT，连接 <code>BUCK_SW</code> 与 <code>3V3_SYS</code>。项目元数据给出 1.25 A 额定电流和 2.07 A 饱和电流，但板上峰值、温升和饱和裕量尚未测量。</p>
+  <p>若电感电流接近饱和，磁芯有效电感下降，电流上升更快，可能增加纹波、损耗和 U3 的保护压力。其近似纹波关系为：</p>
+  <p><code>ΔI<sub>L</sub> ≈ (V<sub>IN</sub> − V<sub>OUT</sub>) × D / (L × f<sub>SW</sub>)</code></p>
+  <p>公式只适用于连续导通、理想化稳态近似。R1 没有提供本页可据以完成真实纹波计算的已验证开关频率、负载和波形，因此不应捏造一个结果。</p>
+  <aside class="warning">
+    <p><strong>布局后果：</strong><code>BUCK_SW</code> 是高速跃变节点。L1 应靠近 U3，开关铜面积要小，并远离 USB、晶体与反馈网络；否则可能增加 EMI、串扰和稳压误差。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-3-4">
+  <h2 id="section-3-4">3.4 二极管与 LED：单向导通、指示与保护</h2>
+  <p>普通二极管利用半导体结在正向偏置时较易导通、反向偏置时阻断的非对称特性。它不是理想单向阀：正向有电压降和动态电阻，反向有漏电，超过额定反向电压或功耗可能损坏。</p>
+  <p><strong>发光二极管（LED）</strong>在正向电流下通过电子与空穴复合发光。LED 亮度由电流、效率、温度和观察条件共同决定，不能直接接到理想电压源，必须限制电流。</p>
+  <p>R1 的 D1 是黄绿色 0603 LED，阴极接 GND，阳极经 R13 = 1 kΩ 接 U1 的 <code>STATUS_LED</code>。若 D1 装反或开路，预期只是不发光；若 R13 误装过小或短路，则可能使 LED 和 U1 GPIO 过流。最终资料没有给出板上 D1 正向压降实测值。</p>
+  <table>
+    <caption>极性器件检查</caption>
+    <thead>
+      <tr><th scope="col">检查项</th><th scope="col">理由</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">符号阳极/阴极</th><td>决定原理图导通方向</td></tr>
+      <tr><th scope="row">封装 1 脚与极性标记</th><td>防止符号正确但实体装反</td></tr>
+      <tr><th scope="row">CPL 旋转与装配图</th><td>自动贴装方向必须与实际封装定义一致</td></tr>
+      <tr><th scope="row">限流元件</th><td>LED 不能仅依靠 GPIO 内阻限制电流</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="section-3-5">
+  <h2 id="section-3-5">3.5 ESD 抑制器：把短时高压事件安全导走</h2>
+  <p><strong>静电放电（Electrostatic Discharge，ESD）</strong>是持续时间很短、上升很快的高压事件。即使总能量不大，峰值电压和电流也可能击穿 MCU 的微小输入结构。保护器件的任务不是“吸收一切”，而是提供比受保护芯片更合适的瞬态电流路径，并把钳位电压、寄生电容和回路电感控制在可接受范围。</p>
+  <p>R1 的 U2 USBLC6-2SC6 保护 USB D+ 与 D−，以 <code>VBUS_IN</code> 和 GND 为钳位参考。数据路径为 J1 → U2 → R3/R4 → U1。U2 必须靠近连接器入口，因为连接器到保护器件之间的铜仍是未保护段；地路径若很长，寄生电感会使瞬态钳位电压上升。</p>
+  <aside class="error-case">
+    <p><strong>不要写成已实现：</strong>早期提案建议在外部 GPIO 处使用低电容 ESD 阵列，但最终 48 个 R1 位号中没有该器件。R14–R23 的 220 Ω 串联电阻能限制部分故障电流，却不等同于经过验证的外部 ESD 防护。</p>
+  </aside>
+  <p>U2 的存在和连线属于设计事实；R1 的真实 ESD 等级、重复冲击寿命和系统级合规仍是待验证项目。</p>
+</section>
+
+<section aria-labelledby="section-3-6">
+  <h2 id="section-3-6">3.6 晶体与负载电容：建立稳定时钟</h2>
+  <p>石英晶体利用压电效应形成高品质因数的机械—电气谐振。晶体本身不是独立时钟源：MCU 内部振荡放大器、晶体、负载电容和 PCB 寄生共同构成振荡器。频率标称值、负载电容、等效串联电阻和驱动电平都会影响起振与频偏。</p>
+  <p>R1 最终使用 Y1 X322512MSB4SI，设计频率 12 MHz、标称负载 20 pF；这覆盖了早期提案中的 8 MHz。C11、C12 各为 12 pF，理想串联等效为：</p>
+  <aside class="example">
+    <p><strong>算例 3-3：晶体负载的第一步估算。</strong></p>
+    <p><code>C<sub>L</sub> ≈ (C11 × C12)/(C11 + C12) + C<sub>stray</sub></code></p>
+    <p><code>(12 pF × 12 pF)/(12 pF + 12 pF) = 6 pF</code></p>
+    <p>因此总负载约为 <code>6 pF + C<sub>stray</sub></code>。由于 MCU 引脚、封装和走线杂散未知，不能声称它已经匹配 20 pF；频偏和起振裕量均为<strong>待验证</strong>。</p>
+  </aside>
+  <p>晶体回路电平小、源阻抗高，容易受 <code>BUCK_SW</code> 和快速数字边沿干扰。Y1 与 C11/C12 应靠近 U1，OSC_IN/OSC_OUT 短、对称、无不必要支路，并有短地返回。</p>
+</section>
+
+<section aria-labelledby="section-3-7">
+  <h2 id="section-3-7">3.7 连接器、开关与测试点</h2>
+  <p><strong>连接器</strong>把板内网络延伸到电缆、主机或目标设备，同时引入机械插拔、接触电阻、方向、误插和 ESD 风险。R1 的 J1 是 USB2-only 16 引脚 USB-C 插座；J2 是 DNP 的 2×8、2.54 mm 目标排针；J3 是 DNP 的 1×5、1.27 mm 调试接口。</p>
+  <p><strong>开关</strong>可以是机械触点，也可以是半导体开关。R1 没有用机械按钮控制两路目标电源，而是由 U4/U5 高侧负载开关根据 U1 的使能信号通断。半导体开关有导通电阻、压降、限流和热保护行为，并非理想零电阻触点。</p>
+  <p><strong>测试点（Test Point）</strong>是为测量、编程或生产夹具提供的可接触节点。好的测试点应有清楚网络名、足够探针空间和安全接地位置。R1 的物理位号中没有 TP 前缀，调试访问依赖 J3 及设计中的可接触焊盘/接口；最终检查仅证明访问没有被邻近器件实体遮挡，真实探针与连接器配合仍待实物确认。</p>
+  <aside class="warning">
+    <p><strong>测量规则：</strong>探针滑动可把相邻焊盘短接。优先在断电时连接夹具，先接 GND，再接信号；高密度节点应使用合适的弹簧探针或焊接引线。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-3-8">
+  <h2 id="section-3-8">3.8 集成电路：稳压器、负载开关与微控制器</h2>
+  <p><strong>集成电路（Integrated Circuit，IC）</strong>把大量晶体管和功能结构封装在一个器件中。理解 IC 不能只看名称，还要阅读电源、地、输入、输出、使能、反馈、热和绝对最大额定值。</p>
+  <table>
+    <caption>R1 的五个 U 位号</caption>
+    <thead>
+      <tr><th scope="col">位号</th><th scope="col">器件</th><th scope="col">核心功能</th><th scope="col">关键外部条件</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">U1</th><td>CH32V203K8T6</td><td>USB、GPIO、PWM、UART、控制与调试</td><td>3.3 V 去耦、12 MHz 时钟、复位、正确固件与引脚映射</td></tr>
+      <tr><th scope="row">U2</th><td>USBLC6-2SC6</td><td>USB 双线 ESD 导流</td><td>低寄生数据路径、短接地与正确方向</td></tr>
+      <tr><th scope="row">U3</th><td>SY8089AAAC</td><td>把 <code>VBUS_IN</code> 降为 <code>3V3_SYS</code></td><td>L1、输入/输出电容、反馈分压和紧凑开关回路</td></tr>
+      <tr><th scope="row">U4</th><td>SY6280AAC</td><td>受控、限流的 <code>5V_SW</code></td><td>R7 限流设置、R9 默认关闭、散热与负载电容</td></tr>
+      <tr><th scope="row">U5</th><td>SY6280AAC</td><td>受控、限流的 <code>3V3_SW</code></td><td>R8 限流设置、R10 默认关闭，并受 U3 总能力约束</td></tr>
+    </tbody>
+  </table>
+  <p>IC 的引脚之间存在内部关联。例如 U3 的反馈脚并不承载主要负载电流，却决定输出调节；把反馈走线靠近噪声开关节点可能使稳压器错误响应。U4/U5 的使能脚电流很小，但若悬空会破坏安全默认状态。</p>
+</section>
+
+<section aria-labelledby="section-3-9">
+  <h2 id="section-3-9">3.9 容差、温度系数、电压额定、电流额定与功率额定</h2>
+  <p>标称值只是中心值。工程选型必须同时检查变化范围和失效边界。</p>
+  <table>
+    <caption>常见额定与其工程意义</caption>
+    <thead>
+      <tr><th scope="col">参数</th><th scope="col">含义</th><th scope="col">忽略后的风险</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">容差</th><td>制造时实际值相对标称值的允许偏差</td><td>分压、限流、时间常数与频率偏离目标</td></tr>
+      <tr><th scope="row">温度系数</th><td>温度改变时参数的变化率</td><td>冷热环境下阈值、频率或阻值漂移</td></tr>
+      <tr><th scope="row">电压额定</th><td>元件可承受的电压边界</td><td>介质击穿、漏电增加、寿命下降</td></tr>
+      <tr><th scope="row">电流额定</th><td>导体、电感、开关或连接器允许电流</td><td>温升、饱和、压降、接点损坏</td></tr>
+      <tr><th scope="row">功率额定</th><td>在规定环境下可耗散的功率</td><td>过热、阻值漂移、烧毁</td></tr>
+      <tr><th scope="row">降额</th><td>不把元件长期用到极限，预留温度与公差裕量</td><td>可靠性依赖理想室温和单一批次</td></tr>
+    </tbody>
+  </table>
+  <p>陶瓷电容尤其要注意直流偏压：标称 10 µF 的电容在实际偏置下有效电容量可能降低。R1 的 C1/C2/C4/C5/C9 采用 10 µF，C3 采用 22 µF；最终资料确认了设计标称值，但没有板上有效电容或电源纹波实测。</p>
+</section>
+
+<section aria-labelledby="section-3-10">
+  <h2 id="section-3-10">3.10 封装尺寸与电气、装配性能</h2>
+  <p>封装越小，走线和回路通常可以更短，寄生电感也可能更低；但铜面积和热容量更小，额定功率、手焊难度、检查与返修空间也会受限。封装越大并非总是更好，它会占板面积并增加某些高频回路长度。</p>
+  <table>
+    <caption>R1 封装选择的示例权衡</caption>
+    <thead>
+      <tr><th scope="col">器件</th><th scope="col">封装</th><th scope="col">主要权衡</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">多数电阻</th><td>0603</td><td>面积与可返修性折中；功率必须按具体料号核对</td></tr>
+      <tr><th scope="row">10/22 µF 电容</th><td>0805</td><td>较大体积有利于获得容量与电压裕量，但仍受直流偏压</td></tr>
+      <tr><th scope="row">U1</th><td>LQFP-32，0.8 mm 节距</td><td>比无引脚封装更易目检和返修，面积大于 QFN</td></tr>
+      <tr><th scope="row">U2/U3/U4/U5</th><td>SOT-23-5/6</td><td>紧凑、常见；方向相似但引脚功能不同，装错风险高</td></tr>
+      <tr><th scope="row">Y1</th><td>3225 四焊盘</td><td>机械稳定且可自动贴装；负载与布局仍需验证</td></tr>
+      <tr><th scope="row">J1</th><td>USB-C 混合 SMD/固定焊盘</td><td>同时承担高速、电源和反复插拔机械载荷</td></tr>
+    </tbody>
+  </table>
+  <p>封装库必须包含焊盘、阻焊开窗、丝印、器件实体与庭院等信息。R1 最终机械审核无重叠，只说明当前几何通过检查；替换为“同值但不同封装”的器件会使这一结论失效。</p>
+</section>
+
+<section class="experiment" aria-labelledby="section-3-11">
+  <h2 id="section-3-11">3.11 实验：测量电阻、电容、二极管与 LED 行为</h2>
+  <p><strong>目的：</strong>比较标称值、仪器读数和电路行为，练习区分测量条件与器件规格。优先使用独立散件，不在已上电 PCB 上直接测电阻或电容。</p>
+  <p><strong>器材：</strong>数字万用表（电阻、电容、二极管档）、若干已知标称值的电阻和电容、普通二极管、LED、1 kΩ 电阻、3.3 V 限流电源、面包板与导线。</p>
+  <aside class="warning">
+    <p><strong>安全与停止条件：</strong>测电阻/电容/二极管前必须断电并给电容放电；不得测量未知高压电容。LED 上电必须串联 1 kΩ。电流达到限制、器件发热或接线不确定时立即断电。</p>
+  </aside>
+  <ol>
+    <li>读取电阻标称值和容差，离开电路测量实际阻值，记录量程和读数。</li>
+    <li>测量电容前短接放电，再用电容档读数；等待显示稳定并记录环境与量程。</li>
+    <li>用二极管档正反向测普通二极管，记录显示；交换表笔后比较。</li>
+    <li>对 LED 重复二极管档测量，观察是否微亮并记录正向显示。不同万用表测试电流不同。</li>
+    <li>在面包板上接 3.3 V → 1 kΩ → LED → GND，限流设为不高于 20 mA。</li>
+    <li>上电后测量电阻两端电压和 LED 两端电压；断电后再改线。</li>
+    <li>用 <code>I = V<sub>R</sub>/1 kΩ</code> 计算 LED 电流，并标为由实测电压计算的结果。</li>
+  </ol>
+  <table>
+    <caption>实验 3-1 原始记录表</caption>
+    <thead>
+      <tr><th scope="col">器件</th><th scope="col">标称/型号</th><th scope="col">仪器与量程</th><th scope="col">原始读数</th><th scope="col">计算/判断</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">电阻</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">电容</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">普通二极管正/反向</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">LED 二极管档</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">LED 上电</th><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  <p><strong>预期现象：</strong>电阻读数应接近标称并落在其容差范围内；电容读数可能受仪器、漏电和容差影响；二极管正反向显示应明显不同；LED 只在正确极性和足够正向电压下发光。这些只是预期，必须以你的原始记录为准。</p>
+  <p><strong>通过判据：</strong>记录中没有把标称值抄成测量值；所有上电改线都在断电后进行；能解释二极管档显示不是固定“导通电压常数”。</p>
+  <p><strong>思考题：</strong>为什么不能用万用表离板电容读数证明 C6 在 MCU 高频电流下的去耦效果？</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="summary-3">
+  <h2 id="summary-3">本章小结</h2>
+  <p>电阻耗散能量并设置电流或电位；电容在电场中储能并抑制电压突变；电感在磁场中储能并抑制电流突变。二极管利用非对称导通，LED 把部分电能转为光，ESD 器件为瞬态电流提供受控路径。晶体振荡依赖完整回路而非单个晶体。标称值、容差、额定值、温度和封装共同决定器件是否适用。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>本章事实依据：</strong><code>component-atlas.json</code> 的全部 R1 元件记录、统一公式事实和最终项目源。所有电压、纹波、温升、限流、晶体和 LED 板上性能均保持为计算、预期或待验证状态。</p>
+</footer>

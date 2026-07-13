@@ -1,0 +1,172 @@
+{
+  "schema_version": "1.0.0",
+  "state_definitions": {
+    "design": "最终设计中明确采用的标称值或规则，不表示已测量。",
+    "calculated": "由设计值、CAD 几何或公式推导。",
+    "expected": "依据器件机理预测的行为或范围。",
+    "measured": "来自已装配实物和仪器的记录；当前事实库没有此类结果。",
+    "unverified": "仍需数据手册细节、生产叠层或实物实验确认。"
+  },
+  "formulas": [
+    {
+      "id": "ohms-law",
+      "name_zh": "欧姆定律",
+      "equation": "V = I × R",
+      "variables": {"V": "电压，V", "I": "电流，A", "R": "电阻，Ω"},
+      "conditions": "线性、近似恒阻元件。",
+      "project_uses": ["R13 LED 限流", "R14-R23 外部信号串联电阻", "电源走线压降"],
+      "state": "design",
+      "sources": ["tutorial-toc"]
+    },
+    {
+      "id": "resistor-power",
+      "name_zh": "电阻功耗",
+      "equation": "P = V × I = I² × R = V² / R",
+      "variables": {"P": "功率，W", "V": "电阻两端电压，V", "I": "电流，A", "R": "电阻，Ω"},
+      "conditions": "稳态或使用 RMS 值。",
+      "project_uses": ["检查 0603 100 mW 电阻裕量"],
+      "state": "design",
+      "sources": ["final-project-archive"]
+    },
+    {
+      "id": "voltage-drop",
+      "name_zh": "导体或开关压降",
+      "equation": "V_DROP = I × R_PATH",
+      "variables": {"V_DROP": "压降，V", "I": "负载电流，A", "R_PATH": "走线、连接器、开关和接点的总电阻，Ω"},
+      "conditions": "低频等效近似；温升会改变电阻，开关器件还需查工作点曲线。",
+      "project_uses": ["5V_SW/3V3_SW 满载压降", "VBUS 与 3V3_SYS 走线宽度", "连接器和线缆损耗"],
+      "state": "expected",
+      "hardware_result": "unverified",
+      "sources": ["fabrication-manifest", "datasheet-sy6280"]
+    },
+    {
+      "id": "buck-feedback",
+      "name_zh": "SY8089 输出反馈",
+      "equation": "V_OUT = V_FB × (1 + R_TOP / R_BOTTOM)",
+      "variables": {"V_FB": "典型 0.6 V", "R_TOP": "R5 = 453 kΩ", "R_BOTTOM": "R6 = 100 kΩ"},
+      "calculation": {"expression": "0.6 × (1 + 453/100)", "result": 3.318, "unit": "V"},
+      "interpretation": "计算值接近 3.3 V；电阻误差、FB 基准误差、负载和布局会改变实物结果。",
+      "state": "calculated",
+      "hardware_result": "unverified",
+      "sources": ["final-project-archive", "datasheet-sy8089"]
+    },
+    {
+      "id": "load-switch-current-limit",
+      "name_zh": "SY6280 限流设置",
+      "equation": "I_LIMIT(A) = 6800 / R_SET(Ω)",
+      "variables": {"I_LIMIT": "典型限流值，A", "R_SET": "ISET 到 GND 的电阻，Ω"},
+      "calculations": [
+        {"rail": "5V_SW", "resistor": "R7", "resistance_ohm": 16900, "result": 0.40237, "unit": "A"},
+        {"rail": "3V3_SW", "resistor": "R8", "resistance_ohm": 27000, "result": 0.25185, "unit": "A"}
+      ],
+      "interpretation": "分别对应约 400 mA 和 250 mA 的设计目标；器件容差、温升、USB 供电和压降仍需实测。",
+      "state": "calculated",
+      "hardware_result": "unverified",
+      "sources": ["final-project-archive", "proposal", "datasheet-sy6280"]
+    },
+    {
+      "id": "reset-rc",
+      "name_zh": "复位 RC 时间常数",
+      "equation": "τ = R × C",
+      "variables": {"R": "R12 = 10 kΩ", "C": "C10 = 100 nF"},
+      "calculation": {"expression": "10000 × 100e-9", "result": 0.001, "unit": "s"},
+      "interpretation": "名义时间常数为 1 ms；实际复位释放时间取决于 NRST 阈值、上电斜率和 MCU 内部电路。",
+      "state": "calculated",
+      "hardware_result": "unverified",
+      "sources": ["final-project-archive", "datasheet-ch32v203"]
+    },
+    {
+      "id": "led-current",
+      "name_zh": "状态 LED 电流",
+      "equation": "I_LED = (V_OH - V_F) / R13",
+      "variables": {"V_OH": "PB5 输出高电平电压，V", "V_F": "D1 正向压降，V", "R13": "1 kΩ"},
+      "bounds": {"absolute_upper_bound_if_vf_zero": 0.0033, "unit": "A"},
+      "interpretation": "没有最终板上 V_OH/V_F 测量；不得把示例电流写成实测值。",
+      "state": "expected",
+      "hardware_result": "unverified",
+      "sources": ["final-project-archive"]
+    },
+    {
+      "id": "crystal-load",
+      "name_zh": "晶振负载电容",
+      "equation": "C_L ≈ (C11 × C12) / (C11 + C12) + C_STRAY",
+      "variables": {"C11": "12 pF", "C12": "12 pF", "C_STRAY": "引脚、封装和走线杂散电容"},
+      "calculation": {"expression": "(12 × 12) / (12 + 12)", "result_without_stray": 6, "unit": "pF"},
+      "interpretation": "Y1 元数据标称 20 pF；未知 C_STRAY 和 MCU 振荡器模型使负载匹配、频偏和起振裕量均未验证，应在上电章节明确复核。",
+      "state": "calculated",
+      "hardware_result": "unverified",
+      "sources": ["final-project-archive", "datasheet-crystal", "datasheet-ch32v203"]
+    },
+    {
+      "id": "capacitor-reactance",
+      "name_zh": "电容容抗",
+      "equation": "X_C = 1 / (2πfC)",
+      "variables": {"X_C": "容抗，Ω", "f": "频率，Hz", "C": "电容，F"},
+      "conditions": "理想电容近似；实际还受 ESR、ESL、直流偏压和封装影响。",
+      "project_uses": ["C6-C8 高频去耦", "C9/C1-C5 低频储能"],
+      "state": "design",
+      "sources": ["tutorial-toc"]
+    },
+    {
+      "id": "inductor-ripple",
+      "name_zh": "Buck 电感纹波近似",
+      "equation": "ΔI_L ≈ (V_IN - V_OUT) × D / (L × f_SW)",
+      "variables": {"ΔI_L": "电感纹波电流，A", "D": "占空比", "L": "L1 = 2.2 µH", "f_SW": "开关频率，Hz"},
+      "conditions": "连续导通模式、理想化稳态近似。",
+      "state": "expected",
+      "hardware_result": "unverified",
+      "sources": ["final-project-archive", "datasheet-sy8089"]
+    },
+    {
+      "id": "efficiency",
+      "name_zh": "转换效率",
+      "equation": "η = P_OUT / P_IN × 100%",
+      "variables": {"P_OUT": "输出功率，W", "P_IN": "输入功率，W", "η": "效率，%"},
+      "conditions": "输入输出应同时、稳态测量。",
+      "state": "design",
+      "hardware_result": "unverified",
+      "sources": ["tutorial-toc"]
+    },
+    {
+      "id": "pwm-average",
+      "name_zh": "PWM 平均值",
+      "equation": "V_AVG ≈ D × V_HIGH",
+      "variables": {"D": "占空比，0 到 1", "V_HIGH": "高电平电压，V"},
+      "conditions": "负载或后级对 PWM 做充分平均；不等同于任意负载上的直流电压。",
+      "state": "expected",
+      "hardware_result": "unverified",
+      "sources": ["proposal", "tutorial-toc"]
+    },
+    {
+      "id": "uart-bit-time",
+      "name_zh": "UART 位时间",
+      "equation": "t_BIT = 1 / baud",
+      "variables": {"t_BIT": "单个位时间，s", "baud": "波特率，bit/s"},
+      "conditions": "异步串口理想时序。",
+      "state": "design",
+      "hardware_result": "unverified",
+      "sources": ["proposal", "tutorial-toc"]
+    },
+    {
+      "id": "cad-usb-skew",
+      "name_zh": "USB CAD 几何偏斜",
+      "equation": "skew = |L_DP - L_DM|",
+      "calculations": [
+        {"segment": "connector-to-esd", "dm_mil": 700.8848, "dp_mil": 700.884807, "skew_mil": 0.000007},
+        {"segment": "esd-to-series-resistor", "dm_mil": 483.619088, "dp_mil": 483.619146, "skew_mil": 0.000058},
+        {"segment": "series-resistor-to-mcu", "dm_mil": 361.88001, "dp_mil": 361.880026, "skew_mil": 0.000016}
+      ],
+      "interpretation": "这些是 CAD 计算长度，不证明受控阻抗、眼图或 EMI 合规。",
+      "state": "calculated",
+      "hardware_result": "unverified",
+      "sources": ["fabrication-manifest", "fabrication-checklist"]
+    },
+    {
+      "id": "mil-to-mm",
+      "name_zh": "mil 与毫米换算",
+      "equation": "1 mil = 0.0254 mm",
+      "state": "design",
+      "sources": ["tutorial-toc"]
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+<section class="notice" aria-labelledby="chapter-15-goals">
+  <h2 id="chapter-15-goals">学习目标</h2>
+  <p>本章把“打开编辑器开始画图”改造成可复现的工程过程。完成后，你应能建立一个名称、版本、单位、库来源和备份策略都明确的 EasyEDA 工程，并能在每次继续工作前确认自己操作的是正确工程与正确文档。</p>
+  <ul>
+    <li>区分工程、板、原理图、原理图页和 PCB 文档的层级；</li>
+    <li>正确使用 mm、mil、网格和坐标原点，而不混淆原理图与 PCB 的坐标；</li>
+    <li>建立稳定的网络命名、修订元数据和归档规则；</li>
+    <li>验证库器件，而不是把搜索结果直接当作可信设计数据；</li>
+    <li>通过保存、关闭、重新打开和活动文档检查，排除错误上下文与陈旧状态。</li>
+  </ul>
+  <aside class="warning" aria-label="版本差异提醒">
+    <p>本项目发布时使用 EasyEDA 编辑器 3.2.166。不同版本的菜单名称和面板位置可能变化，因此以下步骤以“要完成的工程动作”为准，不依赖某个按钮永远位于固定位置。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-15-1">
+  <h2 id="section-15-1">15.1 工程、板、原理图、PCB 与文档层级</h2>
+  <p><strong>工程（Project）</strong>是设计的顶层容器；它可以包含一块或多块<strong>板（Board）</strong>。一块板通常关联原理图与 PCB：原理图又可含多个原理图页，而 PCB 是承载封装、焊盘、网络、铜和机械层的物理文档。编辑器中的“当前工程”与“当前活动文档”是两种不同状态：工程正确，不代表当前标签页就是你准备操作的文档。</p>
+  <table>
+    <caption>R1 的可追溯工程身份</caption>
+    <thead><tr><th scope="col">层级</th><th scope="col">R1 记录</th><th scope="col">用途</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">工程</th><td><code>USB GPIO</code></td><td>保存器件、文档和工程元数据</td></tr>
+      <tr><th scope="row">发布板名</th><td><code>USB_GPIO_R1</code></td><td>把产品身份与修订号绑定</td></tr>
+      <tr><th scope="row">工程 UUID</th><td><code>30fa5cabe0fdf3b7815a2cd8aae1efeb366c1e22505cb483b2be4e204f5a7e89</code></td><td>避免只凭相似文件名判断工程</td></tr>
+      <tr><th scope="row">PCB UUID</th><td><code>dce0af2c48baae5a</code></td><td>标识最终 PCB 文档</td></tr>
+      <tr><th scope="row">原理图页 UUID</th><td><code>6658fda3ff83ea67</code></td><td>标识最终原理图页</td></tr>
+    </tbody>
+  </table>
+  <p>日常操作不必手抄 UUID，但发布清单应记录它们。这样即使出现同名备份、浏览器缓存或多个窗口，也能确认制造输出来自哪一份设计源。</p>
+</section>
+
+<section aria-labelledby="section-15-2">
+  <h2 id="section-15-2">15.2 单位与坐标系统</h2>
+  <p>R1 的机械尺寸用 mm 表达，许多 PCB 规则和历史坐标用 mil 表达，其中 <code>1 mil = 0.0254 mm</code>。例如 12 mil 过孔钻孔约为 0.3048 mm。换算必须写出单位，不能把“12”当成没有语境的尺寸。</p>
+  <p>原理图坐标只服务于符号排版和导线连接，不表示 PCB 上的物理距离；PCB 坐标才用于元件位置、板框、铜和制造数据。即使自动化接口也可能对两个编辑域采用不同坐标单位，所以复制数值前应先确认当前文档类型与单位。</p>
+  <ol>
+    <li>PCB 机械设计优先以 mm 记录外形、器件本体和装配间隙；</li>
+    <li>与现有规则或制造数据比较时保留 mil 原值，并同时给出必要换算；</li>
+    <li>选择能落在器件引脚节距上的网格，不用关闭网格来掩盖库原点错误；</li>
+    <li>固定并记录 PCB 原点；不要在布局中途随意移动原点后继续使用旧坐标表。</li>
+  </ol>
+  <aside class="example">
+    <p><strong>算例：</strong>R1 名义外形 50 mm × 24 mm，约为 1968.5 mil × 944.9 mil。Gerber 解析得到 49.9999 mm × 24.00046 mm；后者是制造几何计算值，不是卡尺实测值。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-15-3">
+  <h2 id="section-15-3">15.3 网格、命名、修订元数据与备份</h2>
+  <p>可复现工程需要在画第一根线之前决定“怎样命名”和“怎样回退”。推荐使用不含含糊空格的稳定文档名、明确的板级修订号，以及能够追溯到日期和发布状态的归档。</p>
+  <h3 id="section-15-3-setup">建议的初始设置</h3>
+  <ol>
+    <li>建立工程 <code>USB GPIO</code>，创建一块板及其原理图、PCB 文档；</li>
+    <li>把板标题设为含修订号的 <code>USB_GPIO_R1</code>，不要只写“final”或“new”；</li>
+    <li>在工程说明中记录功能边界：USB 2.0 Full-Speed、3.3 V 逻辑、8 GPIO、4 PWM、UART 与两路受控电源；</li>
+    <li>原理图网格选择适配符号引脚的固定步距，PCB 使用适配封装节距和规则的固定网格；</li>
+    <li>完成每个质量门后保存：器件冻结、原理图/ERC、布局机械审核、布线/DRC、制造发布；</li>
+    <li>发布时导出完整工程归档，并为归档和制造包记录哈希。</li>
+  </ol>
+  <p>“另存很多名字相近的文件”不是版本控制。备份至少要回答：它属于哪个修订、在哪个质量门生成、能否重新打开、是否含当前原理图和 PCB。R1 的最终工程归档包含工程元数据、当前原理图、当前 PCB 和预览图；其 SHA-256 已写入制造清单。</p>
+</section>
+
+<section aria-labelledby="section-15-4">
+  <h2 id="section-15-4">15.4 库搜索与工程本地器件</h2>
+  <p>库搜索只能找到候选项，不能证明候选项正确。一个可用器件必须同时满足符号引脚、封装焊盘、器件本体、方向、料号和装配属性。对关键器件，应把已验证版本保存在工程可追溯的本地库或随工程归档的器件数据中，避免以后同名公共库条目变化。</p>
+  <ol>
+    <li>用制造商型号或供应商料号搜索候选器件；</li>
+    <li>逐引脚核对符号编号、名称与电气类型；</li>
+    <li>逐焊盘核对封装编号、尺寸、孔型、间距和 1 脚标记；</li>
+    <li>用数据手册机械图检查本体与庭院，不以 3D 模型单独作结论；</li>
+    <li>核对制造商料号、供应商料号、封装和装配面；</li>
+    <li>若公共库不满足要求，复制为工程本地器件后再修正，并记录修正原因。</li>
+  </ol>
+  <aside class="warning">
+    <p>不要因为“符号看起来像 USB-C”就采用它。J1 还必须正确表达 A/B 两组 USB 2.0 引脚、CC1/CC2、外壳固定脚和连接器真实朝向；任何一个编号错误都会在同步后变成错误焊盘网络。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-15-5">
+  <h2 id="section-15-5">15.5 稳定网络名与功能块组织</h2>
+  <p>网络名是跨越原理图、PCB、检查脚本和制造记录的接口。名称应描述电气节点，而不是临时画图位置。R1 必须把 <code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>3V3_SW</code>、<code>5V_SW</code> 和 GND 保持为不同网络。</p>
+  <p>串联元件两侧也应使用不同名称。例如 USB D− 的完整路径被分成 <code>USB_DM_CONN</code>、<code>USB_DM_ESD</code> 和 <code>USB_DM_MCU</code>；GPIO0 经串联电阻分成 <code>GPIO0_MCU</code> 与 <code>GPIO0_PWM0</code>。这种命名既说明功能边界，也让错误短接和遗漏元件更容易被审计。</p>
+  <p>原理图按以下功能块从左到右或从输入到输出组织：</p>
+  <ul>
+    <li>J1、R1/R2、U2、R3/R4：USB-C 入口与数据保护；</li>
+    <li>U3、L1、C2/C3、R5/R6：3.3 V Buck；</li>
+    <li>U4/U5 及其限流、使能和输出电容：受控电源；</li>
+    <li>U1、C6–C12、Y1、复位与调试：控制核心；</li>
+    <li>R14–R23、J2/J3：外部 GPIO、UART、目标电源与调试接口。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-15-6">
+  <h2 id="section-15-6">15.6 保存、重新打开与检查活动文档</h2>
+  <p>保存只说明编辑器已接受当前状态；重新打开则同时检验归档是否可读，并迫使编辑器重新建立文档状态。R1 的最终 PCB DRC 在保存、关闭并重新打开 PCB 后执行，因为反复删除和重建铜图元曾使连接图缓存过期。</p>
+  <ol>
+    <li>保存当前文档和工程，等待保存状态完成；</li>
+    <li>记录当前工程名、板名、文档类型和修订号；</li>
+    <li>关闭文档标签页，再从工程树重新打开；</li>
+    <li>确认原理图操作发生在原理图页、PCB 操作发生在 PCB 文档；</li>
+    <li>抽查元件数、网络数、板框和最近修改，确认不是旧备份；</li>
+    <li>重新运行与当前阶段对应的 ERC 或 DRC，而不是沿用关闭前的结果。</li>
+  </ol>
+  <aside class="error-case">
+    <p><strong>状态错误的特征：</strong>几何独立检查显示网络已经连通，但 DRC 在大量删除/重建后仍报告旧开路。保存、关闭并重新打开后错误消失，说明是连接图陈旧。反过来，如果重开后错误仍在，就必须按真实断点处理，不能把所有错误都归咎于缓存。</p>
+  </aside>
+</section>
+
+<section class="experiment" aria-labelledby="section-15-7">
+  <h2 id="section-15-7">15.7 练习：建立工程骨架</h2>
+  <p><strong>目标：</strong>在不放置任何正式器件前，建立可被另一位同学复现和审核的工程骨架。</p>
+  <ol>
+    <li>创建工程、板、原理图页和 PCB 文档，并使用稳定名称；</li>
+    <li>记录软件版本、工程名、板名、修订、单位、网格和原点策略；</li>
+    <li>建立“USB 入口、Buck、受控电源、MCU、外部接口”五个原理图功能区标题；</li>
+    <li>写出电源、USB 分段和外部接口网络名清单；</li>
+    <li>保存、关闭并重新打开工程，确认活动文档类型；</li>
+    <li>导出一份工程归档，重新导入或在另一窗口验证可打开性。</li>
+  </ol>
+  <p><strong>提交物：</strong>工程树截图、设置记录表、网络命名表和可打开的归档。<strong>通过判据：</strong>同学只凭这些材料即可找到正确文档，且不会把四条电源轨当成同一网络。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-15-summary">
+  <h2 id="chapter-15-summary">本章小结</h2>
+  <p>可靠设计从工程身份和文档上下文开始。稳定名称、明确单位、验证过的库器件、阶段性归档以及保存后重开共同构成可复现基础。下一章将在这个骨架上捕获原理图，并把每一个功能连接写成可审计的网络。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>最终 EasyEDA 工程归档、R1 项目事实库和制造发布清单。UUID、软件版本和尺寸属于设计/发布记录，不代表实物测量。</p>
+</footer>

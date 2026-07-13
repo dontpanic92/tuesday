@@ -1,0 +1,142 @@
+<section class="notice" aria-labelledby="chapter-18-goals">
+  <h2 id="chapter-18-goals">学习目标</h2>
+  <p>从原理图同步到 PCB 的本质，是把“应相连的引脚”转换为“带网络身份的焊盘和待实现连接”。完成本章后，你应能建立两层板、定义制造规则和网络类别、绘制明确闭合的 50 mm × 24 mm 板框，并用数量基线确认同步没有丢失设计意图。</p>
+  <ul>
+    <li>正确导入元件、封装、焊盘网络和 DNP 元件；</li>
+    <li>解释飞线的含义，而不把它误认为制造铜；</li>
+    <li>按制造能力设置线宽、间距、过孔、孔和板边规则；</li>
+    <li>为 USB、电源、地和普通信号建立明确的网络类别；</li>
+    <li>创建单一、锁定、显式闭合的板框并验证制造外形。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-18-1">
+  <h2 id="section-18-1">18.1 导入元件与网络</h2>
+  <p>先保存并通过第 17 章的原理图质量门，再执行“从原理图更新 PCB”或等效同步操作。同步的输入应是冻结的原理图，而不是仍在后台修改的页面。</p>
+  <ol>
+    <li>确认当前活动文档是目标 PCB，工程与板修订均为 R1；</li>
+    <li>运行同步预览，分别查看新增、删除、更新的元件和网络；</li>
+    <li>确认 48 个原理图元件全部对应 PCB 元件，包括 DNP 的 J2/J3；</li>
+    <li>确认 172 个原理图引脚映射到 172 个 PCB 焊盘，网络名一致；</li>
+    <li>确认命名网络总数为 47，四条电源轨与 GND 没有合并；</li>
+    <li>应用更新后保存，重新生成一次差异报告，期望差异为 0。</li>
+  </ol>
+  <aside class="warning">
+    <p>不要通过在 PCB 中手工改焊盘网络来“修好”原理图错误。源头在原理图时，应修正原理图、重新审核并再次同步，否则下一次更新会覆盖补丁或制造两套真相。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-18-2">
+  <h2 id="section-18-2">18.2 飞线的含义</h2>
+  <p><strong>飞线（Ratsnest）</strong>是工具根据网络表绘制的未完成连接提示。它说明两个或多个焊盘在逻辑上属于同一网络，但当前 PCB 铜尚未形成工具认可的连通路径。飞线不是走线，也不会出现在 Gerber 中。</p>
+  <ul>
+    <li>移动元件时飞线会重算，帮助比较不同摆放的连接复杂度；</li>
+    <li>完成一条被工具识别的铜连接后，对应飞线应消失；</li>
+    <li>隐藏飞线只改变显示，不会让网络变成已连接；</li>
+    <li>铺铜边界存在但未生成铜时，GND 飞线仍可能存在；</li>
+    <li>若几何已连通但飞线/DRC 未刷新，应保存并重新打开后复核，不能直接忽略。</li>
+  </ul>
+  <p>飞线通常按最短拓扑显示，而不是建议的实际路线。USB、Buck 和回流路径必须按电气机理规划，不能机械地沿飞线最短距离布线。</p>
+</section>
+
+<section aria-labelledby="section-18-3">
+  <h2 id="section-18-3">18.3 板层叠与制造能力</h2>
+  <p>R1 是两层 PCB：Top copper 与 Bottom copper，所有 48 个元件都在顶层。两层板成本低、便于检查和返修，但信号走线与地参考共享有限的两个铜层，因此布局和回流连续性比“层数更多时自动有完整地平面”更难。</p>
+  <p>建立层设置时还应启用板框、顶/底阻焊、顶层锡膏、顶/底丝印、PTH/NPTH 与过孔钻孔等制造层。底层没有元件，所以最终底层锡膏缺失是预期现象。</p>
+  <aside class="notice">
+    <p>最终发布资料没有给出可用于受控阻抗认证的生产叠层。即使 D+/D− 使用 8 mil 并做到极小几何偏斜，也只能说 CAD 几何已定义，不能声称差分阻抗合格。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-18-4">
+  <h2 id="section-18-4">18.4 选择 50 mm × 24 mm 的两层板框</h2>
+  <p>早期提案估计约 45 mm × 20 mm；器件本体、USB-C 外伸、目标排针、Buck 回路、探测空间和机械间距审核后，最终名义外形冻结为 50 mm × 24 mm。工程尺寸应由真实封装与检查需求决定，而不是为了满足最初估计强行压缩。</p>
+  <p>外形设计顺序：</p>
+  <ol>
+    <li>先确认 J1、J2、J3 的插拔方向、板边位置与有意外伸；</li>
+    <li>给元件本体、庭院、走线、过孔和板边留出规则间距；</li>
+    <li>在板框层绘制 50 mm × 24 mm 的单一闭合轮廓；</li>
+    <li>标注总长和总宽，检查没有多余线段或重复轮廓；</li>
+    <li>锁定板框，避免移动元件时误选并拖动轮廓。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="section-18-5">
+  <h2 id="section-18-5">18.5 线宽、间距、过孔、孔与铜到板边规则</h2>
+  <p>规则应同时满足制造厂最小能力和本设计的裕量。把厂商极限直接当默认值会使整板都工作在最难制造的边界；更好的做法是为普通信号使用保守默认值，只在局部封装逃逸处定义受控例外。</p>
+  <table>
+    <caption>R1 最终采用的主要几何</caption>
+    <thead><tr><th scope="col">对象</th><th scope="col">设计值</th><th scope="col">说明</th></tr></thead>
+    <tbody>
+      <tr><td>普通信号</td><td>6 mil</td><td>默认低电流信号</td></tr>
+      <tr><td>USB D+/D−</td><td>8 mil</td><td>还需配合间距和真实生产叠层</td></tr>
+      <tr><td>GND</td><td>12 mil</td><td>显式地线，不代表所有回流只走线</td></tr>
+      <tr><td><code>BUCK_SW</code></td><td>14 mil</td><td>应短且铜面积受控</td></tr>
+      <tr><td><code>3V3_SW</code> / <code>5V_SW</code></td><td>16 mil / 16 mil</td><td>受控输出路径</td></tr>
+      <tr><td><code>3V3_SYS</code></td><td>20 mil</td><td>系统 3.3 V 主干</td></tr>
+      <tr><td><code>VBUS_IN</code></td><td>24 mil 主干；12 mil 短逃逸</td><td>连接器细间距处局部收颈</td></tr>
+      <tr><td>通孔过孔</td><td>12 mil 钻孔、24 mil 焊盘</td><td>0.3048 mm 钻孔设计值</td></tr>
+    </tbody>
+  </table>
+  <p>最终几何审核记录的最小焊盘/过孔/走线到板边距离分别为 12.9/16.9/17.5 mil。这些是最终板的计算结果，不应反向当作所有项目都适用的通用规则。</p>
+</section>
+
+<section aria-labelledby="section-18-6">
+  <h2 id="section-18-6">18.6 USB、电源、地与普通信号的网络类别</h2>
+  <p>网络类别让规则按功能复用。EasyEDA 的规则系统可以按网络类别、单一网络、层、区域、封装、元件、铺铜和差分对选择规则；选择器优先级必须清楚，避免一个更高优先级的局部规则悄悄覆盖默认值。</p>
+  <ul>
+    <li><strong>USB：</strong>D+ 与 D− 成对，定义宽度、间距、过孔和差分/长度检查；</li>
+    <li><strong>电源：</strong>按 VBUS、3V3_SYS、受控输出与 BUCK_SW 分别定义宽度；</li>
+    <li><strong>GND：</strong>定义显式线宽、过孔，并与铺铜策略协调；</li>
+    <li><strong>普通信号：</strong>GPIO、UART、控制与调试使用默认 6 mil；</li>
+    <li><strong>局部例外：</strong>只对确实受焊盘间距限制的短逃逸设置，并记录原因。</li>
+  </ul>
+  <p>规则名称要表达用途，例如“USB_FS_PAIR”或“VBUS_TRUNK”，而不是“rule2”。修改规则后必须重跑 DRC、重铺原生铺铜并重新检查 Gerber。</p>
+</section>
+
+<section aria-labelledby="section-18-7">
+  <h2 id="section-18-7">18.7 板原点、尺寸与显式闭合板框</h2>
+  <p>板框必须是一条制造工具能识别的闭合轮廓。视觉上四条线端点接触，不一定等价于一个拓扑闭合的轮廓对象；微小间隙、重复边或多个独立片段都可能使板厂无法确定铣切区域。</p>
+  <aside class="error-case" aria-labelledby="outline-case-title">
+    <h3 id="outline-case-title">真实案例：四段线“数值相接”但板框仍未闭合</h3>
+    <table>
+      <thead><tr><th scope="col">阶段</th><th scope="col">事实</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">现象</th><td>EasyEDA 弹出“电路板边界没有闭合”，尽管四条独立边的端点数值看似相同。</td></tr>
+        <tr><th scope="row">原因</th><td>制造检查器没有把四个独立直线图元视为一个可靠的单一轮廓。</td></tr>
+        <tr><th scope="row">修复</th><td>删除分散边线，重建为一个首尾显式重合的闭合折线，并锁定板框。</td></tr>
+        <tr><th scope="row">验证</th><td>源中仅有一个闭合片段；Gerber 外形层闭合，解析尺寸为 49.9999 mm × 24.00046 mm。</td></tr>
+        <tr><th scope="row">预防</th><td>用闭合多段线工具、检查片段数、放大端点，并在独立 Gerber 查看器中验证轮廓。</td></tr>
+      </tbody>
+    </table>
+  </aside>
+  <ol>
+    <li>把原点放在便于尺寸、坐标表和机械基准使用的位置；</li>
+    <li>画完轮廓后检查首尾点完全相同，片段数为 1；</li>
+    <li>删除重合线和孤立短线；</li>
+    <li>检查 J1 外伸属于器件本体，不应改变板框；</li>
+    <li>锁定轮廓并保存，输出 Gerber 后再次验证。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="section-18-8">
+  <h2 id="section-18-8">18.8 设计规则必须对应所选制造商</h2>
+  <p>EDA 自带的“能力模板”只是起点。真正规则应来自具体板厂、层数、铜厚、板厚、表面处理、阻抗服务、最小孔径、环宽、板边和装配工艺。换制造商或工艺后，应重新核对而不是沿用旧模板名称。</p>
+  <ol>
+    <li>保存制造商能力页或订单参数的版本与日期；</li>
+    <li>把绝对最小能力与项目采用值分列记录；</li>
+    <li>检查 12/24 mil 过孔、最小线距、细间距焊盘、PTH/NPTH 和板边能力；</li>
+    <li>若要求受控阻抗，取得实际叠层和厂商计算几何后再冻结 USB 规则；</li>
+    <li>任何规则变更都使旧 DRC、铺铜和 Gerber 审核失效。</li>
+  </ol>
+  <p><strong>设计练习：</strong>建立一张“厂商极限—项目默认—局部例外—验证方法”表。若无法为某一例外写出封装约束和制造依据，就不要应用该例外。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-18-summary">
+  <h2 id="chapter-18-summary">本章小结</h2>
+  <p>PCB 初始化把冻结网络表、真实封装和制造约束放进同一坐标系统。飞线只是待实现连接，规则必须对应制造能力，板框必须是单一显式闭合轮廓。完成这些基础后，才有资格讨论元件实体、布局和走线。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>R1 最终工程、制造清单、检查清单与 EasyEDA 规则/图元格式说明。尺寸和最小间距为设计或 CAD/Gerber 计算值。</p>
+</footer>

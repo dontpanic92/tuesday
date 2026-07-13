@@ -1,0 +1,269 @@
+<section aria-labelledby="g-rules">
+  <h2 id="g-rules">G.1 记录规则与事实状态</h2>
+  <p>本附录只提供可打印的空白记录表。所有测量格默认空白；不得预填、推测或把设计值抄成实测值。每一项结果都应标明：</p>
+  <ul>
+    <li><strong>设计值：</strong>来自最终设计源，例如 Y1=12 MHz、R7=16.9 kΩ。</li>
+    <li><strong>计算值：</strong>例如 3V3_SYS 反馈计算 3.318 V、两路典型限流计算约 0.402/0.252 A。</li>
+    <li><strong>预期行为：</strong>例如复位时受控电源应关闭，但尚未由样机确认。</li>
+    <li><strong>实测值：</strong>必须包含仪器、量程、接法、条件、原始读数和日期。</li>
+    <li><strong>待验证：</strong>证据不足或实验尚未完成。</li>
+  </ul>
+  <aside class="warning">
+    <p><strong>停止条件优先于完成实验：</strong>发现冒烟、异味、异常发热、反接、不可解释的高电流、错误电源方向、示波器地夹可能短路，或任何人无法确认接线时，立即断电并由指导人员复核。禁止用导线直接短接电源测试限流。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="g-cover">
+  <h2 id="g-cover">G.2 通用实验封面</h2>
+  <table>
+    <caption>表 G-1　每次实验开始前填写</caption>
+    <tbody>
+      <tr><th scope="row">实验编号 / 名称</th><td colspan="3">____________________________________________________________</td></tr>
+      <tr><th scope="row">日期 / 地点</th><td>________________</td><th scope="row">操作者 / 指导人</th><td>________________</td></tr>
+      <tr><th scope="row">板版本 / 板号</th><td>________________</td><th scope="row">固件版本</th><td>________________</td></tr>
+      <tr><th scope="row">环境温度</th><td>________ °C</td><th scope="row">USB 主机 / 线缆</th><td>________________</td></tr>
+      <tr><th scope="row">电源型号 / 通道</th><td>________________</td><th scope="row">电压 / 限流设置</th><td>________ V / ________ A</td></tr>
+      <tr><th scope="row">万用表</th><td>型号________　校准/核查________</td><th scope="row">示波器 / 探头</th><td>型号________　倍率________</td></tr>
+      <tr><th scope="row">逻辑分析仪 / 电子负载</th><td colspan="3">____________________________________________________________</td></tr>
+      <tr><th scope="row">实验目的</th><td colspan="3">____________________________________________________________<br><br></td></tr>
+      <tr><th scope="row">接线图编号 / 照片</th><td colspan="3">____________________________________________________________</td></tr>
+      <tr><th scope="row">本次停止条件</th><td colspan="3">____________________________________________________________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="g-receiving">
+  <h2 id="g-receiving">G.3 收板与装配检验工作表</h2>
+  <table>
+    <caption>表 G-2　外观、机械与装配记录</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">方法</th><th scope="col">结果</th><th scope="col">照片/缺陷编号</th></tr></thead>
+    <tbody>
+      <tr><td>板名、R1 修订、批次</td><td>目视对照制造资料</td><td>□ 符合　□ 不符合</td><td>________</td></tr>
+      <tr><td>外形尺寸、板框、翘曲</td><td>卡尺 / 平台</td><td>长____ mm　宽____ mm</td><td>________</td></tr>
+      <tr><td>阻焊、丝印、露铜、划伤</td><td>放大观察</td><td>□ 合格　□ 需评审</td><td>________</td></tr>
+      <tr><td>PTH/NPTH/过孔</td><td>目视与尺寸抽查</td><td>□ 合格　□ 需评审</td><td>________</td></tr>
+      <tr><td>J1 方向、位置和插头配合</td><td>断电插拔</td><td>□ 合格　□ 不合格</td><td>________</td></tr>
+      <tr><td>U1 pin 1、U2–U5 方向</td><td>装配图对照</td><td>□ 正确　□ 可疑</td><td>________</td></tr>
+      <tr><td>D1 极性、Y1、L1 和无源值</td><td>装配图 / 标识 / 测量</td><td>□ 正确　□ 可疑</td><td>________</td></tr>
+      <tr><td>焊桥、虚焊、少锡、立碑</td><td>显微镜；必要时 X-ray</td><td>缺陷数____</td><td>________</td></tr>
+      <tr><td>J2/J3 DNP 状态</td><td>目视</td><td>□ 按计划未装　□ 已另行装配</td><td>________</td></tr>
+      <tr><td>总体接收决定</td><td>审核以上证据</td><td>□ 接收　□ 返修　□ 隔离</td><td>签名________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="g-unpowered">
+  <h2 id="g-unpowered">G.4 断电检查与首次限流上电</h2>
+  <h3 id="g-resistance">G.4.1 上电前电阻/连续性</h3>
+  <table>
+    <caption>表 G-3　电容充电会使读数随时间变化，须记录稳定方式</caption>
+    <thead><tr><th scope="col">测量点</th><th scope="col">表笔方向 / 量程</th><th scope="col">初始读数</th><th scope="col">稳定读数</th><th scope="col">判定</th></tr></thead>
+    <tbody>
+      <tr><td><code>VBUS_IN</code>—GND</td><td>________________</td><td>________ Ω</td><td>________ Ω</td><td>□ 继续　□ 停止</td></tr>
+      <tr><td><code>3V3_SYS</code>—GND</td><td>________________</td><td>________ Ω</td><td>________ Ω</td><td>□ 继续　□ 停止</td></tr>
+      <tr><td><code>5V_SW</code>—GND</td><td>________________</td><td>________ Ω</td><td>________ Ω</td><td>□ 继续　□ 停止</td></tr>
+      <tr><td><code>3V3_SW</code>—GND</td><td>________________</td><td>________ Ω</td><td>________ Ω</td><td>□ 继续　□ 停止</td></tr>
+      <tr><td>J1 外壳—GND</td><td>连续性档</td><td colspan="2">________</td><td>□ 符合设计　□ 复核</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="g-first-power">G.4.2 首次上电时间线</h3>
+  <table>
+    <caption>表 G-4　使用限流电源或受控 USB 供电测试装置</caption>
+    <thead><tr><th scope="col">时间</th><th scope="col">输入电压</th><th scope="col">输入电流</th><th scope="col">3V3_SYS</th><th scope="col">现象 / 温度</th><th scope="col">动作</th></tr></thead>
+    <tbody>
+      <tr><td>上电前</td><td>0 V</td><td>0 A</td><td>0 V</td><td>________________</td><td>□ 接线复核</td></tr>
+      <tr><td>t=____ s</td><td>____ V</td><td>____ A</td><td>____ V</td><td>________________</td><td>□ 继续　□ 断电</td></tr>
+      <tr><td>t=____ s</td><td>____ V</td><td>____ A</td><td>____ V</td><td>________________</td><td>□ 继续　□ 断电</td></tr>
+      <tr><td>稳态</td><td>____ V</td><td>____ A</td><td>____ V</td><td>________________</td><td>□ 通过　□ 调查</td></tr>
+    </tbody>
+  </table>
+  <p>设计参考：3V3_SYS 目标为 3.3 V，反馈标称计算为 3.318 V。实际允许范围必须由器件规格、负载和实验计划确定，不能只凭该计算值判定。</p>
+</section>
+
+<section aria-labelledby="g-buck">
+  <h2 id="g-buck">G.5 Buck 启动、纹波、负载与效率</h2>
+  <table>
+    <caption>表 G-5　测量设置</caption>
+    <tbody>
+      <tr><th scope="row">探测点 / 地弹簧位置</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">带宽限制 / 耦合 / 采样率</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">电子负载模式 / 线缆</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">负载阶跃幅度 / 上升时间</th><td>____________________________________________________________</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <caption>表 G-6　Buck 原始数据</caption>
+    <thead><tr><th scope="col">工况</th><th scope="col">V<sub>IN</sub></th><th scope="col">I<sub>IN</sub></th><th scope="col">V<sub>OUT</sub></th><th scope="col">I<sub>OUT</sub></th><th scope="col">纹波 p-p</th><th scope="col">最高温度</th><th scope="col">文件名</th></tr></thead>
+    <tbody>
+      <tr><td>空载/系统待机</td><td>____ V</td><td>____ A</td><td>____ V</td><td>____ A</td><td>____ mV</td><td>____ °C</td><td>________</td></tr>
+      <tr><td>工况 1</td><td>____ V</td><td>____ A</td><td>____ V</td><td>____ A</td><td>____ mV</td><td>____ °C</td><td>________</td></tr>
+      <tr><td>工况 2</td><td>____ V</td><td>____ A</td><td>____ V</td><td>____ A</td><td>____ mV</td><td>____ °C</td><td>________</td></tr>
+      <tr><td>负载阶跃</td><td>____ V</td><td>____ A</td><td>最低____ / 最高____ V</td><td>____→____ A</td><td>恢复____ µs</td><td>____ °C</td><td>________</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <caption>表 G-7　效率计算</caption>
+    <thead><tr><th scope="col">工况</th><th scope="col">P<sub>IN</sub>=V<sub>IN</sub>I<sub>IN</sub></th><th scope="col">P<sub>OUT</sub>=V<sub>OUT</sub>I<sub>OUT</sub></th><th scope="col">η</th><th scope="col">状态</th></tr></thead>
+    <tbody><tr><td>________</td><td>________ W</td><td>________ W</td><td>________ %</td><td>□ 实测计算　□ 待复核</td></tr><tr><td>________</td><td>________ W</td><td>________ W</td><td>________ %</td><td>□ 实测计算　□ 待复核</td></tr></tbody>
+  </table>
+</section>
+
+<section aria-labelledby="g-switched-power">
+  <h2 id="g-switched-power">G.6 5V_SW 与 3V3_SW 工作表</h2>
+  <p>过流测试应使用可编程电子负载缓慢增加电流，并设置硬件限流、温度和时间停止条件；禁止短路导线故障注入。</p>
+  <table>
+    <caption>表 G-8　使能、压降、限流与恢复</caption>
+    <thead><tr><th scope="col">电源</th><th scope="col">EN 状态</th><th scope="col">输入 V</th><th scope="col">输出 V</th><th scope="col">负载 A</th><th scope="col">压降 V</th><th scope="col">观察到的限流起点</th><th scope="col">恢复行为</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><code>5V_SW</code></th><td>0</td><td>____</td><td>____</td><td>____</td><td>____</td><td rowspan="3">____ A<br>设计计算约 0.402 A</td><td rowspan="3">________________</td></tr>
+      <tr><th scope="row"><code>5V_SW</code></th><td>1，工况 1</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><th scope="row"><code>5V_SW</code></th><td>1，工况 2</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><th scope="row"><code>3V3_SW</code></th><td>0</td><td>____</td><td>____</td><td>____</td><td>____</td><td rowspan="3">____ A<br>设计计算约 0.252 A</td><td rowspan="3">________________</td></tr>
+      <tr><th scope="row"><code>3V3_SW</code></th><td>1，工况 1</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><th scope="row"><code>3V3_SW</code></th><td>1，工况 2</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <caption>表 G-9　安全状态</caption>
+    <thead><tr><th scope="col">事件</th><th scope="col">5V_SW</th><th scope="col">3V3_SW</th><th scope="col">GPIO/PWM/UART</th><th scope="col">证据文件</th></tr></thead>
+    <tbody>
+      <tr><td>复位保持</td><td>____ V</td><td>____ V</td><td>________________</td><td>________</td></tr>
+      <tr><td>启动期间</td><td>____ V</td><td>____ V</td><td>________________</td><td>________</td></tr>
+      <tr><td>USB 挂起</td><td>____ V</td><td>____ V</td><td>________________</td><td>________</td></tr>
+      <tr><td>USB 断开</td><td>____ V</td><td>____ V</td><td>________________</td><td>________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="g-clock-reset-led">
+  <h2 id="g-clock-reset-led">G.7 时钟、复位与状态 LED</h2>
+  <table>
+    <caption>表 G-10　低负载测量，避免探头改变振荡</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">方法 / 探头</th><th scope="col">设计/计算参考</th><th scope="col">实测</th><th scope="col">判定</th></tr></thead>
+    <tbody>
+      <tr><td>Y1 起振</td><td>________________</td><td>12 MHz 设计值</td><td>启动时间____；频率____ MHz</td><td>□ 通过　□ 调查</td></tr>
+      <tr><td>晶振负载</td><td>频率误差/起振裕量方法：________</td><td>C11=C12=12 pF；理想串联 6 pF + 杂散</td><td>________________</td><td>□ 通过　□ 待验证</td></tr>
+      <tr><td>NRST 上电波形</td><td>________________</td><td>R12×C10 名义 τ=1 ms</td><td>阈值/释放时间____</td><td>□ 通过　□ 调查</td></tr>
+      <tr><td>BOOT0 默认电平</td><td>________________</td><td>R11 100 kΩ 下拉</td><td>____ V</td><td>□ 通过　□ 调查</td></tr>
+      <tr><td>D1 电流</td><td>测 R13 两端压降</td><td>零 Vf 数学上限 3.3 mA</td><td>V<sub>R13</sub>____ V；I____ mA</td><td>□ 通过　□ 调查</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="g-usb">
+  <h2 id="g-usb">G.8 USB 枚举、传输与挂起</h2>
+  <table>
+    <caption>表 G-11　USB 测试矩阵</caption>
+    <thead><tr><th scope="col">主机 / OS</th><th scope="col">端口 / 线缆</th><th scope="col">枚举</th><th scope="col">持续传输</th><th scope="col">挂起/恢复</th><th scope="col">重连</th><th scope="col">日志文件</th></tr></thead>
+    <tbody>
+      <tr><td>________</td><td>________</td><td>□ 成功 □ 失败</td><td>时长____；错误____</td><td>□ 成功 □ 失败</td><td>□ 成功 □ 失败</td><td>________</td></tr>
+      <tr><td>________</td><td>________</td><td>□ 成功 □ 失败</td><td>时长____；错误____</td><td>□ 成功 □ 失败</td><td>□ 成功 □ 失败</td><td>________</td></tr>
+      <tr><td>________</td><td>________</td><td>□ 成功 □ 失败</td><td>时长____；错误____</td><td>□ 成功 □ 失败</td><td>□ 成功 □ 失败</td><td>________</td></tr>
+    </tbody>
+  </table>
+  <p>记录设备描述符、VID/PID（若固件提供）、驱动状态、错误码和复现步骤。枚举成功不证明眼图、EMI 或 ESD 合规；这些必须另建受控测试。</p>
+</section>
+
+<section aria-labelledby="g-gpio">
+  <h2 id="g-gpio">G.9 GPIO 输入/输出工作表</h2>
+  <table>
+    <caption>表 G-12　八路通道逐一测试</caption>
+    <thead><tr><th scope="col">通道 / J2 pin</th><th scope="col">模式</th><th scope="col">施加条件</th><th scope="col">低电平</th><th scope="col">高电平</th><th scope="col">输入读回</th><th scope="col">通过</th></tr></thead>
+    <tbody>
+      <tr><td>G0 / 5</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+      <tr><td>G1 / 6</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+      <tr><td>G2 / 7</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+      <tr><td>G3 / 8</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+      <tr><td>G4 / 9</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+      <tr><td>G5 / 10</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+      <tr><td>G6 / 11</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+      <tr><td>G7 / 12</td><td>________</td><td>________</td><td>____ V</td><td>____ V</td><td>________</td><td>□</td></tr>
+    </tbody>
+  </table>
+  <p>外接 LED 必须有独立限流电阻；不得直接驱动电机、继电器或大电流 LED。测试输入时应使用受控 3.3 V 电平和共同地。</p>
+</section>
+
+<section aria-labelledby="g-pwm">
+  <h2 id="g-pwm">G.10 PWM 频率、占空比与抖动</h2>
+  <table>
+    <caption>表 G-13　四路 PWM 共用 TIM3 频率</caption>
+    <thead><tr><th scope="col">通道</th><th scope="col">命令频率</th><th scope="col">返回/实际设置</th><th scope="col">实测频率</th><th scope="col">命令占空比</th><th scope="col">实测占空比</th><th scope="col">高/低电平</th><th scope="col">抖动方法/结果</th></tr></thead>
+    <tbody>
+      <tr><td>PWM0 / J2-5</td><td>____ Hz</td><td>____ Hz</td><td>____ Hz</td><td>____ %</td><td>____ %</td><td>____ / ____ V</td><td>________</td></tr>
+      <tr><td>PWM1 / J2-6</td><td>____ Hz</td><td>____ Hz</td><td>____ Hz</td><td>____ %</td><td>____ %</td><td>____ / ____ V</td><td>________</td></tr>
+      <tr><td>PWM2 / J2-7</td><td>____ Hz</td><td>____ Hz</td><td>____ Hz</td><td>____ %</td><td>____ %</td><td>____ / ____ V</td><td>________</td></tr>
+      <tr><td>PWM3 / J2-8</td><td>____ Hz</td><td>____ Hz</td><td>____ Hz</td><td>____ %</td><td>____ %</td><td>____ / ____ V</td><td>________</td></tr>
+    </tbody>
+  </table>
+  <p>若用低通滤波验证平均值，另记录滤波器参数、负载、纹波和 <span aria-label="D times V high">D×V<sub>HIGH</sub></span> 的计算比较；不得把未滤波 PWM 当作稳定模拟电压。</p>
+</section>
+
+<section aria-labelledby="g-uart">
+  <h2 id="g-uart">G.11 UART 环回、帧格式与误码</h2>
+  <table>
+    <caption>表 G-14　3.3 V CMOS/TTL UART；不是 RS-232</caption>
+    <thead><tr><th scope="col">波特率</th><th scope="col">格式</th><th scope="col">样本字节</th><th scope="col">发送数</th><th scope="col">接收正确</th><th scope="col">帧/校验错误</th><th scope="col">误码率</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr><td>____</td><td>____N____</td><td>________</td><td>____</td><td>____</td><td>____</td><td>____</td><td>□ 通过 □ 失败</td></tr>
+      <tr><td>____</td><td>____N____</td><td>________</td><td>____</td><td>____</td><td>____</td><td>____</td><td>□ 通过 □ 失败</td></tr>
+      <tr><td>____</td><td>____N____</td><td>________</td><td>____</td><td>____</td><td>____</td><td>____</td><td>□ 通过 □ 失败</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <caption>表 G-15　波形检查</caption>
+    <tbody>
+      <tr><th scope="row">TX 高/低电平</th><td>____ / ____ V</td><th scope="row">位时间</th><td>____ µs（理论 1/baud=____ µs）</td></tr>
+      <tr><th scope="row">上升/下降时间</th><td>____ / ____ ns</td><th scope="row">接线长度/负载</th><td>________________</td></tr>
+      <tr><th scope="row">故意帧格式不匹配结果</th><td colspan="3">____________________________________________________________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="g-thermal-reliability">
+  <h2 id="g-thermal-reliability">G.12 热、长时间运行与样本一致性</h2>
+  <table>
+    <caption>表 G-16　温度记录</caption>
+    <thead><tr><th scope="col">时间</th><th scope="col">环境</th><th scope="col">U1</th><th scope="col">U3</th><th scope="col">L1</th><th scope="col">U4</th><th scope="col">U5</th><th scope="col">J1/电源路径</th><th scope="col">工况</th></tr></thead>
+    <tbody>
+      <tr><td>0 min</td><td>____ °C</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>________</td></tr>
+      <tr><td>____ min</td><td>____ °C</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>________</td></tr>
+      <tr><td>____ min</td><td>____ °C</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>________</td></tr>
+      <tr><td>____ min</td><td>____ °C</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>________</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <caption>表 G-17　多板比较</caption>
+    <thead><tr><th scope="col">板号</th><th scope="col">3V3_SYS</th><th scope="col">空载电流</th><th scope="col">USB</th><th scope="col">时钟</th><th scope="col">5V_SW 限流</th><th scope="col">3V3_SW 限流</th><th scope="col">异常</th></tr></thead>
+    <tbody>
+      <tr><td>____</td><td>____ V</td><td>____ A</td><td>____</td><td>____ MHz</td><td>____ A</td><td>____ A</td><td>________</td></tr>
+      <tr><td>____</td><td>____ V</td><td>____ A</td><td>____</td><td>____ MHz</td><td>____ A</td><td>____ A</td><td>________</td></tr>
+      <tr><td>____</td><td>____ V</td><td>____ A</td><td>____</td><td>____ MHz</td><td>____ A</td><td>____ A</td><td>________</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="g-fault-log">
+  <h2 id="g-fault-log">G.13 故障与偏差记录</h2>
+  <table>
+    <caption>表 G-18　一次只改变一个变量</caption>
+    <thead><tr><th scope="col">时间</th><th scope="col">现象</th><th scope="col">当前工况</th><th scope="col">假设</th><th scope="col">下一项测量</th><th scope="col">结果</th><th scope="col">结论/后续</th></tr></thead>
+    <tbody>
+      <tr><td>____</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td></tr>
+      <tr><td>____</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td></tr>
+      <tr><td>____</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td></tr>
+      <tr><td>____</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td><td>________</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <caption>表 G-19　实验结论</caption>
+    <tbody>
+      <tr><th scope="row">通过/失败判据来源</th><td>□ 数据手册　□ 设计规范　□ 教师批准　□ 其他________</td></tr>
+      <tr><th scope="row">结论</th><td>□ 通过　□ 有条件通过　□ 失败　□ 数据不足</td></tr>
+      <tr><th scope="row">支持结论的原始文件</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">不确定性与限制</th><td>____________________________________________________________<br><br></td></tr>
+      <tr><th scope="row">R2 修改建议</th><td>____________________________________________________________<br><br></td></tr>
+      <tr><th scope="row">操作者 / 审核人签名</th><td>________________ / ________________　日期____________</td></tr>
+    </tbody>
+  </table>
+</section>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="附录 L：参考资料与延伸阅读（References and Further Reading） — USB GPIO PCB 离线教程">
+  <title>附录 L：参考资料与延伸阅读（References and Further Reading） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="appendix-l">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="../chapters/01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="../chapters/02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="../chapters/03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="../chapters/04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="../chapters/05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="../chapters/06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="../chapters/07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="../chapters/08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="../chapters/09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="../chapters/10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="../chapters/11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="../chapters/12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="../chapters/13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="../chapters/14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="../chapters/15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="../chapters/16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="../chapters/17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="../chapters/18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="../chapters/19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="../chapters/20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="../chapters/21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="../chapters/22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="../chapters/23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="../chapters/24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="../chapters/25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="../chapters/26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="../chapters/27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="../chapters/28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="../chapters/29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="../chapters/30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="../chapters/31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="../chapters/32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="../chapters/33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="../chapters/34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="../chapters/35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="../chapters/36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="../chapters/37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="l-references.html" aria-current="page">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>附录（Appendices）</li><li aria-current="page">附录 L：参考资料与延伸阅读（References and Further Reading）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">附录（Appendices）</p>
+          <h1>附录 L：参考资料与延伸阅读（References and Further Reading）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#l-policy">L.1 来源优先级与引用方法</a></li><li class="toc-level-2"><a href="#l-project-sources">L.2 项目与教程来源</a></li><li class="toc-level-2"><a href="#l-hashes">L.3 R1 发布文件 SHA-256</a></li><li class="toc-level-2"><a href="#l-core-datasheets">L.4 核心有源器件与晶振资料</a></li><li class="toc-level-2"><a href="#l-passive-datasheets">L.5 连接器、磁性、LED 与无源料号</a></li><li class="toc-level-2"><a href="#l-further">L.6 延伸阅读的正确入口</a></li><li class="toc-level-2"><a href="#l-copyright">L.7 版权与可复现引用清单</a></li></ul></nav>
+        <section aria-labelledby="l-policy">
+  <h2 id="l-policy">L.1 来源优先级与引用方法</h2>
+  <p>本教程使用以下冲突解决顺序：最终 EasyEDA 项目归档 → 制造 manifest → fabrication checklist → 最终 BOM → 最终 CPL → 最终原理图/装配图/Gerber → 器件数据手册 → 早期提案 → 教程目录与实施要求。较早文档用于解释设计意图，但不能覆盖最终源中的位号、值、封装、网络或 DNP 状态。</p>
+  <aside class="notice">
+    <p><strong>引用标签：</strong>正文中的 <code>final-project-archive</code>、<code>fabrication-manifest</code> 等键对应下表。引用一个来源只表示该来源支持所述范围；例如 CAD 清单可支持几何和连通性，不能支持板上纹波或温度。</p>
+  </aside>
+  <ul>
+    <li>设计文件和发布文件用于回答“最终 R1 实际采用什么”。</li>
+    <li>数据手册用于回答“器件在什么条件下如何工作”。</li>
+    <li>实验记录用于回答“这块装配板实际表现如何”；当前尚无此类结果。</li>
+    <li>任何转载数据手册都应与制造商当前正式版本交叉核对。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="l-project-sources">
+  <h2 id="l-project-sources">L.2 项目与教程来源</h2>
+  <table>
+    <caption>表 L-1　项目自有资料及其证据范围</caption>
+    <thead><tr><th scope="col">引用键</th><th scope="col">路径 / 名称</th><th scope="col">权威用途</th><th scope="col">限制与版权安全摘要</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><code>approved-plan</code></th><td>内部实施计划 <code>plan.md</code></td><td>教程范围、语言、事实状态、48 位号覆盖和验收要求。</td><td>项目过程文档；只提取要求，不作为电子器件技术事实。</td></tr>
+      <tr><th scope="row"><code>tutorial-toc</code></th><td><code>tutorial/toc.md</code></td><td>37 章、12 附录、练习/实验的固定结构。</td><td>只决定内容映射，不证明电路数值。</td></tr>
+      <tr><th scope="row"><code>proposal</code></th><td><code>usb_gpio/PROPOSAL.md</code></td><td>用户问题、架构意图、安全状态、协议与早期选型理由。</td><td>早期 45×20 mm、8 MHz、17 kΩ 和旧 LDO 表述已被最终源覆盖；可选 GPIO ESD/fault 网络没有在 R1 实现。</td></tr>
+      <tr><th scope="row"><code>fabrication-checklist</code></th><td><code>usb_gpio/fabrication_checklist.md</code></td><td>ERC/DRC、网表、机械、铜区、BOM/CPL、Gerber 和发布决定。</td><td>证明源与制造包审核，不证明装配板功能。</td></tr>
+      <tr><th scope="row"><code>fabrication-manifest</code></th><td><code>usb_gpio/fabrication/R1/usb_gpio_R1_manifest.txt</code></td><td>板尺寸、层数、组件/焊盘/网络、走线/过孔、USB 几何、铜区和哈希。</td><td>CAD/制造计算值不是实物测量。</td></tr>
+      <tr><th scope="row"><code>final-bom</code></th><td><code>usb_gpio_R1_BOM.csv</code></td><td>21 个分组行、46 个拟装配位号、料号、供应商和封装。</td><td>UTF-16 制表文本；Value 列为空，不能据此断言值未知。</td></tr>
+      <tr><th scope="row"><code>final-bom-xlsx</code></th><td><code>usb_gpio_R1_BOM.xlsx</code></td><td>同一最终 BOM 的工作簿交付形式。</td><td>内容应与 CSV 交叉核对；不是独立数值来源。</td></tr>
+      <tr><th scope="row"><code>final-cpl</code></th><td><code>usb_gpio_R1_CPL.csv</code></td><td>全部 48 位号的位置、旋转、顶层装配和 J2/J3 物理存在。</td><td>坐标正确不证明元件不会因实际供应商外壳变化而干涉。</td></tr>
+      <tr><th scope="row"><code>final-project-archive</code></th><td><code>usb_gpio_R1_project.epro2</code></td><td>最终值、料号、符号/footprint、焊盘网络、DNP 属性、规则和设计源。</td><td>最高设计源权威；仍不包含样机测量。</td></tr>
+      <tr><th scope="row"><code>final-schematic-pdf</code></th><td><code>usb_gpio_R1_Schematic.pdf</code></td><td>一页最终原理图的人类可读视图与针脚交叉核对。</td><td>项目自有导出；教材用原创文字导读，不复制为第三方素材。</td></tr>
+      <tr><th scope="row"><code>final-assembly-pdf</code></th><td><code>usb_gpio_R1_Assembly.pdf</code></td><td>7 页装配资料、全部位号定位和方向。</td><td>用于装配/检验；不能代替真实器件尺寸数据。</td></tr>
+      <tr><th scope="row"><code>final-gerbers</code></th><td><code>usb_gpio_R1_Gerber.zip</code></td><td>实际制造铜、阻焊、锡膏、丝印、板框、PTH/NPTH/过孔钻孔和 17 个 GND 区域。</td><td>制造几何权威；不含材料叠层的受控阻抗证明。</td></tr>
+      <tr><th scope="row"><code>release-package</code></th><td><code>USB_GPIO_R1_fabrication.zip</code></td><td>八个 R1 交付物的最终容器和完整性检查。</td><td>容器完整不自动证明内部设计功能正确。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="l-hashes">
+  <h2 id="l-hashes">L.3 R1 发布文件 SHA-256</h2>
+  <table>
+    <caption>表 L-2　用于确认教材引用的发布版本</caption>
+    <thead><tr><th scope="col">文件</th><th scope="col">SHA-256</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><code>usb_gpio_R1_Gerber.zip</code></th><td><code>7d81f32aaa0c86296a7b39104be11a2de33049ff0b6500de6bfc2f660a6a043f</code></td></tr>
+      <tr><th scope="row"><code>usb_gpio_R1_BOM.csv</code></th><td><code>c1f8965b1e9cfa9eee6bed12ce98a8cd6b0d5aaf8f057e256290b0d154ac8908</code></td></tr>
+      <tr><th scope="row"><code>usb_gpio_R1_BOM.xlsx</code></th><td><code>a97009a6cc809470c354c5e5ec9fa95dee6e2ea6344e251df879d146871f9a29</code></td></tr>
+      <tr><th scope="row"><code>usb_gpio_R1_CPL.csv</code></th><td><code>b0a2aa3c513eb7e0b21e271f813a5a3993778f367304b1fec7caf739fe4f3bd5</code></td></tr>
+      <tr><th scope="row"><code>usb_gpio_R1_Assembly.pdf</code></th><td><code>51367cdc810f95f2e69de309e2612dc8ac08604e43bb8f0284adf20333d97d27</code></td></tr>
+      <tr><th scope="row"><code>usb_gpio_R1_Schematic.pdf</code></th><td><code>70501c8d913850ad9e2b7988422f06f6d632a7d1d570322c518eca02e2928f85</code></td></tr>
+      <tr><th scope="row"><code>usb_gpio_R1_project.epro2</code></th><td><code>3e9911c2ee80f79f4a75fceb980dcf14d88b57af99aa1146854ea087f5f261a0</code></td></tr>
+      <tr><th scope="row"><code>USB_GPIO_R1_fabrication.zip</code></th><td><code>9338b27dd72e221447259a6c77af5f8c95fc479c06f6b3febff2278b2fd916fd</code></td></tr>
+    </tbody>
+  </table>
+  <p>哈希只证明字节相同。若设计改变，应生成新修订号、新 manifest 和新哈希，而不是继续沿用 R1 的签核。</p>
+</section>
+
+<section aria-labelledby="l-core-datasheets">
+  <h2 id="l-core-datasheets">L.4 核心有源器件与晶振资料</h2>
+  <table>
+    <caption>表 L-3　正文实际使用的必要事实来源</caption>
+    <thead><tr><th scope="col">引用键 / 器件</th><th scope="col">来源</th><th scope="col">本教程只提取的必要事实</th><th scope="col">未完成边界</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><code>datasheet-ch32v203</code><br>CH32V203K8T6</th><td><a href="https://www.wch-ic.com/downloads/CH32V203DS0_PDF.html">WCH 官方数据手册入口</a></td><td>工作电源范围类别、USB、时钟、外设能力和针脚/复用核对。</td><td>具体固件时序、I/O 最坏情况、USB 和板上安全状态仍需逐项复核/实测。</td></tr>
+      <tr><th scope="row"><code>datasheet-sy8089</code><br>SY8089AAAC</th><td><a href="https://item.szlcsc.com/datasheet/SY8089AAAC/80125.html">LCSC 文档入口</a><br><a href="https://www.mouser.com/datasheet/2/306/SY8089AAAC-3223250.pdf">备用分销商 PDF</a></td><td>典型 0.6 V FB、反馈公式、2.2 µH 与输入/输出电容选型方向、布局关注点。</td><td>频率/模式、容差、纹波、稳定性、效率和温升需查当前原文并实测。</td></tr>
+      <tr><th scope="row"><code>datasheet-sy6280</code><br>SY6280AAC</th><td><a href="https://item.szlcsc.com/datasheet/SY6280AAC/56162.html">LCSC 文档入口</a><br><a href="https://www.visvie.com/static/upload/file/20230516/1684204685444040.pdf">备用 PDF</a></td><td>高电平使能、I<sub>LIMIT</sub>=6800/R<sub>SET</sub>、过流/热保护类别。</td><td>限流容差、导通压降、浪涌、恢复和反向行为需当前原文及样机确认。</td></tr>
+      <tr><th scope="row"><code>datasheet-usblc6</code><br>USBLC6-2SC6</th><td><a href="https://atta.szlcsc.com/upload/public/pdf/source/20231109/512642D850D9873E7C519F71E85B9A10.pdf">供应商器件 PDF</a><br><a href="https://www.st.com/resource/en/datasheet/usblc6-2sc6.pdf">同系列拓扑参考</a></td><td>双线 USB ESD 拓扑、针脚方向和低电容用途。</td><td>不同制造商器件不可仅凭同名替代；钳位、结电容和等级需按实际料号核对。</td></tr>
+      <tr><th scope="row"><code>datasheet-crystal</code><br>X322512MSB4SI</th><td><a href="https://item.szlcsc.com/datasheet/X322512MSB4SI/9522.html">供应商数据手册入口</a></td><td>最终元数据交叉核对：12 MHz、20 pF nominal load、3225-4P。</td><td>ESR、驱动电平、频差、杂散、负载匹配和起振裕量未闭环。</td></tr>
+    </tbody>
+  </table>
+  <p>链接可能随供应商站点变化。正式评审应下载并保存带文档编号、修订和日期的版本，在工程记录中标注页码/章节。</p>
+</section>
+
+<section aria-labelledby="l-passive-datasheets">
+  <h2 id="l-passive-datasheets">L.5 连接器、磁性、LED 与无源料号</h2>
+  <table>
+    <caption>表 L-4　最终 part catalog 的来源索引</caption>
+    <thead><tr><th scope="col">料号</th><th scope="col">制造商 / 项目用途</th><th scope="col">资料入口</th><th scope="col">版权安全摘要用途</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">TYPE-C-31-M-12</th><td>HanYoung；J1</td><td><a href="https://item.szlcsc.com/datasheet/TYPE-C-31-M-12/177331.html">连接器资料</a></td><td>针脚、机械外形、推荐 footprint、额定与耐久复核。</td></tr>
+      <tr><th scope="row">SWPA252012S2R2MT</th><td>Sunlord；L1</td><td><a href="https://item.szlcsc.com/datasheet/SWPA252012S2R2MT/24634.html">电感资料</a></td><td>2.2 µH、容差、电流、DCR、温升和封装。</td></tr>
+      <tr><th scope="row">19-217/G7C-BK2L2VY/3T</th><td>Everlight；D1</td><td><a href="https://atta.szlcsc.com/upload/public/pdf/source/20180817/C264462_2484FC304B145C231F26AC872E74E609.pdf">LED PDF</a></td><td>颜色、极性、V<sub>F</sub> 条件、光强和降额。</td></tr>
+      <tr><th scope="row">GRM21BR61H106KE43L</th><td>Murata；10 µF C1/C2/C4/C5/C9</td><td><a href="https://item.szlcsc.com/datasheet/GRM21BR61H106KE43L/439567.html">MLCC 资料</a></td><td>介质、耐压、直流偏压下有效电容、温度和封装。</td></tr>
+      <tr><th scope="row">CL21A226MAQNNNE</th><td>Samsung；C3 22 µF</td><td><a href="https://item.szlcsc.com/datasheet/CL21A226MAQNNNE/46786.html">MLCC 资料</a></td><td>输出电容的有效容量、偏压、温度和制造限制。</td></tr>
+      <tr><th scope="row">CC0603KRX7R9BB104</th><td>Yageo；100 nF C6/C7/C8/C10/C13/C14</td><td><a href="https://item.szlcsc.com/datasheet/CC0603KRX7R9BB104/15331.html">MLCC 资料</a></td><td>X7R、耐压、容差和封装；实际高频效果还依赖布局。</td></tr>
+      <tr><th scope="row">CL10C120JB8NNNC</th><td>Samsung；12 pF C11/C12</td><td><a href="https://item.szlcsc.com/datasheet/CL10C120JB8NNNC/39506.html">MLCC 资料</a></td><td>C0G、容差与晶振负载计算输入。</td></tr>
+      <tr><th scope="row">0603WAF5101T5E</th><td>UNI-ROYAL；R1/R2 5.1 kΩ</td><td><a href="https://item.szlcsc.com/datasheet/0603WAF5101T5E/23913.html">电阻资料</a></td><td>阻值、容差、功率、工作电压和温漂。</td></tr>
+      <tr><th scope="row">0603WAF220JT5E</th><td>UNI-ROYAL；R3/R4 22 Ω</td><td><a href="https://atta.szlcsc.com/upload/public/pdf/source/20200306/C422600_1E6D84923E4A46A82E41ADD87F860B5C.pdf">系列电阻 PDF</a></td><td>USB 串联电阻的电阻系列与封装额定。</td></tr>
+      <tr><th scope="row">0603WAF4533T5E</th><td>UNI-ROYAL；R5 453 kΩ</td><td><a href="https://atta.szlcsc.com/upload/public/pdf/source/20200306/C422600_1E6D84923E4A46A82E41ADD87F860B5C.pdf">系列电阻 PDF</a></td><td>反馈上臂阻值、容差和高阻节点注意。</td></tr>
+      <tr><th scope="row">0603WAF1003T5E</th><td>UNI-ROYAL；R6/R9/R10/R11 100 kΩ</td><td><a href="https://item.szlcsc.com/datasheet/0603WAF1003T5E/26546.html">电阻资料</a></td><td>反馈/偏置阻值与额定。</td></tr>
+      <tr><th scope="row">0603WAF1692T5E</th><td>UNI-ROYAL；R7 16.9 kΩ</td><td><a href="https://item.szlcsc.com/datasheet/0603WAF1692T5E/26697.html">电阻资料</a></td><td>5V_SW ISET 计算输入与容差。</td></tr>
+      <tr><th scope="row">0603WAF2702T5E</th><td>UNI-ROYAL；R8 27 kΩ</td><td><a href="https://item.szlcsc.com/datasheet/0603WAF2702T5E/23694.html">电阻资料</a></td><td>3V3_SW ISET 计算输入与容差。</td></tr>
+      <tr><th scope="row">0603WAF1002T5E</th><td>UNI-ROYAL；R12 10 kΩ</td><td><a href="https://item.szlcsc.com/datasheet/0603WAF1002T5E/26547.html">电阻资料</a></td><td>复位上拉及 RC 计算输入。</td></tr>
+      <tr><th scope="row">0603WAF1001T5E</th><td>UNI-ROYAL；R13 1 kΩ</td><td><a href="https://item.szlcsc.com/datasheet/0603WAF1001T5E/21904.html">电阻资料</a></td><td>LED 限流与功耗。</td></tr>
+      <tr><th scope="row">0603WAF2200T5E</th><td>UNI-ROYAL；R14–R23 220 Ω</td><td><a href="https://atta.szlcsc.com/upload/public/pdf/source/20200306/C422600_1E6D84923E4A46A82E41ADD87F860B5C.pdf">系列电阻 PDF</a></td><td>外部接口串联阻值、容差和功耗。</td></tr>
+      <tr><th scope="row">2.54mm2*8Pinheader</th><td>project-local；J2</td><td>最终项目无独立数据手册</td><td>实际装配前必须选定具体排针并核对 pin 1、针长、高度、额定和配对件。</td></tr>
+      <tr><th scope="row">HDR-1X5</th><td>project-local；J3</td><td>最终项目无独立数据手册</td><td>实际装配前必须确定具体 1.27 mm 接口或夹具及供电方向。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="l-further">
+  <h2 id="l-further">L.6 延伸阅读的正确入口</h2>
+  <ul>
+    <li><strong>USB：</strong>查 USB-IF 官方 USB 2.0、Type-C 与测试资料的当前版本；只使用与 USB 2.0 设备/受电端直接相关的章节，并记录版本。</li>
+    <li><strong>PCB 制造：</strong>使用实际板厂的层叠、最小线宽/间距、孔、板边、阻焊、钢网和阻抗能力，而不是通用“经验值”。</li>
+    <li><strong>装配：</strong>查器件制造商的封装、回流焊、湿敏和返修指南，以及装配厂的 DFM 要求。</li>
+    <li><strong>测量：</strong>查仪器厂商关于短地弹簧、差分探测、带宽限制、电流测量和电子负载动态模式的应用资料。</li>
+    <li><strong>EasyEDA：</strong>查与当前客户端版本匹配的官方项目、ERC/DRC、铺铜、Gerber 和制造输出文档；界面名称变化时以操作目的和输出证据为准。</li>
+  </ul>
+  <p>延伸阅读只能补充方法，不能覆盖最终项目源。若新资料导致设计事实改变，应创建新板修订并重新发布，而不是直接改写 R1 的历史记录。</p>
+</section>
+
+<section aria-labelledby="l-copyright">
+  <h2 id="l-copyright">L.7 版权与可复现引用清单</h2>
+  <table>
+    <caption>表 L-5　引用第三方资料时填写</caption>
+    <thead><tr><th scope="col">勾选</th><th scope="col">要求</th><th scope="col">记录</th></tr></thead>
+    <tbody>
+      <tr><td>□</td><td>只摘要完成论证所需的事实，没有复制长段文字或整张表。</td><td>________________</td></tr>
+      <tr><td>□</td><td>制造商、文档号、修订、日期、页/节和 URL 已记录。</td><td>________________</td></tr>
+      <tr><td>□</td><td>图示为原创或项目自有；第三方图仅链接，不冒充自制。</td><td>________________</td></tr>
+      <tr><td>□</td><td>典型/保证/绝对最大/推荐条件在摘要中没有被改变。</td><td>________________</td></tr>
+      <tr><td>□</td><td>转载来源已与制造商正式版本交叉核对。</td><td>________________</td></tr>
+      <tr><td>□</td><td>引用支持的结论范围明确，没有延伸成未经验证的板级结果。</td><td>________________</td></tr>
+    </tbody>
+  </table>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="k-answer-key.html"><small>上一页</small>附录 K：复习题与答案（Review Questions and Answer Key）</a><a class="next" href="../index.html"><small>完成</small>返回首页 / 总目录</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

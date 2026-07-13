@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="22. USB 差分对布线（Routing USB Differential Pairs） — USB GPIO PCB 离线教程">
+  <title>22. USB 差分对布线（Routing USB Differential Pairs） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-22">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html" aria-current="page">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</li><li aria-current="page">22. USB 差分对布线（Routing USB Differential Pairs）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</p>
+          <h1>22. USB 差分对布线（Routing USB Differential Pairs）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#chapter-22-goals">学习目标</a></li><li class="toc-level-2"><a href="#section-22-1">22.1 从真实叠层确定线宽与间距</a></li><li class="toc-level-2"><a href="#section-22-2">22.2 保持耦合、对称与相同参考</a></li><li class="toc-level-2"><a href="#section-22-3">22.3 缩短连接器到 ESD 的未保护段</a></li><li class="toc-level-2"><a href="#section-22-4">22.4 串联电阻相对 MCU 的位置</a></li><li class="toc-level-2"><a href="#section-22-5">22.5 避免支路、过多过孔、参考缝隙与不对称</a></li><li class="toc-level-2"><a href="#section-22-6">22.6 测量三段 USB 路径</a></li><li class="toc-level-2"><a href="#section-22-7">22.7 长度匹配与偏斜解释</a></li><li class="toc-level-2"><a href="#section-22-8">22.8 极小几何偏斜不等于阻抗保证</a></li><li class="toc-level-2"><a href="#section-22-9">22.9 把 USB 眼图与 EMI 留给实物验证</a></li><li class="toc-level-2"><a href="#chapter-22-summary">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="chapter-22-goals">
+  <h2 id="chapter-22-goals">学习目标</h2>
+  <p>USB D+ 与 D− 是一对共同工作的传输路径。完成本章后，你应能从真实生产叠层确定差分几何，按 J1—U2—R3/R4—U1 的顺序布线和测量三段路径，并准确说明“长度匹配”“阻抗”“眼图”和“EMI”是不同层次的证据。</p>
+  <ul>
+    <li>根据板厂叠层建立线宽、间距和参考层假设；</li>
+    <li>保持 D+、D− 耦合、对称、同参考和同层转换；</li>
+    <li>缩短连接器到 ESD 的未保护段并避免支路；</li>
+    <li>测量三段长度与偏斜，而不迷信显示的小数位；</li>
+    <li>把眼图、EMI 和 ESD 明确留给实物验证。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-22-1">
+  <h2 id="section-22-1">22.1 从真实叠层确定线宽与间距</h2>
+  <p>差分阻抗由铜厚、介质厚度、介电常数、线宽、线间距、到参考铜距离、阻焊和制造公差共同决定。只知道“两层板”和“8 mil 线宽”不足以计算并保证生产阻抗。</p>
+  <ol>
+    <li>向计划使用的板厂取得具体板厚、铜厚、介质参数和阻抗服务条件；</li>
+    <li>说明 D+/D− 位于哪一层、参考哪一片连续 GND 铜；</li>
+    <li>使用板厂计算器或场求解器得到候选线宽/间距；</li>
+    <li>检查候选几何能否从 J1、U2、R3/R4 和 U1 焊盘实际逃逸；</li>
+    <li>把差分规则、允许局部例外和制造公差写入发布资料；</li>
+    <li>叠层变化后重新计算，不沿用旧板的 8 mil 数字。</li>
+  </ol>
+  <aside class="warning">
+    <p>R1 的最终 D+/D− 使用 8 mil 走线，但发布资料没有受控阻抗叠层。因此本章只把它作为设计几何事实，不把它写成“90 Ω 已验证”。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-22-2">
+  <h2 id="section-22-2">22.2 保持耦合、对称与相同参考</h2>
+  <p>差分对传输的是两线电压差，但每条线仍与周围参考和结构发生电磁耦合。两线应尽量经历相同环境：相同层、相似拐角、相似邻近铜、相同数量和位置关系的过孔，以及连续 GND 参考。</p>
+  <ul>
+    <li>成对布线，不让一条线先穿过拥堵区、另一条走完全不同路径；</li>
+    <li>保持规则间距，短暂扇入焊盘后尽快恢复；</li>
+    <li>避开板边、地缝、连接器固定孔和开关节点；</li>
+    <li>若必须换层，两线在相近位置成对换层，并提供附近地过孔；</li>
+    <li>避免一条线靠近铜岛、另一条线靠近空洞造成参考不对称；</li>
+    <li>不要为了视觉完全平行而穿过更差的参考区域。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-22-3">
+  <h2 id="section-22-3">22.3 缩短连接器到 ESD 的未保护段</h2>
+  <p>J1 到 U2 的铜在 ESD 保护器件之前。该段越长，静电事件越可能耦合进板内其他网络，也越容易形成支路和更大的放电回路。</p>
+  <ol>
+    <li>先固定 J1 朝向和外壳脚，再把 U2 放在数据引脚进入板内的位置；</li>
+    <li>D+、D− 从 J1 直接进入 U2，不先绕过 MCU 或测试点；</li>
+    <li>U2 的 GND 端建立短、宽、低电感回路，并就近连接地铜/地过孔；</li>
+    <li>不要把未保护段与 BUCK_SW、晶振或长外部 GPIO 平行走线；</li>
+    <li>若需要测量点，评估其焊盘和支路对信号与 ESD 路径的影响。</li>
+  </ol>
+  <p>“ESD 器件离连接器近”应由实际铜路径和回流证明，不能只比较两个封装中心。</p>
+</section>
+
+<section aria-labelledby="section-22-4">
+  <h2 id="section-22-4">22.4 串联电阻相对 MCU 的位置</h2>
+  <p>R3/R4 是 22 Ω 串联电阻，最终布局要求它们成对并靠近 MCU 端。这样可以让电阻后的 <code>USB_DP_MCU</code>/<code>USB_DM_MCU</code> 段保持短，并把阻尼元件放在驱动端附近。</p>
+  <ul>
+    <li>R3/R4 使用相同方向、相似焊盘逃逸和等效拓扑；</li>
+    <li>不要在电阻两侧形成同名网络旁路；</li>
+    <li>电阻前后分段测量，避免把器件本体长度误算成铜线；</li>
+    <li>保持电阻到 U1 PA11/PA12 的路径无支路、同参考；</li>
+    <li>最终是否需要 22 Ω 以及最佳值，仍应结合 MCU 指南和实物信号测试。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-22-5">
+  <h2 id="section-22-5">22.5 避免支路、过多过孔、参考缝隙与不对称</h2>
+  <table>
+    <caption>USB 布线常见缺陷</caption>
+    <thead><tr><th scope="col">缺陷</th><th scope="col">为什么有风险</th><th scope="col">检查方法</th></tr></thead>
+    <tbody>
+      <tr><td>支路/桩线</td><td>产生不连续与反射；还可能绕过保护/串阻</td><td>逐段高亮网络，确认只有主路径</td></tr>
+      <tr><td>一多一少的过孔</td><td>寄生和传播环境不对称</td><td>比较两线过孔数量、位置与地过孔</td></tr>
+      <tr><td>跨地缝</td><td>返回电流绕行，增大环路与共模噪声</td><td>同时显示信号层和已生成地铜</td></tr>
+      <tr><td>局部间距突变</td><td>改变耦合和阻抗</td><td>用规则检查并人工查看焊盘扇入</td></tr>
+      <tr><td>蛇形线拥挤</td><td>自耦合可能使“增加的几何长度”并非等效传播长度</td><td>优先通过布局与主路径匹配，只做必要补偿</td></tr>
+      <tr><td>靠近 BUCK_SW</td><td>耦合开关噪声，增加共模和 EMI 风险</td><td>联合查看电源开关区域与 USB 通道</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="section-22-6">
+  <h2 id="section-22-6">22.6 测量三段 USB 路径</h2>
+  <p>以器件为边界分别测量，能定位哪一段出现不对称，而不是只看从连接器到 MCU 的总长。R1 的最终 CAD 几何如下：</p>
+  <table>
+    <caption>R1 USB 差分对分段长度（CAD 计算）</caption>
+    <thead><tr><th scope="col">分段</th><th scope="col">D−</th><th scope="col">D+</th><th scope="col">绝对偏斜</th></tr></thead>
+    <tbody>
+      <tr><td>J1 → U2</td><td>700.884800 mil</td><td>700.884807 mil</td><td>0.000007 mil</td></tr>
+      <tr><td>U2 → R3/R4</td><td>483.619088 mil</td><td>483.619146 mil</td><td>0.000058 mil</td></tr>
+      <tr><td>R3/R4 → U1</td><td>361.880010 mil</td><td>361.880026 mil</td><td>0.000016 mil</td></tr>
+    </tbody>
+  </table>
+  <ol>
+    <li>确认测量对象只包含目标网络上的铜线和相关过孔；</li>
+    <li>两线使用相同的起止器件边界和单位；</li>
+    <li>把每段长度、总长、过孔数与规则版本一起记录；</li>
+    <li>布局或走线变化后重新测量，旧结果立即失效；</li>
+    <li>不要把编辑器显示的小数位当作制造可实现精度。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="section-22-7">
+  <h2 id="section-22-7">22.7 长度匹配与偏斜解释</h2>
+  <p>几何偏斜定义为 <code>|L<sub>D+</sub> − L<sub>D−</sub>|</code>。长度更接近通常有助于降低两线到达时间差，但传播速度还取决于局部介质和参考结构；两条几何等长、环境不同的线仍可能有电气不对称。</p>
+  <p>R1 记录的偏斜小于 0.00006 mil，说明 CAD 生成路径在数学上高度匹配。这个数字远小于常规 PCB 制造和材料公差，不能按其小数位宣称物理板也达到同样差值。工程结论应是“几何匹配没有成为主要差异源”，而不是“传播时间完全相同”。</p>
+  <aside class="example">
+    <p>若 D+ 为 500 mil、D− 为 497 mil，则几何偏斜为 3 mil。修正前先找出差异来自焊盘扇出、过孔还是主路径；不要在任意空地添加密集蛇形线而忽略参考和自耦合。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-22-8">
+  <h2 id="section-22-8">22.8 极小几何偏斜不等于阻抗保证</h2>
+  <p>长度匹配只回答“几何路径差多少”。阻抗还取决于叠层与局部环境，插入损耗取决于材料、铜粗糙度和长度，反射取决于连接器、焊盘、过孔和宽度变化，共模还受不对称与返回路径影响。</p>
+  <table>
+    <caption>不要混淆的四种结论</caption>
+    <thead><tr><th scope="col">结论</th><th scope="col">所需证据</th></tr></thead>
+    <tbody>
+      <tr><td>几何长度匹配</td><td>CAD 路径测量</td></tr>
+      <tr><td>阻抗按目标设计</td><td>真实叠层、场求解/板厂计算和制造控制</td></tr>
+      <tr><td>信号波形满足 USB 要求</td><td>合适夹具、示波器和眼图/电气测试</td></tr>
+      <tr><td>产品 EMI/ESD 合格</td><td>规定配置下的预兼容或正式测试</td></tr>
+    </tbody>
+  </table>
+  <p>DRC 的“差分对 0 错误”只说明已配置规则通过，不自动升级为后三种结论。</p>
+</section>
+
+<section aria-labelledby="section-22-9">
+  <h2 id="section-22-9">22.9 把 USB 眼图与 EMI 留给实物验证</h2>
+  <p>制造前应保存叠层假设、线宽/间距、长度、过孔、参考铜和 DRC 结果。制造后再验证：</p>
+  <ul>
+    <li>不同主机、线缆和端口上的枚举、重连、挂起/恢复；</li>
+    <li>持续数据传输和错误/掉线情况；</li>
+    <li>按 USB 测试方法进行眼图或相关电气测量；</li>
+    <li>近场探测与辐射/传导 EMI 预扫描；</li>
+    <li>USB 端口及外壳的 ESD 鲁棒性；</li>
+    <li>板批次、温度和电源条件变化。</li>
+  </ul>
+  <aside class="warning">
+    <p>探测 USB 差分对会增加电容和支路，错误探头或长地线本身可能破坏波形。测试方法、夹具和带宽应由具备高速测量经验的人员制定。</p>
+  </aside>
+  <p><strong>复习练习：</strong>给出一份只有“8 mil、两线等长、DRC 通过”的报告，列出它还缺少哪些信息才能支持阻抗、眼图与 EMI 结论。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-22-summary">
+  <h2 id="chapter-22-summary">本章小结</h2>
+  <p>USB 差分布线需要真实叠层、耦合对称、连续参考、正确器件顺序和分段测量。R1 的极小 CAD 偏斜是几何事实，不是阻抗或合规证书；最终信号质量必须由生产条件和实物测试补齐。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>R1 制造清单、检查清单、最终工程和 CAD 偏斜公式。所有长度均为计算值；阻抗、眼图、EMI 与 ESD 尚未实测。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="21-routing-fundamentals.html"><small>上一页</small>21. 布线基础（Routing Fundamentals）</a><a class="next" rel="next" href="23-power-ground-routing.html"><small>下一页</small>23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

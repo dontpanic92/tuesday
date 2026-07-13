@@ -1,0 +1,195 @@
+<section class="notice" aria-labelledby="learning-goals-2">
+  <h2 id="learning-goals-2">学习目标</h2>
+  <p>本章把原理图视为一套有语法的工程语言。学完后，你应能通过位号、引脚号和网络名追踪连接，识别信号方向与默认状态，并能先按功能块阅读，再深入到单个元件。</p>
+  <ul>
+    <li>解释常见位号前缀以及它们不能告诉你的信息；</li>
+    <li>区分导线交点、网络标签、总线和电源符号；</li>
+    <li>识别高有效、低有效、输入、输出、双向和高阻态；</li>
+    <li>说明 GND 是参考与返回网络，而不是电流消失处；</li>
+    <li>正确区分 R1 的四条主要电源轨；</li>
+    <li>沿 U1、R14 与 J2 追踪一条真实信号路径。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-2-1">
+  <h2 id="section-2-1">2.1 位号：R、C、L、D、U、J、Y 与 TP</h2>
+  <p><strong>位号（Reference Designator）</strong>是原理图和 PCB 中某个元件实例的唯一名称。前缀通常表示元件类别，数字区分同类实例。位号能回答“是哪一个”，但不能单独回答“阻值是多少”“型号是什么”或“放在哪里”。</p>
+  <table>
+    <caption>常见位号前缀及 R1 示例</caption>
+    <thead>
+      <tr><th scope="col">前缀</th><th scope="col">常见含义</th><th scope="col">R1 中的实例</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">R</th><td>电阻</td><td>R1/R2 为 USB-C 配置通道（Configuration Channel，CC）下拉；R14–R23 为外部信号串联电阻</td></tr>
+      <tr><th scope="row">C</th><td>电容</td><td>C6–C8 为 U1 高频去耦；C10 与 R12 构成复位 RC</td></tr>
+      <tr><th scope="row">L</th><td>电感</td><td>L1 为 U3 Buck 的 2.2 µH 储能电感</td></tr>
+      <tr><th scope="row">D</th><td>分立二极管或 LED</td><td>D1 为黄绿色状态 LED</td></tr>
+      <tr><th scope="row">U</th><td>集成电路</td><td>U1 MCU、U2 USB ESD 器件、U3 稳压器、U4/U5 负载开关</td></tr>
+      <tr><th scope="row">J</th><td>连接器</td><td>J1 USB-C、J2 目标接口、J3 调试接口</td></tr>
+      <tr><th scope="row">Y</th><td>晶体或谐振器</td><td>Y1 为 12 MHz 晶体</td></tr>
+      <tr><th scope="row">TP</th><td>专用测试点</td><td>R1 的 48 个物理位号中没有 TP 前缀；测试与调试主要依赖连接器/调试接点</td></tr>
+    </tbody>
+  </table>
+  <p>同一个元件在原理图、PCB、BOM、CPL 和装配图中必须保持相同位号。R1 的发布审核确认 48/48 个原理图元件映射到 PCB；J2 和 J3 虽然在 PCB 与 CPL 中存在，但标记为 DNP，不进入拟采购装配的 BOM。</p>
+</section>
+
+<section aria-labelledby="section-2-2">
+  <h2 id="section-2-2">2.2 导线、连接点、标签、总线与电源符号</h2>
+  <dl>
+    <dt><strong>导线（Wire）</strong></dt>
+    <dd>原理图中的连接线，表示其端点在电气上应属于同一网络；线条长度通常不代表 PCB 走线长度。</dd>
+    <dt><strong>连接点（Junction）</strong></dt>
+    <dd>明确表示多条导线在交点电气相连。仅仅视觉交叉不一定连接，必须遵守所用 EDA 的连接点规则。</dd>
+    <dt><strong>网络标签（Net Label）</strong></dt>
+    <dd>给网络命名，使相距较远的同名节点相连并提高可读性。例如所有 <code>3V3_SYS</code> 标签属于同一网络。</dd>
+    <dt><strong>总线（Bus）</strong></dt>
+    <dd>用于整理一组相关信号的图形和命名方式。总线本身不自动创造正确连接，仍要核对每根成员信号。</dd>
+    <dt><strong>电源符号</strong></dt>
+    <dd>常用于全局或局部电源网络。符号朝上、朝下只是绘图习惯，不代表电流只能按纸面方向流动。</dd>
+  </dl>
+  <aside class="error-case">
+    <p><strong>常见错误：</strong>看到两根线交叉就认为它们相连，或者认为两个文字相似的标签必然相同。<code>3V3_SYS</code>、<code>3V3_SW</code> 与 <code>GPIO3_MCU</code> 是完全不同的网络；一个字符的差异就可能改变电气结果。</p>
+  </aside>
+  <p>阅读时不要只沿线移动眼睛。每到一个元件引脚，记录“位号—引脚号—网络名”，这三项共同建立可复核的连接证据。</p>
+</section>
+
+<section aria-labelledby="section-2-3">
+  <h2 id="section-2-3">2.3 高有效、低有效、输入、输出与双向信号</h2>
+  <p><strong>高有效（Active-High）</strong>表示逻辑高电平触发功能；<strong>低有效（Active-Low）</strong>表示逻辑低电平触发功能。低有效常用名称上的横线、前缀 <code>n</code>、后缀 <code>_N</code> 或约定名称表示，但不能只凭字体猜测，必须查数据手册。</p>
+  <p>R1 的 U4、U5 为高有效负载开关：<code>EN_5V</code> 或 <code>EN_3V3</code> 拉高时，设计意图是开启相应电源。R9、R10 各用 100 kΩ 下拉，在 U1 复位或引脚高阻时把使能保持为低。<code>NRST</code> 则是 MCU 的低有效复位输入，拉低会使 U1 保持复位。</p>
+  <table>
+    <caption>信号方向描述</caption>
+    <thead>
+      <tr><th scope="col">类型</th><th scope="col">含义</th><th scope="col">R1 示例</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">输入</th><td>接收外部状态，不应主动驱动该网络</td><td>U1 的 <code>UART_RX_MCU</code></td></tr>
+      <tr><th scope="row">输出</th><td>主动产生逻辑电平</td><td>U1 的 <code>EN_5V</code>、<code>STATUS_LED</code></td></tr>
+      <tr><th scope="row">双向</th><td>可在不同时间输入或输出，必须避免双方同时反向驱动</td><td>8 路 GPIO</td></tr>
+      <tr><th scope="row">高阻态（Hi-Z）</th><td>引脚暂不主动拉高或拉低</td><td>R1 的安全启动目标要求外部 GPIO 和 UART TX 在配置前为高阻</td></tr>
+    </tbody>
+  </table>
+  <p>“高阻”不等于“电压必为 0”。高阻节点可能被外部上拉、下拉、漏电或电容保持在某个电压，所以安全设计常增加明确的偏置电阻。R1 的上电安全状态是<strong>设计要求与预期行为</strong>，尚需固件和实物实验确认。</p>
+</section>
+
+<section aria-labelledby="section-2-4">
+  <h2 id="section-2-4">2.4 地是参考与返回网络，不是魔法汇点</h2>
+  <p>原理图上重复出现 GND 符号，是为了减少长线并说明这些节点属于共同的地网络。GND 定义了本板的 0 V 参考，并为电源和信号电流提供返回路径；它不会使电荷或能量“消失”。</p>
+  <p>例如 U1 输出高电平点亮 D1 时，传统电流路径为 <code>3V3_SYS → U1 输出级 → R13 → D1 → GND → U1 电源返回</code>。原理图可能把多个 GND 符号画在不同位置，但 PCB 必须用铜把它们连接，并控制返回路径的阻抗与回路面积。</p>
+  <aside class="warning">
+    <p><strong>工程后果：</strong>R1 与 USB 主机、目标设备共地且不隔离。若目标系统由另一个电源供电，连接 J2 前应先确认地电位兼容；否则信号线或 USB 屏蔽/地可能承担意外均衡电流。</p>
+  </aside>
+  <p>R1 最终制造数据包含 173 条显式 GND 走线、32 个地缝合/树状过孔，以及 17 个与 GND 相连的静态铜填充区域。这说明 GND 在 PCB 上是具体铜网络，而不是一个抽象的“删除电流”符号。</p>
+</section>
+
+<section aria-labelledby="section-2-5">
+  <h2 id="section-2-5">2.5 电源轨以及 <code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>3V3_SW</code> 与 <code>5V_SW</code> 的区别</h2>
+  <p><strong>电源轨（Power Rail）</strong>是向一组负载供电的命名网络。即使两个电源轨的标称电压相同，也可能因来源、开关状态、限流和用途不同而必须分开。</p>
+  <table>
+    <caption>R1 的主要电源网络</caption>
+    <thead>
+      <tr><th scope="col">网络</th><th scope="col">来源</th><th scope="col">用途</th><th scope="col">状态说明</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row"><code>VBUS_IN</code></th><td>J1 的 USB VBUS</td><td>U3 输入、U4 输入及 USB 前端参考</td><td>设计标称约 5 V；真实主机、线缆压降待测</td></tr>
+      <tr><th scope="row"><code>3V3_SYS</code></th><td>U3 SY8089 降压型开关变换器（Buck）</td><td>U1、逻辑电路及 U5 输入，始终开启的系统电源</td><td>反馈设计计算为 3.318 V；实物电压待测</td></tr>
+      <tr><th scope="row"><code>5V_SW</code></th><td>U4 从 <code>VBUS_IN</code> 受控输出</td><td>J2 的目标侧 5 V 电源</td><td>设计限流约 0.402 A，默认关闭；阈值与压降待测</td></tr>
+      <tr><th scope="row"><code>3V3_SW</code></th><td>U5 从 <code>3V3_SYS</code> 受控输出</td><td>J2 的目标侧 3.3 V 电源</td><td>设计限流约 0.252 A，默认关闭；阈值与压降待测</td></tr>
+    </tbody>
+  </table>
+  <p><code>3V3_SYS</code> 与 <code>3V3_SW</code> 标称都是 3.3 V，但 U5 关闭时必须彼此隔离；若在原理图中误用同一网络名，负载开关会被旁路，默认关闭和限流功能都失效。同理，<code>5V_SW</code> 是电源输出，不是可选择的 5 V GPIO 逻辑电平。</p>
+</section>
+
+<section aria-labelledby="section-2-6">
+  <h2 id="section-2-6">2.6 阅读元件引脚号与封装视图</h2>
+  <p>符号旁的<strong>引脚号</strong>应对应实体封装上的焊盘编号。引脚名称描述功能，编号描述物理位置；两者不能互换。U1 的 PA6 是功能名，LQFP-32 的 12 是封装脚号，最终映射为 <code>GPIO0_MCU</code>。</p>
+  <aside class="example">
+    <p><strong>算例 2-1：追踪 GPIO0。</strong></p>
+    <ol>
+      <li>查 U1：封装 12 脚为 PA6，可复用为 TIM3_CH1。</li>
+      <li>该脚连接网络 <code>GPIO0_MCU</code>。</li>
+      <li>R14 的 1 脚接 <code>GPIO0_MCU</code>，2 脚接 <code>GPIO0_PWM0</code>。</li>
+      <li><code>GPIO0_PWM0</code> 到 J2 的 5 脚。</li>
+      <li>因此 J2-5 可作为普通 GPIO0 或 PWM0，但不能同时由两个互相冲突的功能占用。</li>
+    </ol>
+  </aside>
+  <p>封装视图可能采用顶视图、底视图或器件面视图。连接器尤其容易因镜像而出错。J1 是可翻转 USB-C 插座：A6/B6 都属于 D+，A7/B7 都属于 D−，A5 与 B5 分别为 CC1、CC2。读图时要同时确认资料的观察方向、Pin 1 标记和板边朝向。</p>
+  <p>R1 发布审核确认 172/172 个原理图引脚与 PCB 焊盘按“元件身份—引脚号—网络”一致，但这仍不免除收板后的方向与焊接检查。</p>
+</section>
+
+<section aria-labelledby="section-2-7">
+  <h2 id="section-2-7">2.7 不连接引脚、保留引脚与有意不装配的元件</h2>
+  <p><strong>不连接（No Connect，NC）</strong>表示设计者有意让某引脚悬空，而不是忘记连线。EDA 中应使用明确的 No-Connect 标记，使审核者和 ERC 能区分“有意”与“遗漏”。R1 有 9 个经过核对的有意未连接引脚；J2 的 16 脚也保留未连接，供未来功能考虑。</p>
+  <p><strong>保留引脚</strong>通常由数据手册规定处理方式：可能要求悬空、接地或禁止连接。不能因为名字写着 Reserved 就随意接到测试点。</p>
+  <p><strong>DNP（Do Not Populate，不装配）</strong>与 NC 不同。DNP 元件在 PCB 上有焊盘和位置，但当前装配不放器件。R1 的 J2、J3 在 PCB 与 CPL 中存在，原理图属性为不加入 BOM，最终采购 BOM 也排除它们。</p>
+  <table>
+    <caption>三种“没有连接/没有器件”状态</caption>
+    <thead>
+      <tr><th scope="col">状态</th><th scope="col">发生在哪里</th><th scope="col">应怎样记录</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">有意 NC</th><td>某个引脚不接网络</td><td>No-Connect 标记、数据手册依据</td></tr>
+      <tr><th scope="row">保留引脚</th><td>器件定义的特殊引脚</td><td>严格按数据手册处理</td></tr>
+      <tr><th scope="row">DNP</th><td>整个元件当前不装</td><td>BOM 属性、装配说明、PCB/CPL 一致性</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="section-2-8">
+  <h2 id="section-2-8">2.8 按功能块阅读，而不是逐线猜测</h2>
+  <p>面对完整原理图时，先找输入、输出与功能边界，再深入单线。逐线从左上角读到右下角容易失去电源来源和控制关系，也容易把相邻但不相连的电路误认为一组。</p>
+  <ol>
+    <li><strong>找连接器：</strong>J1 从主机带来 VBUS、GND、CC 和 USB 数据；J2 输出目标信号与电源；J3 用于调试。</li>
+    <li><strong>找电源轨：</strong>从 <code>VBUS_IN</code> 追踪到 U3、U4，再从 <code>3V3_SYS</code> 追踪到 U1、U5。</li>
+    <li><strong>找控制中心：</strong>U1 接收 USB，控制 GPIO/PWM/UART、状态 LED 和两路电源使能。</li>
+    <li><strong>找保护边界：</strong>U2 位于 USB 入口；R3/R4 位于 USB 数据路径；R14–R23 位于外部信号路径。</li>
+    <li><strong>找时钟、复位与启动：</strong>Y1/C11/C12、R12/C10、R11 分别建立时钟、复位和默认启动状态。</li>
+    <li><strong>最后核对每个引脚：</strong>确认块间接口、方向、默认状态和网络名；串行线调试（Serial Wire Debug，SWD）连接也应单独核对。</li>
+  </ol>
+  <figure data-figure="schematic-reading-order">
+    <img src="../assets/svg/schematic-reading-order.svg" alt="原理图阅读的五步顺序：先找连接器和电源，再划分功能块、追踪块间接口、理解元件作用，最后核对引脚与默认状态。" width="960" height="300">
+    <figcaption>图 2-1　从系统到细节的阅读顺序比逐线猜测更可靠。</figcaption>
+  </figure>
+  <aside class="checkpoint">
+    <p><strong>检查点：</strong>每读完一个功能块，尝试回答四个问题：能量从哪里来？信息从哪里来？由谁控制？故障时会影响哪些相邻块？</p>
+  </aside>
+</section>
+
+<section class="experiment" aria-labelledby="section-2-9">
+  <h2 id="section-2-9">2.9 练习：把 USB GPIO 原理图划分为功能块</h2>
+  <p><strong>目的：</strong>在不依赖布局位置的情况下，用原理图连接关系划分系统，并建立块间接口表。</p>
+  <p><strong>资料：</strong>R1 最终原理图 PDF或 EasyEDA 工程，只读查看；彩色笔或批注工具；本章电源轨表。</p>
+  <p><strong>步骤：</strong></p>
+  <ol>
+    <li>圈出 J1、J2、J3，并标出每个连接器带来的电源、地与信号。</li>
+    <li>用一种颜色追踪 <code>VBUS_IN</code>，另一种颜色追踪 <code>3V3_SYS</code>。</li>
+    <li>把元件分入以下候选块：USB-C/CC、USB 数据保护、Buck、5 V 开关、3.3 V 开关、MCU、时钟/复位/状态、外部接口、调试。</li>
+    <li>对每个块填写“输入—输出—控制—返回路径—失效影响”。</li>
+    <li>任选 GPIO0，按“U1 引脚—MCU 侧网络—串联元件—外部网络—连接器脚”写出完整路径。</li>
+    <li>与事实表核对：不要把提案中的外部 GPIO ESD 阵列或负载开关故障输出画成 R1 已实现的功能。</li>
+  </ol>
+  <table>
+    <caption>练习 2-1 功能块记录表</caption>
+    <thead>
+      <tr><th scope="col">功能块</th><th scope="col">主要元件</th><th scope="col">电源输入</th><th scope="col">信号/控制</th><th scope="col">主要失效影响</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">USB-C 与 CC</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">USB 数据路径</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">3.3 V 转换</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">受控电源</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">MCU 与接口</th><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  <p><strong>通过判据：</strong>所有 48 个物理位号都能归入某个功能块或跨块接口；四条主要电源轨没有被合并；J2/J3 被标为 DNP；GPIO0 路径与最终引脚表一致。</p>
+  <p><strong>思考题：</strong>U2 应归入“USB 数据”还是“保护”？一个元件能否同时具有两个阅读视角？说明你的分块规则。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="summary-2">
+  <h2 id="summary-2">本章小结</h2>
+  <p>读原理图要同时使用位号、引脚号和网络名。网络标签与电源符号压缩了图形，却不改变闭合回路；GND 是共同参考与返回网络。方向、有效电平、高阻、NC 与 DNP 都是设计语义，不能靠外观猜测。先按功能块追踪电源、信号和控制，再核对单个引脚，能显著减少误读。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>本章事实依据：</strong>R1 最终项目归档中的网络与引脚、<code>project-facts.json</code> 的连接器和 MCU 映射，以及制造检查清单的 48/48 元件、172/172 引脚和 9 个有意未连接引脚记录。</p>
+</footer>

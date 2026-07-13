@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="7. USB-C 供电与配置通道（USB-C Power and Configuration Channel） — USB GPIO PCB 离线教程">
+  <title>7. USB-C 供电与配置通道（USB-C Power and Configuration Channel） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-07">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html" aria-current="page">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</li><li aria-current="page">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</p>
+          <h1>7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch07-learning-objectives">学习目标与事实状态</a></li><li class="toc-level-2"><a href="#ch07-7-1">7.1 USB-C 连接器对 USB 2.0 设备意味着什么</a></li><li class="toc-level-2"><a href="#ch07-7-2">7.2 可翻转的 D+ 与 D− 引脚</a></li><li class="toc-level-2"><a href="#ch07-7-3">7.3 CC1 与 CC2 如何完成连接检测</a></li><li class="toc-level-2"><a href="#ch07-7-4">7.4 R1 与 R2：为什么需要两只独立 5.1 kΩ 下拉</a></li><li class="toc-level-2"><a href="#ch07-7-5">7.5 VBUS、连接器外壳与地引脚</a></li><li class="toc-level-2"><a href="#ch07-7-6">7.6 枚举前后都不能忽略 USB 电流预算</a></li><li class="toc-level-2"><a href="#ch07-7-7">7.7 为什么 R1 不实现 USB Power Delivery</a></li><li class="toc-level-2"><a href="#ch07-7-8">7.8 连接器外壳接地的工程取舍</a></li><li class="toc-level-2"><a href="#ch07-7-9">7.9 实验：识别 USB-C 引脚并测量 CC 电阻</a></li><li class="toc-level-3"><a href="#ch07-experiment-purpose">目的与器材</a></li><li class="toc-level-3"><a href="#ch07-experiment-safety">安全与停止条件</a></li><li class="toc-level-3"><a href="#ch07-experiment-procedure">步骤</a></li><li class="toc-level-2"><a href="#ch07-summary">本章小结</a></li><li class="toc-level-2"><a href="#ch07-sources">事实来源</a></li></ul></nav>
+        <section class="notice" aria-labelledby="ch07-learning-objectives">
+  <h2 id="ch07-learning-objectives">学习目标与事实状态</h2>
+  <p>学完本章后，应能从 J1 的引脚连接解释 USB Type-C 可翻转、CC 检测和 VBUS 供电，并能说明 R1、R2 与 C1 的作用、布局重点及失效后果。</p>
+  <ul>
+    <li><strong>【设计】</strong>表示最终 R1 工程中采用的网络、标称值或装配状态。</li>
+    <li><strong>【计算】</strong>表示由设计值和公式推导的结果。</li>
+    <li><strong>【预期】</strong>表示依据电路机理推断、尚未由实物确认的行为。</li>
+    <li><strong>【待验证】</strong>表示仍需数据手册细节、真实主机/线缆或装配板实验确认。</li>
+  </ul>
+  <p>当前事实库中的实测记录为 0；本章不会把标称 5 V、计算电流或预计现象写成实测结果。</p>
+</section>
+
+<section aria-labelledby="ch07-7-1">
+  <h2 id="ch07-7-1">7.1 USB-C 连接器对 USB 2.0 设备意味着什么</h2>
+  <p>R1 的 J1 是 <strong>TYPE-C-31-M-12、16 引脚、仅 USB 2.0</strong> 的 Type-C 母座【设计】。它同时承担三类任务：把主机的 VBUS 引入 <code>VBUS_IN</code>，用 CC1/CC2 表明本板是受电设备，并把 USB 2.0 的 D+、D− 接入数据通道。它没有 SuperSpeed 通道，也没有 USB Power Delivery（USB-PD）控制器。</p>
+  <table>
+    <caption>J1 在最终 R1 工程中的关键连接【设计】</caption>
+    <thead>
+      <tr><th scope="col">J1 引脚组</th><th scope="col">网络</th><th scope="col">用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A4/B9、B4/A9</td><td><code>VBUS_IN</code></td><td>主机提供的总线电源输入。</td></tr>
+      <tr><td>A1/B12、B1/A12</td><td><code>GND</code></td><td>供电回流和信号参考。</td></tr>
+      <tr><td>A5</td><td><code>CC1</code></td><td>插头方向、角色和供电能力检测的一侧配置通道。</td></tr>
+      <tr><td>B5</td><td><code>CC2</code></td><td>另一插头方向对应的配置通道。</td></tr>
+      <tr><td>A6、B6</td><td><code>USB_DP_CONN</code></td><td>可翻转后的 USB D+。</td></tr>
+      <tr><td>A7、B7</td><td><code>USB_DM_CONN</code></td><td>可翻转后的 USB D−。</td></tr>
+      <tr><td>A8、B8</td><td>未连接</td><td>R1 不使用这些引脚。</td></tr>
+      <tr><td>外壳固定焊盘 1–4</td><td><code>GND</code></td><td>机械固定，并在 R1 中直接接公共地。</td></tr>
+    </tbody>
+  </table>
+  <p>J1 位于左侧板边、朝外并有意略微伸出板框【设计/计算】。连接器方向、外壳固定脚和插拔空间属于机械约束；即使电气网络全对，方向装反或焊盘错位仍会使成品无法插接。</p>
+  <aside class="warning">
+    <strong>安全边界：</strong>本板与 USB 主机共地且没有隔离。不要把 J1 的地、目标板的地和其他已接地仪器随意组成未知回路；接线前先确认各设备的参考地关系。
+  </aside>
+</section>
+
+<section aria-labelledby="ch07-7-2">
+  <h2 id="ch07-7-2">7.2 可翻转的 D+ 与 D− 引脚</h2>
+  <p>Type-C 插头可以正插或反插，因此母座为 USB 2.0 数据各提供两只接触点。R1 在连接器处把 A6 与 B6并到 <code>USB_DP_CONN</code>，把 A7 与 B7 并到 <code>USB_DM_CONN</code>【设计】。无论插头方向如何，后级 U2、R3/R4 和 U1 看到的仍是一对 D+/D− 网络。</p>
+  <p>“并在一起”只解决方向复用，不代表可以任意拉长支路。连接器焊盘到合并点、ESD 器件和后续差分走线仍应保持短、对称并具有连续地参考；第 8 章将分析完整数据路径。</p>
+  <div class="error-case">
+    <strong>常见误解：</strong>CC1/CC2 不能像 D+ 的 A6/B6 那样直接短接。两根 CC 线分别代表两种插头方向，必须各自保留独立检测支路。
+  </div>
+</section>
+
+<section aria-labelledby="ch07-7-3">
+  <h2 id="ch07-7-3">7.3 CC1 与 CC2 如何完成连接检测</h2>
+  <p>配置通道（Configuration Channel，CC）先于 USB 数据枚举工作。作为受电端，R1 在 CC1 和 CC2 上分别放置受电端下拉 <span lang="en">Rd</span>。供电端在自己的 CC 上提供上拉；插入后，供电端从其中一根 CC 检测到 Rd，从而知道：</p>
+  <ol>
+    <li>有一个受电设备接入；</li>
+    <li>哪一根 CC 是当前有效通道，也就是插头方向；</li>
+    <li>应按 Type-C/USB 规则提供 VBUS，并通过 CC 表达可用供电能力。</li>
+  </ol>
+  <p>另一根 CC 在该插头方向下不承担方向检测，但它必须仍有自己的 Rd，才能保证翻转插头后同样被识别。CC 检测与 USB 设备枚举是两个阶段：前者建立连接角色和供电条件，后者由 U1 的 USB 协议栈与主机交换描述信息。</p>
+</section>
+
+<section aria-labelledby="ch07-7-4">
+  <h2 id="ch07-7-4">7.4 R1 与 R2：为什么需要两只独立 5.1 kΩ 下拉</h2>
+  <table>
+    <caption>CC 下拉元件事实</caption>
+    <thead>
+      <tr><th scope="col">位号</th><th scope="col">值与网络</th><th scope="col">作用与布局</th><th scope="col">失效影响</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>R1</td>
+        <td>5.1 kΩ，0603；<code>CC1</code>—<code>GND</code>【设计】</td>
+        <td>CC1 的独立 Rd；靠近 J1，避免长支路和误接【设计】。</td>
+        <td>开路或错大：一个插头方向可能无法识别或供电；短路或错小：CC 电流异常【预期】。</td>
+      </tr>
+      <tr>
+        <td>R2</td>
+        <td>5.1 kΩ，0603；<code>CC2</code>—<code>GND</code>【设计】</td>
+        <td>CC2 的独立 Rd；必须与 CC1 电气分离【设计】。</td>
+        <td>开路或错大：另一个插头方向可能失败；短路或错小：CC 检测异常【预期】。</td>
+      </tr>
+    </tbody>
+  </table>
+  <figure class="example" id="ch07-cc-current-equation">
+    <figcaption>CC 支路的欧姆定律表达</figcaption>
+    <p><var>I</var><sub>CC</sub> = <var>V</var><sub>CC</sub> / <var>R</var><sub>d</sub></p>
+    <dl>
+      <dt><var>I</var><sub>CC</sub></dt><dd>CC 支路电流，单位 A。</dd>
+      <dt><var>V</var><sub>CC</sub></dt><dd>供电端上拉与受电端下拉共同形成的 CC 电压，单位 V。</dd>
+      <dt><var>R</var><sub>d</sub></dt><dd>R1 或 R2，设计值 5.1 kΩ。</dd>
+    </dl>
+    <p><strong>假设：</strong>用线性电阻近似且忽略仪表、漏电和接触电阻。事实库没有给出某一主机的 <var>V</var><sub>CC</sub>，所以不能虚构一个“R1 实测 CC 电流”。</p>
+  </figure>
+  <p>两只 5.1 kΩ 电阻不是并联成 2.55 kΩ，因为 CC1 与 CC2 是两个独立网络。把它们短接会破坏方向检测；只装一只则会造成明显的单方向故障。</p>
+</section>
+
+<section aria-labelledby="ch07-7-5">
+  <h2 id="ch07-7-5">7.5 VBUS、连接器外壳与地引脚</h2>
+  <p>J1 的 VBUS 焊盘汇入 <code>VBUS_IN</code>【设计】，再分别供给 U3、U4 及其局部电容。所有电流都必须经 <code>GND</code> 返回主机；地不是“吸收电流的点”，而是完整回路的一半。</p>
+  <p>C1 是 10 µF、C0805 的 VBUS 本地储能/旁路电容，连接 <code>VBUS_IN</code>—<code>GND</code>【设计】。它与 C2、C13 在原理图上并联，但物理位置不同，分别服务连接器附近、Buck 输入和 U4 输入的局部电流环。C1 开路时，VBUS 瞬态和噪声裕量预计下降；C1 短路时，主机 VBUS 被对地短接，主机端口保护可能动作【预期，待实物验证】。</p>
+  <p>最终 R1 把 J1 的四个外壳固定焊盘直接接 <code>GND</code>【设计】；早期提案中的可配置 0 Ω/RC 外壳网络没有出现在最终 48 个位号中。直接接地能形成明确的机械与电气参考，但真实 ESD、EMI 和机壳电流路径仍为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch07-7-6">
+  <h2 id="ch07-7-6">7.6 枚举前后都不能忽略 USB 电流预算</h2>
+  <p>连接建立后有三个不同概念：</p>
+  <ol>
+    <li><strong>CC 检测：</strong>确认受电角色、方向和供电声明；</li>
+    <li><strong>VBUS 上电：</strong>给 U3、U1 和其他板上电路供电；</li>
+    <li><strong>USB 枚举：</strong>U1 作为 USB Full-Speed 设备向主机报告身份和功能。</li>
+  </ol>
+  <p>R1 的 5V_SW 目标电流为 0.4 A，3V3_SW 目标电流为 0.25 A【设计】，但这些目标不能覆盖主机端口、线缆、电源转换、板上消耗和枚举策略的约束。实际可用电流、线缆压降、主机保护动作和热性能均为【待验证】。安全固件应在复位、启动和 USB 挂起时保持两路开关关闭【预期，硬件/固件尚未验证】。</p>
+  <aside class="warning">
+    <strong>不得这样做：</strong>不要因为看到 VBUS 标称 5 V，就把 5V_SW 与 3V3_SW 的目标电流简单相加并认定任意 USB 口都能持续供电；也不要在枚举和安全状态尚未验证时接入高功率目标负载。
+  </aside>
+</section>
+
+<section aria-labelledby="ch07-7-7">
+  <h2 id="ch07-7-7">7.7 为什么 R1 不实现 USB Power Delivery</h2>
+  <p>USB-PD 需要在 CC 上进行专门协议通信，并要求相应控制器、功率路径和协商状态机。R1 只有 J1、R1/R2 的受电端 Rd、USB 2.0 数据通道和普通 VBUS 电源路径【设计】；没有 PD 控制器，也没有可协商高压电源轨。</p>
+  <p>因此，本板应被理解为<strong>USB 总线供电的 USB 2.0 设备</strong>，而不是可请求更高电压或任意功率的 PD 受电器。把 PD 充电器接上并不会自动把 R1 变成 PD 设备；没有协商时不得假定出现高于普通 VBUS 的电压。</p>
+</section>
+
+<section aria-labelledby="ch07-7-8">
+  <h2 id="ch07-7-8">7.8 连接器外壳接地的工程取舍</h2>
+  <p>外壳接地要同时考虑机械强度、静电泄放、共模电流、机壳结构和系统接地。R1 是无金属机壳、无隔离的两层小板，最终选择外壳焊盘直接接公共 <code>GND</code>【设计】。这一连接在 CAD 中明确，但它不能单独证明 ESD 或 EMI 合规。</p>
+  <p>布局审核应检查：</p>
+  <ul>
+    <li>外壳固定焊盘有足够铜和可靠焊接，且不误连 VBUS；</li>
+    <li>静电回流尽量在连接器入口附近闭合，不穿过 U1、Y1 或 BUCK_FB 的敏感区域；</li>
+    <li>连接器外伸、线缆插拔和外壳受力不会撬动小信号焊盘；</li>
+    <li>示波器、电脑和目标板同时接地时没有危险的地环路。</li>
+  </ul>
+</section>
+
+<section class="experiment" aria-labelledby="ch07-7-9">
+  <h2 id="ch07-7-9">7.9 实验：识别 USB-C 引脚并测量 CC 电阻</h2>
+  <h3 id="ch07-experiment-purpose">目的与器材</h3>
+  <p>在不上电条件下确认 J1 的可翻转数据引脚、CC1/CC2、VBUS 和 GND，并验证 R1/R2 的直流下拉路径。器材：R1 原理图、带 Type-C 引脚标注的无源转接板或测试夹具、数字万用表和防静电工作台。</p>
+  <h3 id="ch07-experiment-safety">安全与停止条件</h3>
+  <ul>
+    <li>拔掉 USB 线、目标板、调试器和所有外部电源；电阻档绝不能接到带电电路。</li>
+    <li>不要用粗探针直接撬压 J1 的细间距触点；优先使用无源转接板。</li>
+    <li>若 <code>VBUS_IN</code>—<code>GND</code> 接近短路、CC 对地接近 0 Ω，或读数不断异常漂移，停止并检查焊桥、错件和测量路径。</li>
+  </ul>
+  <h3 id="ch07-experiment-procedure">步骤</h3>
+  <ol>
+    <li>用导通档确认 J1 的地引脚和外壳焊盘属于 <code>GND</code>；不要把蜂鸣声当作低阻精确值。</li>
+    <li>确认 A6/B6 同属 <code>USB_DP_CONN</code>，A7/B7 同属 <code>USB_DM_CONN</code>；确认 D+ 与 D− 之间不短路。</li>
+    <li>改用合适的电阻档，分别测 CC1—GND 和 CC2—GND。</li>
+    <li>记录读数、量程、探具和板号；再交换表笔重复一次，以发现外部并联路径或接触问题。</li>
+  </ol>
+  <table>
+    <caption>实验 7-1 原始数据表</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">设计预期</th><th scope="col">实测</th><th scope="col">判定/备注</th></tr></thead>
+    <tbody>
+      <tr><td>CC1—GND</td><td>R1 = 5.1 kΩ【设计】</td><td>待填</td><td>不得预填“通过”</td></tr>
+      <tr><td>CC2—GND</td><td>R2 = 5.1 kΩ【设计】</td><td>待填</td><td>不得预填“通过”</td></tr>
+      <tr><td>D+ A/B 触点连续</td><td>同一网络【设计】</td><td>待填</td><td>记录夹具影响</td></tr>
+      <tr><td>D− A/B 触点连续</td><td>同一网络【设计】</td><td>待填</td><td>记录夹具影响</td></tr>
+    </tbody>
+  </table>
+  <p><strong>通过原则：</strong>两根 CC 都应呈现与 5.1 kΩ 设计相符的独立下拉，且没有 CC1/CC2 互短、VBUS 对地短路或数据线互短。具体允许误差应结合电阻公差、仪表精度和并联路径制定，不能在没有这些信息时虚构百分比。</p>
+</section>
+
+<section aria-labelledby="ch07-summary">
+  <h2 id="ch07-summary">本章小结</h2>
+  <ul>
+    <li>J1 用重复的 D+/D− 触点实现 USB 2.0 可翻转，但 CC1/CC2 必须保持独立。</li>
+    <li>R1、R2 各为 5.1 kΩ Rd，缺一只会形成方向相关故障；C1 为 VBUS 的 10 µF 本地储能。</li>
+    <li>CC 检测、VBUS 上电和 USB 枚举是不同阶段；R1 没有 USB-PD。</li>
+    <li>最终外壳直接接 GND；真实供电能力、ESD、EMI 和枚举行为仍需实物验证。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch07-sources">
+  <h2 id="ch07-sources">事实来源</h2>
+  <p>本章依据最终 EasyEDA 工程归档中的 J1、R1、R2、C1 网络与器件元数据，以及 <code>project-facts.json</code>、<code>component-atlas.json</code>、<code>formula-facts.json</code> 和 R1 制造审核。早期提案仅用于解释设计意图；与最终工程冲突时以最终工程为准。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="06-part-selection.html"><small>上一页</small>6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a><a class="next" rel="next" href="08-usb-data-protection.html"><small>下一页</small>8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

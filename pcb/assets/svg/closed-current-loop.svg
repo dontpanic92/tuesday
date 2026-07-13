@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="title desc">
+  <title id="title">闭合电流环与返回路径</title>
+  <desc id="desc">电流从电源正端沿去程铜线流向负载，再沿邻近的地或返回铜线回到电源负端，构成闭合环路。</desc>
+  <defs>
+    <marker id="red-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#b33a3a"/>
+    </marker>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#0b5cab"/>
+    </marker>
+    <style>
+      text{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans CJK SC",sans-serif;fill:#17202a}
+      .label{font-size:18px;font-weight:700;text-anchor:middle}
+      .note{font-size:14px;fill:#586474;text-anchor:middle}
+    </style>
+  </defs>
+  <rect width="960" height="440" rx="18" fill="#f7fafc"/>
+  <text x="480" y="42" font-size="24" font-weight="700" text-anchor="middle">电流必须有去程，也必须有返回路径</text>
+  <g transform="translate(90 120)">
+    <rect width="150" height="200" rx="16" fill="#fff" stroke="#34495e" stroke-width="2"/>
+    <line x1="60" y1="52" x2="90" y2="52" stroke="#b33a3a" stroke-width="5"/>
+    <line x1="69" y1="72" x2="81" y2="72" stroke="#34495e" stroke-width="5"/>
+    <text class="label" x="75" y="120">电源</text>
+    <text x="75" y="148" font-size="15" text-anchor="middle" fill="#b33a3a">正端 ＋</text>
+    <text x="75" y="174" font-size="15" text-anchor="middle" fill="#0b5cab">负端 −</text>
+  </g>
+  <g transform="translate(720 120)">
+    <rect width="150" height="200" rx="16" fill="#fff8e8" stroke="#9a5b00" stroke-width="2"/>
+    <path d="M42 52h66v48H42z" fill="#ffd27a" stroke="#9a5b00" stroke-width="2"/>
+    <path d="M55 66l40 20M95 66L55 86" stroke="#9a5b00" stroke-width="3"/>
+    <text class="label" x="75" y="140">负载</text>
+    <text class="note" x="75" y="168">消耗或转换能量</text>
+  </g>
+  <path d="M240 165H720" fill="none" stroke="#b33a3a" stroke-width="8" marker-end="url(#red-arrow)"/>
+  <path d="M720 275H240" fill="none" stroke="#0b5cab" stroke-width="8" marker-end="url(#blue-arrow)"/>
+  <text x="480" y="140" font-size="17" font-weight="700" fill="#9c2424" text-anchor="middle">去程铜线 / 信号导体</text>
+  <text x="480" y="310" font-size="17" font-weight="700" fill="#083f75" text-anchor="middle">GND / 邻近返回铜线</text>
+  <path d="M165 120V90H795V120" fill="none" stroke="#ccd3dc" stroke-width="2" stroke-dasharray="5 5"/>
+  <text x="480" y="82" font-size="14" fill="#586474" text-anchor="middle">完整环路的几何面积与阻抗共同影响压降、噪声和辐射</text>
+  <text x="480" y="390" font-size="16" font-weight="700" text-anchor="middle">返回路径断开：稳态电流不能维持　　返回路径绕远：环路面积与高频阻抗增大</text>
+</svg>

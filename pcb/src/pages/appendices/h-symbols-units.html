@@ -1,0 +1,189 @@
+<section aria-labelledby="h-models">
+  <h2 id="h-models">H.1 符号、器件、footprint 与实体不是同一件事</h2>
+  <dl>
+    <dt><strong>原理图符号（symbol）</strong></dt>
+    <dd>表达功能、针脚和逻辑连接；图上大小与真实器件无比例关系。</dd>
+    <dt><strong>器件实例（component/device）</strong></dt>
+    <dd>带唯一位号、值、料号和属性的设计对象，例如 R5、U1。</dd>
+    <dt><strong>footprint / land pattern</strong></dt>
+    <dd>PCB 上的焊盘、孔、阻焊、锡膏、丝印和装配边界定义。</dd>
+    <dt><strong>package / 外壳</strong></dt>
+    <dd>供应商器件的真实机械外形及引脚形式；相似外壳不保证针脚顺序相同。</dd>
+    <dt><strong>3D body / 实体包络</strong></dt>
+    <dd>用于插接、碰撞和高度检查；不能替代焊盘号与数据手册尺寸核对。</dd>
+  </dl>
+  <div class="error-case">
+    <p><strong>典型错误：</strong>符号针脚正确、footprint 焊盘号错误，ERC 仍可能通过；焊盘电气正确、实体包络重叠，DRC 仍可能通过。因此电气映射和机械审核必须分别完成。</p>
+  </div>
+</section>
+
+<section aria-labelledby="h-refdes">
+  <h2 id="h-refdes">H.2 常见位号前缀</h2>
+  <table>
+    <caption>表 H-1　位号字母与本项目实例</caption>
+    <thead><tr><th scope="col">前缀</th><th scope="col">器件类别</th><th scope="col">R1 实例</th><th scope="col">阅读要点</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><code>R</code></th><td>电阻</td><td>R1–R23</td><td>查看阻值、容差、功耗、网络和用途；相同封装可能是完全不同阻值。</td></tr>
+      <tr><th scope="row"><code>C</code></th><td>电容</td><td>C1–C14</td><td>查看容量、介质、耐压、直流偏压、ESR/ESL 和位置。</td></tr>
+      <tr><th scope="row"><code>L</code></th><td>电感</td><td>L1</td><td>查看电感量、额定/饱和电流、DCR、频率和磁场布局。</td></tr>
+      <tr><th scope="row"><code>D</code></th><td>二极管 / LED</td><td>D1</td><td>有方向；检查阳极/阴极、正向压降、电流和封装标记。</td></tr>
+      <tr><th scope="row"><code>U</code></th><td>集成电路/模块</td><td>U1–U5</td><td>逐针核对电源、地、输入、输出、配置和 pin 1。</td></tr>
+      <tr><th scope="row"><code>J</code></th><td>连接器</td><td>J1–J3</td><td>针脚号、观察面、插接方向、机械固定和 DNP 状态同等重要。</td></tr>
+      <tr><th scope="row"><code>Y</code></th><td>晶振/谐振器</td><td>Y1</td><td>频率、负载电容、脚位、起振裕量和近端布局。</td></tr>
+      <tr><th scope="row"><code>TP</code></th><td>测试点</td><td>R1 无独立 TP 位号</td><td>不要把连接器焊盘自动当成安全、可达的测试点。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="h-schematic-symbols">
+  <h2 id="h-schematic-symbols">H.3 原理图常用符号读法</h2>
+  <table>
+    <caption>表 H-2　无需依赖绘图风格的语义读法</caption>
+    <thead><tr><th scope="col">对象</th><th scope="col">常见图形特征</th><th scope="col">真正要读的内容</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">电阻</th><td>矩形或锯齿，两端各一针</td><td>位号、阻值、连接网络；方向通常不影响电气，但布局位置可能关键。</td></tr>
+      <tr><th scope="row">非极性电容</th><td>两条平行极板</td><td>容量、介质、耐压和服务的电流回路；原理图位置不表示物理距离。</td></tr>
+      <tr><th scope="row">极性电容</th><td>带“+”或弯曲极板</td><td>正负极必须正确。R1 的列举 MLCC 为非极性，但不能把此结论推广到所有电容。</td></tr>
+      <tr><th scope="row">电感</th><td>线圈或串联弧形</td><td>电流方向可双向，但磁性参数、饱和和布局很重要。</td></tr>
+      <tr><th scope="row">二极管 / LED</th><td>二极管符号；LED 另有向外箭头</td><td>阳极、阴极和电流方向；箭头表示发光，不表示电流方向。</td></tr>
+      <tr><th scope="row">集成电路</th><td>矩形、多针，可能按功能分组</td><td>针号与针名；图形边缘位置不等于封装物理顺序。</td></tr>
+      <tr><th scope="row">连接器</th><td>编号针脚阵列</td><td>针号、观察面和配对方向；相邻画法不保证实物相邻。</td></tr>
+      <tr><th scope="row">晶振</th><td>晶体板符号，常配两只对地电容</td><td>频率、负载、接地脚和 OSC_IN/OUT。</td></tr>
+      <tr><th scope="row">GND / 电源符号</th><td>地形符号或带名称箭头</td><td>它是命名网络连接，不是“电流消失点”；同名符号会在逻辑上相连。</td></tr>
+      <tr><th scope="row">网络标签</th><td>附在导线上的文字</td><td>同名即同网；大小写、空格和拼写错误可能产生不同网络。</td></tr>
+      <tr><th scope="row">连接点</th><td>导线交点处实心点</td><td>有点通常表示相连；交叉无点是否相连应按工具规则和网络高亮确认。</td></tr>
+      <tr><th scope="row">No-connect</th><td>针脚末端的专用标记</td><td>明确表示“有意不接”；不是遗漏，也不能随意加到不理解的警告上。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="h-packages">
+  <h2 id="h-packages">H.4 USB GPIO R1 实际使用的封装</h2>
+  <table>
+    <caption>表 H-3　项目封装标识、器件与装配注意</caption>
+    <thead><tr><th scope="col">封装标识</th><th scope="col">位号</th><th scope="col">类型</th><th scope="col">关键检查</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><code>R0603</code></th><td>R1–R23</td><td>表贴电阻</td><td>值不可混料；焊盘两端无极性，但功能位置和串联方向仍需按网络核对。</td></tr>
+      <tr><th scope="row"><code>C0603</code></th><td>C6–C8、C10–C14</td><td>表贴陶瓷电容</td><td>100 nF 与 12 pF 同为此类 footprint，必须按位号防错料。</td></tr>
+      <tr><th scope="row"><code>C0805</code></th><td>C1–C5、C9</td><td>较大表贴陶瓷电容</td><td>10 µF 与 22 µF 不能仅凭外观区分；检查有效电容和耐压。</td></tr>
+      <tr><th scope="row"><code>LED0603-R-RD_GREEN</code></th><td>D1</td><td>0603 LED</td><td>极性、发光面和装配标记。</td></tr>
+      <tr><th scope="row"><code>LQFP-32_L7.0-W7.0-P0.80-LS9.0-BL</code></th><td>U1</td><td>32 针四边引脚 IC</td><td>pin 1、0.80 mm pitch、焊桥、共面性和返修空间。</td></tr>
+      <tr><th scope="row"><code>SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL</code></th><td>U2</td><td>6 针小外形</td><td>不能与 SOT-23-5 互换；核对 1–6 针方向和 USB 保护通道。</td></tr>
+      <tr><th scope="row"><code>SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR</code></th><td>U3</td><td>5 针小外形</td><td>末尾方向标识与 U4/U5 不同；按焊盘号而非外观判断。</td></tr>
+      <tr><th scope="row"><code>SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BL</code></th><td>U4、U5</td><td>5 针小外形</td><td>同 footprint、同型号，但输入电源和输出网络不同。</td></tr>
+      <tr><th scope="row"><code>USB-C_SMD-TYPE-C-31-M-12_1</code></th><td>J1</td><td>USB-C 表贴/固定脚连接器</td><td>USB2 针、外壳焊盘、插接方向、板边伸出和机械固定。</td></tr>
+      <tr><th scope="row"><code>HDR-TH_16P-P2.54-V-M-R2-C8-S2.54-1</code></th><td>J2</td><td>2×8、2.54 mm 通孔排针</td><td>DNP；pin 1、两排编号、母座/公座配合和高度。</td></tr>
+      <tr><th scope="row"><code>HDR-TH_5P-P1.27_C9900008152</code></th><td>J3</td><td>1×5、1.27 mm 通孔排针</td><td>DNP；调试器针序和供电方向。</td></tr>
+      <tr><th scope="row"><code>IND-SMD_L2.5-W2.0_SWPA2520</code></th><td>L1</td><td>2520 类功率电感</td><td>电流、饱和、DCR、温升和与 U3 的紧凑回路。</td></tr>
+      <tr><th scope="row"><code>CRYSTAL-SMD_4P-L3.2-W2.5-BL</code></th><td>Y1</td><td>3225、4 焊盘晶振</td><td>1/3 为振荡端、2/4 接地；脚号与地焊盘不能凭对称外观猜测。</td></tr>
+    </tbody>
+  </table>
+  <p>封装名称中的尺寸信息是库命名的一部分，不替代原厂机械图和推荐 land pattern。采购替代料时必须逐项核对实际尺寸、针序和工艺。</p>
+</section>
+
+<section aria-labelledby="h-pcb-objects">
+  <h2 id="h-pcb-objects">H.5 PCB 图元与制造层</h2>
+  <table>
+    <caption>表 H-4　常见 PCB 对象</caption>
+    <thead><tr><th scope="col">对象</th><th scope="col">作用</th><th scope="col">常见误解</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Pad</th><td>器件引脚焊接或电气接触的铜区。</td><td>焊盘正确不代表实体不会碰撞。</td></tr>
+      <tr><th scope="row">Track / Trace</th><td>线状铜导体。</td><td>网络连通不代表线宽、回流或温升合格。</td></tr>
+      <tr><th scope="row">Via</th><td>连接铜层的金属化孔。</td><td>过孔有电阻/电感和占板空间，不是“免费换层”。</td></tr>
+      <tr><th scope="row">PTH</th><td>金属化通孔，可焊接并导电。</td><td>不能与 NPTH 混用。</td></tr>
+      <tr><th scope="row">NPTH</th><td>非金属化机械孔。</td><td>孔壁没有设计导电功能。</td></tr>
+      <tr><th scope="row">Board outline</th><td>最终铣板边界。</td><td>必须闭合；可见矩形不保证只有一个有效轮廓。</td></tr>
+      <tr><th scope="row">Solder mask</th><td>覆盖非焊接铜面的阻焊层。</td><td>不是铜层，也不是锡膏层。</td></tr>
+      <tr><th scope="row">Paste mask</th><td>钢网锡膏开口。</td><td>通孔元件通常不由该层定义焊料。</td></tr>
+      <tr><th scope="row">Silkscreen</th><td>文字、方向和用户标识。</td><td>不能依赖丝印作为唯一装配定位资料。</td></tr>
+      <tr><th scope="row">Native pour</th><td>按网络和规则可重算的大面积铜。</td><td>边界对象本身不是生成铜；修改后必须重铺并查 Gerber。</td></tr>
+      <tr><th scope="row">Static fill</th><td>固定铜图元。</td><td>不会随规则自动重算；R1 的 17 个 GND 区域属于此类。</td></tr>
+      <tr><th scope="row">Courtyard</th><td>装配和返修预留边界。</td><td>不是电气间距，也不一定等同器件实体。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="h-si-units">
+  <h2 id="h-si-units">H.6 常用 SI 单位</h2>
+  <table>
+    <caption>表 H-5　电子与 PCB 计算单位</caption>
+    <thead><tr><th scope="col">量</th><th scope="col">符号</th><th scope="col">单位</th><th scope="col">单位符号</th><th scope="col">常见用途</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">电压</th><td>V</td><td>伏特</td><td>V</td><td>VBUS、3V3_SYS、逻辑电平</td></tr>
+      <tr><th scope="row">电流</th><td>I</td><td>安培</td><td>A</td><td>输入电流、限流、LED 电流</td></tr>
+      <tr><th scope="row">电阻</th><td>R</td><td>欧姆</td><td>Ω</td><td>偏置、反馈、串联保护</td></tr>
+      <tr><th scope="row">功率</th><td>P</td><td>瓦特</td><td>W</td><td>损耗、器件额定、输出功率</td></tr>
+      <tr><th scope="row">能量</th><td>E</td><td>焦耳</td><td>J</td><td>电容/电感储能</td></tr>
+      <tr><th scope="row">电荷</th><td>Q</td><td>库仑</td><td>C</td><td>电容充放电</td></tr>
+      <tr><th scope="row">电容</th><td>C</td><td>法拉</td><td>F</td><td>去耦、储能、定时、晶振负载</td></tr>
+      <tr><th scope="row">电感</th><td>L</td><td>亨利</td><td>H</td><td>Buck 储能与纹波</td></tr>
+      <tr><th scope="row">频率</th><td>f</td><td>赫兹</td><td>Hz</td><td>晶振、PWM、开关频率</td></tr>
+      <tr><th scope="row">时间</th><td>t、τ</td><td>秒</td><td>s</td><td>RC、UART 位时间、启动时间</td></tr>
+      <tr><th scope="row">长度</th><td>l、L</td><td>米</td><td>m</td><td>PCB 常用 mm；英制常用 mil</td></tr>
+      <tr><th scope="row">温度</th><td>T</td><td>摄氏度 / 开尔文</td><td>°C / K</td><td>环境与器件温升</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="h-prefixes">
+  <h2 id="h-prefixes">H.7 工程前缀</h2>
+  <table>
+    <caption>表 H-6　大小写必须准确</caption>
+    <thead><tr><th scope="col">前缀</th><th scope="col">符号</th><th scope="col">倍率</th><th scope="col">示例</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">吉</th><td>G</td><td>10<sup>9</sup></td><td>1 GHz</td></tr>
+      <tr><th scope="row">兆</th><td>M</td><td>10<sup>6</sup></td><td>12 MHz</td></tr>
+      <tr><th scope="row">千</th><td>k</td><td>10<sup>3</sup></td><td>5.1 kΩ</td></tr>
+      <tr><th scope="row">无前缀</th><td>—</td><td>10<sup>0</sup></td><td>22 Ω</td></tr>
+      <tr><th scope="row">毫</th><td>m</td><td>10<sup>−3</sup></td><td>402 mA</td></tr>
+      <tr><th scope="row">微</th><td>µ</td><td>10<sup>−6</sup></td><td>10 µF、8.68 µs</td></tr>
+      <tr><th scope="row">纳</th><td>n</td><td>10<sup>−9</sup></td><td>100 nF</td></tr>
+      <tr><th scope="row">皮</th><td>p</td><td>10<sup>−12</sup></td><td>12 pF</td></tr>
+    </tbody>
+  </table>
+  <p><strong>易错：</strong><code>M</code> 是 10<sup>6</sup>，<code>m</code> 是 10<sup>−3</sup>；<code>µF</code> 不能写成 <code>mF</code>。在纯 ASCII 环境可用 <code>uF</code> 临时代替 µF，但正式教材与 BOM 应使用清楚一致的写法。</p>
+</section>
+
+<section aria-labelledby="h-length">
+  <h2 id="h-length">H.8 mm、inch 与 mil</h2>
+  <p><strong>1 inch = 25.4 mm；1 mil = 0.001 inch = 0.0254 mm。</strong></p>
+  <table>
+    <caption>表 H-7　快速换算</caption>
+    <thead><tr><th scope="col">值</th><th scope="col">换算</th><th scope="col">R1 示例</th></tr></thead>
+    <tbody>
+      <tr><td>6 mil</td><td>0.1524 mm</td><td>一般信号线宽</td></tr>
+      <tr><td>8 mil</td><td>0.2032 mm</td><td>USB 线宽</td></tr>
+      <tr><td>12 mil</td><td>0.3048 mm</td><td>GND 线宽、过孔钻径</td></tr>
+      <tr><td>24 mil</td><td>0.6096 mm</td><td>VBUS 主干、过孔焊盘</td></tr>
+      <tr><td>1968.5 mil</td><td>约 50 mm</td><td>板宽名义值</td></tr>
+      <tr><td>944.9 mil</td><td>约 24 mm</td><td>板高名义值</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="h-notation">
+  <h2 id="h-notation">H.9 书写与读数规范</h2>
+  <ul>
+    <li>数值与单位之间留空格：<code>3.3 V</code>、<code>100 nF</code>、<code>50 mm</code>。</li>
+    <li>单位符号不加复数、不随中文变化：写 <code>10 Ω</code>，不写 “10 Ωs”。</li>
+    <li>网络名、位号和器件型号使用等宽样式并保持大小写：<code>3V3_SYS</code>、<code>R12</code>、<code>SY8089AAAC</code>。</li>
+    <li>电压必须说明参考点，例如“3V3_SYS 对 GND”，不能只写“测得 3.3”。</li>
+    <li>频率、占空比、纹波和温度应说明仪器、带宽、负载和工况。</li>
+    <li>标称、典型、最小、最大、计算和实测不得混用。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="h-status-labels">
+  <h2 id="h-status-labels">H.10 本教程事实标签</h2>
+  <table>
+    <caption>表 H-8　看到数字时先找标签</caption>
+    <thead><tr><th scope="col">标签</th><th scope="col">含义</th><th scope="col">例子</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">设计</th><td>最终源采用的标称事实</td><td>Y1=12 MHz；板为两层。</td></tr>
+      <tr><th scope="row">计算</th><td>由设计/CAD 推导</td><td>反馈 3.318 V；Gerber 外形尺寸；USB 几何偏斜。</td></tr>
+      <tr><th scope="row">预期</th><td>按机理预测</td><td>R9/R10 使受控电源在 MCU 高阻时倾向关闭。</td></tr>
+      <tr><th scope="row">实测</th><td>来自装配板和仪器</td><td>当前事实库尚无。</td></tr>
+      <tr><th scope="row">待验证</th><td>证据不足</td><td>纹波、温升、眼图、晶振负载匹配、实际限流。</td></tr>
+    </tbody>
+  </table>
+</section>

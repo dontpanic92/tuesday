@@ -1,0 +1,271 @@
+<section class="notice" aria-labelledby="ch26-evidence-boundary">
+  <h2 id="ch26-evidence-boundary">本章证据边界</h2>
+  <p>本章讨论的是“设计文件是否具备送样条件”，不是“实物已经工作”。USB GPIO R1 的发布审核在 2026-07-12 得到
+    <strong>PASS—可送原型制造</strong>；当前没有装配板的电压、纹波、温升、USB 枚举、眼图或固件实测数据。
+    因此，下文的尺寸和数量属于设计值或由 CAD/制造文件得到的计算值，不能改写成实测值。</p>
+</section>
+
+<section aria-labelledby="ch26-learning-goals">
+  <h2 id="ch26-learning-goals">学习目标</h2>
+  <ul>
+    <li>说明设计规则检查（Design Rule Check，DRC）能证明什么、不能证明什么。</li>
+    <li>执行“保存—关闭—重开—复查”的连接状态刷新流程，而不是盲信缓存结果。</li>
+    <li>用实体包络、庭院/元件外形、板边和连接器配合方向完成全板机械审核。</li>
+    <li>把原理图、PCB、焊盘、网络、BOM、CPL 和 DNP 数量核对成可解释的闭环。</li>
+    <li>建立有证据、可失效、可重跑的正式发布质量门。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch26-1-drc-checks">
+  <h2 id="ch26-1-drc-checks">26.1 DRC 检查什么</h2>
+  <p>DRC 是 CAD 工具把当前几何和网络关系与一组规则比较的自动检查。它通常擅长发现未连接网络、不同网络间距不足、
+    走线或过孔违反规则、差分对规则不满足以及部分板边约束。结论始终带有前提：<strong>规则必须正确、对象必须被规则覆盖、
+    工具内部连接图必须是最新状态</strong>。</p>
+  <table>
+    <caption>USB GPIO R1 最终 DRC 记录</caption>
+    <thead>
+      <tr><th scope="col">检查类别</th><th scope="col">最终结果</th><th scope="col">审核时仍要追问</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>连接错误</td><td>0</td><td>47 个命名网络是否又经独立几何连通分析确认？</td></tr>
+      <tr><td>间距错误</td><td>0</td><td>规则值是否符合所选制造商能力，而非只采用工具默认值？</td></tr>
+      <tr><td>差分对错误</td><td>0</td><td>是否只证明几何规则，而没有冒充阻抗或眼图验证？</td></tr>
+      <tr><td>其他规则类别</td><td>0；详细结果为空数组</td><td>是否存在被禁用、豁免或没有建模的类别？</td></tr>
+    </tbody>
+  </table>
+  <p>发布 manifest 记录的最终调用方法为 <code>eda.pcb_Drc.check(true, false, true)</code>。审核记录保留方法字符串，
+    但不应脱离对应 EasyEDA 版本和规则配置，凭三个布尔参数猜测检查范围。</p>
+</section>
+
+<section aria-labelledby="ch26-2-drc-limitations">
+  <h2 id="ch26-2-drc-limitations">26.2 DRC 不检查什么</h2>
+  <p>“DRC=0”只说明工具没有在已启用规则中找到违规。以下项目需要不同证据：</p>
+  <table>
+    <caption>DRC 之外的证据责任</caption>
+    <thead>
+      <tr><th scope="col">问题</th><th scope="col">为什么 DRC 不足</th><th scope="col">应使用的证据</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>器件实体碰撞</td><td>焊盘不重叠不代表塑封、连接器外壳或返修空间不冲突。</td><td>数据手册实体包络、庭院/元件外形、3D/装配图和成对碰撞计算。</td></tr>
+      <tr><td>连接器方向</td><td>引脚网络正确时，插口仍可能朝板内或无法插线。</td><td>配合方向、板边、外壳包络和装配图审核。</td></tr>
+      <tr><td>实际制造铜</td><td>一个“铺铜边界对象”可能没有生成任何铜。</td><td>重新铺铜后，在导出的 GTL/GBL Gerber 中检查实体区域。</td></tr>
+      <tr><td>BOM、CPL 与 DNP</td><td>DRC 不知道采购数量、贴装变体或旋转约定。</td><td>项目源、BOM、CPL、装配图四方核对。</td></tr>
+      <tr><td>热、信号完整性与功能</td><td>几何合法不等于温升、纹波、USB 眼图或固件状态合格。</td><td>叠层/场求解、样板测量、功能测试和合规测试。</td></tr>
+    </tbody>
+  </table>
+  <aside class="warning" aria-labelledby="ch26-zero-error-warning">
+    <h3 id="ch26-zero-error-warning">危险的推理</h3>
+    <p>“没有 DRC 错误，所以可以量产”是把局部证据扩大成全局结论。R1 的结论仅为“制造资料内部一致，可送原型制造”，
+      不包含装配、上电或量产合格。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch26-3-refresh-connectivity">
+  <h2 id="ch26-3-refresh-connectivity">26.3 信任刷新后的连接关系前，先保存、关闭并重开</h2>
+  <p>布局移动、删线、重布线或修改铺铜后，编辑器可能仍显示旧的连接缓存。R1 曾遇到重新布局后旧布线失效以及连接图缓存过期；
+    最终发布前先保存 PCB，关闭文档，再重新打开并运行最终检查。</p>
+  <ol>
+    <li>保存原理图和 PCB，记录项目、PCB UUID 与版本。</li>
+    <li>关闭 PCB 文档，确认没有未保存提示。</li>
+    <li>重新打开同一 PCB，等待网络和规则对象加载完成。</li>
+    <li>重新运行 DRC，不沿用移动器件前的截图或结果。</li>
+    <li>再做独立几何连通分析；R1 的结果为 47/47 个命名网络完全连通。</li>
+    <li>若结果前后不一致，停止发布，先找出缓存、网络表或残留铜的来源。</li>
+  </ol>
+  <p>这个流程不能修复设计；它只迫使检查面对重新载入后的真实文档状态。任何依赖“刷新后错误消失”的情况都必须解释原因，
+    不能把重开软件当成豁免。</p>
+</section>
+
+<section aria-labelledby="ch26-4-rule-audit">
+  <h2 id="ch26-4-rule-audit">26.4 连接、间距、差分对与板边检查</h2>
+  <p>审核者应逐类查看结果，而不是只看总数。板边距离尤其要区分“CAD 几何最小值”和“制造商允许值”：前者来自当前设计，
+    后者来自下单工艺能力；只有比较后才能放行。</p>
+  <table>
+    <caption>R1 的自动检查与独立板边测量</caption>
+    <thead>
+      <tr><th scope="col">项目</th><th scope="col">R1 结果</th><th scope="col">判读方法</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>命名网络连通</td><td>47/47 完全连通</td><td>按网络聚类铜、焊盘和过孔，确认每个网络只有一个连通集合。</td></tr>
+      <tr><td>焊盘到板边最小距离</td><td>12.9 mil</td><td>定位产生最小值的对象，并与制造商能力比较。</td></tr>
+      <tr><td>过孔到板边最小距离</td><td>16.9 mil</td><td>同时考虑成品孔位偏差和板边加工偏差。</td></tr>
+      <tr><td>走线到板边最小距离</td><td>17.5 mil</td><td>检查是否为连接器附近的有意颈缩，而非意外越界。</td></tr>
+      <tr><td>USB 三段差分几何</td><td>DRC 错误 0</td><td>再核对 D+、D− 拓扑、长度、过孔和连续地参考。</td></tr>
+    </tbody>
+  </table>
+  <p><code>1 mil = 0.0254 mm</code>。不要只把数值换算成毫米；还要保存对象 ID、所在层和截图/查看器位置，使下一位审核者能够复现。</p>
+</section>
+
+<section aria-labelledby="ch26-5-collision-audit">
+  <h2 id="ch26-5-collision-audit">26.5 全部器件的实体与庭院碰撞审核</h2>
+  <p>48 个器件有 <code>48 × 47 ÷ 2 = 1128</code> 个不重复器件对。R1 对全部 1128 对分别进行了两次审核：
+    一次使用数据手册实体包络，一次使用封装元件外形/庭院包络。两种包络回答不同问题，不能互相替代。</p>
+  <table>
+    <caption>R1 全板机械审核结果</caption>
+    <thead>
+      <tr><th scope="col">指标</th><th scope="col">已验证结果</th><th scope="col">意义</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>实体包络重叠</td><td>0</td><td>已建模的实际器件身体不互穿。</td></tr>
+      <tr><td>庭院/元件外形重叠</td><td>0</td><td>封装定义的装配空间不冲突。</td></tr>
+      <tr><td>小于 0.25 mm 的实体间隙</td><td>0</td><td>没有低于项目验收间距的器件对。</td></tr>
+      <tr><td>最小描边庭院到板边/器件裕量</td><td>10.748 mil</td><td>约 0.273 mm；这是本板计算值，不是通用工艺规则。</td></tr>
+      <tr><td>C8–C9 实体间隙</td><td>49.650 mil</td><td>用于复验曾发生的 C8/C9 碰撞。</td></tr>
+      <tr><td>C8–C9 外形/庭院间隙</td><td>45.709 mil</td><td>独立于实体包络的第二份证据。</td></tr>
+    </tbody>
+  </table>
+  <ol>
+    <li>从数据手册取得最大实体尺寸，而不是只看焊盘。</li>
+    <li>统一旋转和镜像后，把每个包络变换到板坐标。</li>
+    <li>枚举全部不重复器件对，并保存最小间距及对应位号。</li>
+    <li>再以封装庭院/元件外形重复一次。</li>
+    <li>对连接器、晶振、功率器件和高密度区域进行人工复核。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="ch26-6-connector-review">
+  <h2 id="ch26-6-connector-review">26.6 连接器方向与有意悬边审核</h2>
+  <p>连接器审核必须从“用户怎样插入配合件”开始。J1 的最终中心为 <code>(200.5, 472) mil</code>，
+    旋转为 <code>-90°</code>；CPL 用等价的 <code>270°</code> 表示。插口朝左侧板边向外。</p>
+  <table>
+    <caption>R1 连接器机械证据</caption>
+    <thead>
+      <tr><th scope="col">项目</th><th scope="col">结果</th><th scope="col">审核重点</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>J1 外壳最小 X</td><td>-5.055 mil</td><td>这是有意伸出左板边的外壳，不是铜或板框越界。</td></tr>
+      <tr><td>J1 最近非连接器实体间隙</td><td>44.005 mil</td><td>确认 R1 不在 USB-C 外壳下方。</td></tr>
+      <tr><td>J2/J3 最近非连接器实体间隙</td><td>32.126 mil</td><td>保证插针、测试和返修接近空间没有被遮挡。</td></tr>
+      <tr><td>连接器实体碰撞</td><td>0</td><td>J1、J2、J3 的身体均不与邻近器件身体相交。</td></tr>
+      <tr><td>测试/调试接近空间</td><td>未被其他器件身体覆盖</td><td>检查探针、插头和返修工具的进入方向。</td></tr>
+      <tr><td>配合方向</td><td>J1 朝左；J2/J3 从顶面接近</td><td>结合板边、线缆、夹具和外壳审查。</td></tr>
+    </tbody>
+  </table>
+  <p>有意悬边必须同时满足四项条件：外壳可越界、铜和孔不非法越界、板框保持闭合、装配图明确方向。
+    “对象超出板框”本身既不能自动判错，也不能自动放行。</p>
+</section>
+
+<section aria-labelledby="ch26-7-count-reconciliation">
+  <h2 id="ch26-7-count-reconciliation">26.7 网络表、引脚、焊盘与器件数量核对</h2>
+  <p>数量核对的目的不是让所有文件都出现同一个数字，而是解释每个差异。R1 的关键闭环如下：</p>
+  <table>
+    <caption>R1 跨文件数量闭环</caption>
+    <thead>
+      <tr><th scope="col">对象</th><th scope="col">数量</th><th scope="col">必须成立的关系</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>原理图到 PCB 映射器件</td><td>48/48</td><td>每个物理位号都有唯一 PCB 对象。</td></tr>
+      <tr><td>原理图引脚到 PCB 焊盘</td><td>172/172</td><td>按器件身份、引脚号和网络三项一致。</td></tr>
+      <tr><td>PCB 命名网络</td><td>47</td><td>原理图与 PCB 网络表差异为 0。</td></tr>
+      <tr><td>明确不连接引脚</td><td>9</td><td>逐一有意图记录，不能用“忘接”解释。</td></tr>
+      <tr><td>PCB/CPL 物理位号</td><td>48</td><td>包含拟装配件和 DNP 件。</td></tr>
+      <tr><td>BOM 拟装配位号</td><td>46</td><td><code>46 拟装配 + 2 DNP（J2、J3） = 48</code>。</td></tr>
+    </tbody>
+  </table>
+  <p>如果数字不相等，先查变体和 DNP，再查丢失封装、重复位号、隐藏电源单元或错误排除项；不要为了“对齐”而删除证据。</p>
+</section>
+
+<section aria-labelledby="ch26-8-power-return-ground">
+  <h2 id="ch26-8-power-return-ground">26.8 复核电源线宽、回流路径与地铜</h2>
+  <p>规则合法的线宽仍可能不适合电流、压降或回流路径。R1 的发布记录固定了实际采用的线宽，审核者可据此定位异常颈缩：</p>
+  <table>
+    <caption>R1 最终布线宽度</caption>
+    <thead>
+      <tr><th scope="col">网络类别</th><th scope="col">线宽</th><th scope="col">复核问题</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>普通信号</td><td>6 mil</td><td>是否满足制造能力和所需间距？</td></tr>
+      <tr><td>USB D+/D−</td><td>8 mil</td><td>是否成对、拓扑一致且有连续地参考？</td></tr>
+      <tr><td>GND</td><td>12 mil</td><td>回流是否被狭缝、板边或层切换迫使绕行？</td></tr>
+      <tr><td><code>BUCK_SW</code></td><td>14 mil</td><td>高 <code>dv/dt</code> 节点是否紧凑并远离反馈？</td></tr>
+      <tr><td><code>3V3_SW</code> / <code>5V_SW</code></td><td>16 mil / 16 mil</td><td>负载路径和返回路径是否同时完整？</td></tr>
+      <tr><td><code>3V3_SYS</code></td><td>20 mil</td><td>去耦回路是否短，而非只有主干较宽？</td></tr>
+      <tr><td><code>VBUS_IN</code></td><td>24 mil 主干；连接器处短段 12 mil</td><td>颈缩是否短、可解释且没有误延伸？</td></tr>
+    </tbody>
+  </table>
+  <p>地网络还有 173 条显式走线和 32 个地缝合/树状过孔。制造铜由 17 个已连接的静态 GND FILL 构成：
+    顶层 11 个、底层 6 个，面积分别为 562.422 mm² 和 520.456 mm²。它们不是可自动重铺的原生 POUR；
+    任何几何变化都必须重新生成、重新检查间距并在 Gerber 中确认。</p>
+</section>
+
+<section aria-labelledby="ch26-9-exceptions">
+  <h2 id="ch26-9-exceptions">26.9 不允许无法解释的警告、例外或隐藏假设</h2>
+  <p>发布记录应包含“通过项”和“已知限制”。R1 严格原理图 ERC 为 0 个错误，但保留 2 个非阻断提示；
+    API 未暴露提示文本，这一限制被记录，而不是被改写成“零警告”。PCB DRC 各类错误为 0，J2/J3 的 DNP 状态也明确写入。</p>
+  <table>
+    <caption>例外登记最少字段</caption>
+    <thead>
+      <tr><th scope="col">字段</th><th scope="col">应回答的问题</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>对象与规则</td><td>是哪一个位号、网络、层或检查类别？</td></tr>
+      <tr><td>原始结果</td><td>工具实际报告了什么，是否能保存完整文本？</td></tr>
+      <tr><td>处置理由</td><td>为何修复、接受或标为不适用？谁批准？</td></tr>
+      <tr><td>补充证据</td><td>用数据手册、机械图、Gerber 或实测中的哪一种补足？</td></tr>
+      <tr><td>失效条件</td><td>哪种修改会使该结论不再成立？</td></tr>
+    </tbody>
+  </table>
+  <p>R1 仍未验证的假设包括生产叠层与受控阻抗、USB 眼图/EMI/ESD、Buck 启动和纹波、热性能、开关电源限流、
+    晶振起振以及固件安全状态。把这些写出来，比给出一个没有边界的“PASS”更可靠。</p>
+</section>
+
+<section aria-labelledby="ch26-10-release-gates">
+  <h2 id="ch26-10-release-gates">26.10 正式发布质量门与变更失效</h2>
+  <p>质量门（quality gate）是“证据完整才允许进入下一阶段”的规则。R1 的签核明确规定：任何 PCB、原理图、封装、
+    BOM、CPL 或制造输出变化，都会使整份签核失效，必须从源身份开始重跑。</p>
+  <table>
+    <caption>建议的分阶段发布门</caption>
+    <thead>
+      <tr><th scope="col">质量门</th><th scope="col">必备证据</th><th scope="col">失败动作</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>G1 源身份</td><td>项目/PCB UUID、修订号、保存并重开记录</td><td>停止；确认审核的不是旧文档。</td></tr>
+      <tr><td>G2 电气一致性</td><td>ERC、网络表差异、48/48 器件与 172/172 引脚映射</td><td>修正原理图/同步，再从 G1 开始。</td></tr>
+      <tr><td>G3 PCB 规则与连通</td><td>刷新后的 DRC、47/47 独立几何连通</td><td>修线或规则，不得以豁免掩盖断网。</td></tr>
+      <tr><td>G4 机械</td><td>1128 对双包络审核、板边、连接器方向</td><td>调整布局；旧布线和后续门全部失效。</td></tr>
+      <tr><td>G5 制造与装配</td><td>Gerber/钻孔、BOM/CPL/DNP、装配图交叉核对</td><td>重新导出并完整复验。</td></tr>
+      <tr><td>G6 完整性</td><td>manifest、哈希、ZIP 完整性、交付文件逐项一致</td><td>禁止发送；重建发布包。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="error-case" aria-labelledby="ch26-failure-cases">
+  <h2 id="ch26-failure-cases">失败案例：怎样识别“假通过”</h2>
+  <ul>
+    <li><strong>只截图 DRC 总数：</strong>没有规则配置、时间和文档身份，无法复现。</li>
+    <li><strong>移动器件后不重开：</strong>旧连接缓存或旧铜可能让结果与当前几何不一致。</li>
+    <li><strong>只检查焊盘：</strong>R1 曾出现 R1 进入 USB-C 外壳区域、C8/C9 实体碰撞；电气 DRC 无法证明实体可装。</li>
+    <li><strong>把铺铜边界当成铜：</strong>边界存在但 Gerber 没有实体铜，回流路径仍可能中断。</li>
+    <li><strong>把两个 ERC 提示隐藏：</strong>未解释的提示不会因为发布者不记录就消失。</li>
+  </ul>
+</section>
+
+<section class="experiment" aria-labelledby="ch26-exercise">
+  <h2 id="ch26-exercise">审计练习：为一块 48 位号 PCB 建立签核表</h2>
+  <ol>
+    <li>计算不重复器件对数量，并写出公式。</li>
+    <li>为 DRC、实体碰撞、连接器方向、板边、BOM/CPL 和 Gerber 各指定一种独立证据。</li>
+    <li>解释为什么 <code>48 个 PCB 位号、46 个 BOM 位号、48 个 CPL 位号</code> 可以同时正确。</li>
+    <li>选择一个设计变更（例如移动 J1 或修改 U3 封装），列出它会使哪些质量门失效。</li>
+  </ol>
+  <p><strong>通过判据：</strong>答案必须给出证据来源和失效条件，不能只写“重新跑 DRC”。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="ch26-quality-gate">
+  <h2 id="ch26-quality-gate">本章质量门</h2>
+  <p>只有在刷新后的 DRC、47/47 网络连通、1128 对双包络审核、连接器方向、跨文件数量闭环和例外登记全部可复现时，
+    才能进入 BOM/CPL 与制造输出审核。任一项无法解释即为阻断项。</p>
+</section>
+
+<section aria-labelledby="ch26-summary">
+  <h2 id="ch26-summary">本章小结</h2>
+  <p>DRC 是必要的自动证据，不是全板正确性的证明。可靠签核把电气规则、连接刷新、独立连通、实体/庭院碰撞、
+    连接器与板边、数量闭环、回流路径和例外登记组合成分阶段质量门，并规定任何相关变更都会使旧结论失效。</p>
+</section>
+
+<section aria-labelledby="ch26-sources">
+  <h2 id="ch26-sources">事实来源</h2>
+  <p>本章数值来自 <code>usb_gpio/fabrication_checklist.md</code>、
+    <code>usb_gpio/fabrication/R1/usb_gpio_R1_manifest.txt</code> 和结构化项目事实。
+    最终 EasyEDA 项目与制造资料优先于早期提案；所有硬件表现仍标为待实物验证。</p>
+</section>

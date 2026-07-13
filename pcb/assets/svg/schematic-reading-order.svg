@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">原理图阅读的五步顺序</title>
+  <desc id="desc">先识别连接器和电源，再划分功能块、追踪块间接口、理解元件作用，最后核对引脚和默认状态。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#0b5cab"/>
+    </marker>
+    <style>
+      text{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans CJK SC",sans-serif;fill:#17202a}
+      .box{fill:#fff;stroke:#0b5cab;stroke-width:2}
+      .num{fill:#0b5cab}
+      .step{font-size:16px;font-weight:700;text-anchor:middle}
+      .sub{font-size:13px;fill:#586474;text-anchor:middle}
+      .flow{stroke:#0b5cab;stroke-width:3;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="300" rx="18" fill="#f7fafc"/>
+  <text x="480" y="38" font-size="23" font-weight="700" text-anchor="middle">先看系统边界，再进入引脚细节</text>
+  <g transform="translate(25 82)">
+    <g>
+      <rect class="box" width="160" height="140" rx="12"/>
+      <circle class="num" cx="24" cy="24" r="16"/><text x="24" y="30" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+      <text class="step" x="80" y="64">连接器与电源</text><text class="sub" x="80" y="92">能量、信号从哪里</text><text class="sub" x="80" y="113">进入和离开？</text>
+    </g>
+    <g transform="translate(188)">
+      <rect class="box" width="160" height="140" rx="12"/>
+      <circle class="num" cx="24" cy="24" r="16"/><text x="24" y="30" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+      <text class="step" x="80" y="64">功能块</text><text class="sub" x="80" y="92">电源、保护、控制</text><text class="sub" x="80" y="113">与接口如何分区？</text>
+    </g>
+    <g transform="translate(376)">
+      <rect class="box" width="160" height="140" rx="12"/>
+      <circle class="num" cx="24" cy="24" r="16"/><text x="24" y="30" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+      <text class="step" x="80" y="64">块间接口</text><text class="sub" x="80" y="92">追踪命名网络、方向</text><text class="sub" x="80" y="113">与电压域边界</text>
+    </g>
+    <g transform="translate(564)">
+      <rect class="box" width="160" height="140" rx="12"/>
+      <circle class="num" cx="24" cy="24" r="16"/><text x="24" y="30" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+      <text class="step" x="80" y="64">元件作用</text><text class="sub" x="80" y="92">每个器件为何存在？</text><text class="sub" x="80" y="113">失效会影响什么？</text>
+    </g>
+    <g transform="translate(752)">
+      <rect width="160" height="140" rx="12" fill="#eaf5ee" stroke="#247a45" stroke-width="2"/>
+      <circle cx="24" cy="24" r="16" fill="#247a45"/><text x="24" y="30" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+      <text class="step" x="80" y="64">引脚与默认状态</text><text class="sub" x="80" y="92">逐脚核对编号、上拉</text><text class="sub" x="80" y="113">下拉与有意未连接</text>
+    </g>
+    <line class="flow" x1="160" y1="70" x2="184" y2="70"/>
+    <line class="flow" x1="348" y1="70" x2="372" y2="70"/>
+    <line class="flow" x1="536" y1="70" x2="560" y2="70"/>
+    <line class="flow" x1="724" y1="70" x2="748" y2="70"/>
+  </g>
+  <text x="480" y="265" font-size="15" fill="#586474" text-anchor="middle">每一步都记录疑问；不要在未知系统边界时逐线猜测</text>
+</svg>

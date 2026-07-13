@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="33. 接口实验（Interface Experiments） — USB GPIO PCB 离线教程">
+  <title>33. 接口实验（Interface Experiments） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-33">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html" aria-current="page">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</li><li aria-current="page">33. 接口实验（Interface Experiments）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</p>
+          <h1>33. 接口实验（Interface Experiments）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch33-lab-rules">实验顺序、接口地图与共同安全规则</a></li><li class="toc-level-2"><a href="#sec-33-1">33.1 实验：USB 枚举与串行通信</a></li><li class="toc-level-2"><a href="#sec-33-2">33.2 实验：数字输出与 LED 控制</a></li><li class="toc-level-2"><a href="#sec-33-3">33.3 实验：数字输入与按键消抖</a></li><li class="toc-level-2"><a href="#sec-33-4">33.4 实验：PWM 频率与占空比测量</a></li><li class="toc-level-2"><a href="#sec-33-5">33.5 实验：UART 回环与帧错误</a></li><li class="toc-level-2"><a href="#sec-33-6">33.6 实验：受控 5 V 与 3.3 V 电源轨</a></li><li class="toc-level-2"><a href="#sec-33-7">33.7 实验：负载阶跃响应与压降</a></li><li class="toc-level-2"><a href="#sec-33-8">33.8 实验：过流保护与恢复</a></li><li class="toc-level-2"><a href="#sec-33-9">33.9 实验：USB 挂起与安全状态</a></li><li class="toc-level-2"><a href="#sec-33-10">33.10 实验：不损坏电路的有意故障诊断</a></li><li class="toc-level-2"><a href="#ch33-summary">本章小结</a></li></ul></nav>
+        <section aria-labelledby="ch33-lab-rules">
+  <h2 id="ch33-lab-rules">实验顺序、接口地图与共同安全规则</h2>
+  <p>只有通过第 31、32 章质量门的板才能进行本章实验。R1 的 USB、GPIO、PWM、UART、受控电源、限流与挂起行为目前均<strong>没有实物测量</strong>；下文的电平、限流值和现象分别标为设计值、计算值或预期值，所有“实际”栏保持空白。</p>
+  <table>
+    <caption>表 33-1　J2 目标接口（默认 DNP，需排针或测试治具）</caption>
+    <thead><tr><th scope="col">引脚</th><th scope="col">网络</th><th scope="col">引脚</th><th scope="col">网络</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>GND</td><td>2</td><td>GND</td></tr>
+      <tr><td>3</td><td><code>5V_SW</code></td><td>4</td><td><code>3V3_SW</code></td></tr>
+      <tr><td>5</td><td><code>GPIO0_PWM0</code></td><td>6</td><td><code>GPIO1_PWM1</code></td></tr>
+      <tr><td>7</td><td><code>GPIO2_PWM2</code></td><td>8</td><td><code>GPIO3_PWM3</code></td></tr>
+      <tr><td>9</td><td><code>GPIO4</code></td><td>10</td><td><code>GPIO5</code></td></tr>
+      <tr><td>11</td><td><code>GPIO6</code></td><td>12</td><td><code>GPIO7</code></td></tr>
+      <tr><td>13</td><td><code>UART_TX</code></td><td>14</td><td><code>UART_RX</code></td></tr>
+      <tr><td>15</td><td><code>NRST</code></td><td>16</td><td>未连接</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>所有 GPIO、PWM 和 UART 都是 <strong>3.3 V CMOS/TTL</strong>；不得连接 RS-232 电平、5 V 推挽输出或负电压。</li>
+    <li>R14～R23 的 220 Ω 串联电阻只能限制部分瞬态电流、改善边沿，不能替代 ESD 阵列、隔离器或过压保护。</li>
+    <li>先接共同 GND，再接信号，最后使能电源；拆线顺序相反。每次只测试一个功能块。</li>
+    <li>示波器台式地夹通常与保护地相连，只能接板上 GND；绝不能夹到 <code>BUCK_SW</code>、VBUS 或任一信号。</li>
+    <li>实验前给板、线缆、仪器和固件分配编号；任何异常都保存日志，不同时换线、刷固件和改接线。</li>
+  </ul>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-1">
+  <h2 id="sec-33-1">33.1 实验：USB 枚举与串行通信</h2>
+  <h4 id="exp-33-1-purpose">目的</h4>
+  <p>验证 R1 能在已知主机和数据线条件下稳定枚举为固件声明的 USB CDC ACM 设备，并能无误地完成一段可重复的命令/响应传输。</p>
+  <h4 id="exp-33-1-theory">原理</h4>
+  <p>USB 枚举依赖 VBUS、D+/D−、12 MHz 时钟、USB 外设和描述符固件。CDC 把 USB 传输呈现为虚拟串口，但“端口名出现”不等于数据正确。CAD 几何偏斜很小是计算事实，却不能证明阻抗、眼图或实物传输。</p>
+  <h4 id="exp-33-1-equipment">器材与量程</h4>
+  <ul>
+    <li>通过第 32 章的 R1、批准固件及哈希。</li>
+    <li>已验证的数据型 USB-C 线两条、直接主机端口和一个已知良好集线器（用于对比）。</li>
+    <li>主机系统日志查看工具、串口终端或测试脚本；时间分辨率至少 0.1 s。</li>
+    <li>可选 USB 电流表，0～1 A 量程、毫安级分辨率；它不能替代首次上电限流。</li>
+  </ul>
+  <h4 id="exp-33-1-safety">安全与停止条件</h4>
+  <p>连接主机前移除实验电源 VBUS 和调试器供电输出。若主机报告过流、连接器或 U2/U3 发热、反复快速连接/断开或有气味，立即拔线并回到限流电源诊断。</p>
+  <h4 id="exp-33-1-wiring">接线指导</h4>
+  <pre aria-label="USB CDC 实验接线"><code>主机 USB 端口 ── 已编号数据线 ── J1
+J2：不接负载
+J3：调试器可断开；若保留，只允许信号/参考，不供电</code></pre>
+  <h4 id="exp-33-1-precheck">上电前检查</h4>
+  <ol>
+    <li>核对板号、固件哈希和安全输出状态记录。</li>
+    <li>检查 J1 机械牢固、无异物；确认线缆曾在另一设备上验证数据功能。</li>
+    <li>关闭可能自动切换 DTR/RTS 或发送控制命令的后台程序。</li>
+  </ol>
+  <h4 id="exp-33-1-procedure">编号步骤</h4>
+  <ol>
+    <li>连接 J1，同时开始主机日志计时；记录设备首次出现时间和所有描述符字段。</li>
+    <li>打开 CDC 端口，读取只读身份/状态命令，确认板版本、固件版本与安全状态。</li>
+    <li>选择固定测试字节序列（含 <code>00</code>、<code>55</code>、<code>AA</code>、<code>FF</code> 和可打印字符），记录长度与校验值。</li>
+    <li>按固件协议发送并读回 100 轮；保存原始日志，不只保存“成功”摘要。</li>
+    <li>关闭端口、拔线 10 s，再连接；同一线缆重复三次。</li>
+    <li>换第二条线和第二个端口重复；最后用集线器测试，保持其他条件不变。</li>
+  </ol>
+  <h4 id="exp-33-1-expected">预期结果（非实测）</h4>
+  <p>预期每次出现同一 CDC 身份，版本响应一致，测试帧长度与校验完全匹配。枚举时间、主机电流和任何错误数尚无 R1 实测值，必须记录；不同操作系统端口名可以不同。</p>
+  <h4 id="exp-33-1-record">记录表</h4>
+  <table>
+    <caption>表 33-2　USB CDC 枚举与传输</caption>
+    <thead><tr><th scope="col">线缆/端口/拓扑</th><th scope="col">枚举时间</th><th scope="col">VID:PID/序列</th><th scope="col">发送字节/轮</th><th scope="col">错字节/超时</th><th scope="col">重连 3/3</th><th scope="col">日志编号</th></tr></thead>
+    <tbody>
+      <tr><td>____</td><td>____ s</td><td>____</td><td>____ / ____</td><td>____ / ____</td><td>____</td><td>____</td></tr>
+      <tr><td>____</td><td>____ s</td><td>____</td><td>____ / ____</td><td>____ / ____</td><td>____</td><td>____</td></tr>
+      <tr><td>____</td><td>____ s</td><td>____</td><td>____ / ____</td><td>____ / ____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-1-criteria">通过/失败判据</h4>
+  <p>预先选定的主机/线缆矩阵中均能在实验规定时间内枚举，描述符与固件发布一致，100 轮数据零错字节、零协议超时，三次冷重连均成功，且无过流或反复重置。任一条件不满足即失败；“换一条线后偶尔能用”应记录为兼容性问题。</p>
+  <h4 id="exp-33-1-analysis">分析</h4>
+  <p>按线缆、端口和拓扑分组比较枚举时间与错误。若只有集线器失败，不能直接归因于 PCB；若所有拓扑都在相同阶段失败，优先寻找板端共因。零错误只代表本次字节数，不等于真实误码率为零。</p>
+  <h4 id="exp-33-1-troubleshooting">故障排查</h4>
+  <p>无任何设备：查 VBUS、3V3_SYS、NRST 和时钟。出现“未知设备”：保存描述符错误，查固件和 D+/D−。反复重连：同步记录电流和复位。只接某方向有效：查 J1 两组 D+/D−/CC 焊接。枚举正常但数据错：查协议、缓冲区、端点和主机软件，不先改 R3/R4。</p>
+  <h4 id="exp-33-1-questions">思考题</h4>
+  <p>为什么“换线后成功”只能缩小候选范围，而不能单独证明原线缆就是唯一根因？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-2">
+  <h2 id="sec-33-2">33.2 实验：数字输出与 LED 控制</h2>
+  <h4 id="exp-33-2-purpose">目的</h4>
+  <p>验证一个外部 GPIO 能按命令输出低/高电平，并驱动带独立限流电阻的低电流 LED；同时区分外部 GPIO 与板载状态 LED D1。</p>
+  <h4 id="exp-33-2-theory">原理</h4>
+  <p>GPIO4 从 U1 PA0 经 R18 = 220 Ω 到 J2 pin 9。外接 1 kΩ 电阻和 LED 后，输出电流由 GPIO 电压、LED 正向压降和总串联电阻决定。D1 则由 PB5 经 R13 = 1 kΩ 独立控制，高电平预期点亮。</p>
+  <h4 id="exp-33-2-equipment">器材与量程</h4>
+  <ul>
+    <li>DMM 0～5 V 直流档；逻辑分析仪输入兼容 3.3 V。</li>
+    <li>可见光 LED 一只、1 kΩ 电阻一只、面包板和短线。</li>
+    <li>USB CDC 控制终端；可选 10× 示波器探头。</li>
+  </ul>
+  <h4 id="exp-33-2-safety">安全与停止条件</h4>
+  <p>不把外部电源接到 GPIO。发现节点高于 3.6 V、低于 −0.3 V、板复位、LED/电阻发热或电源电流显著偏离基线时立即关闭输出并断开。</p>
+  <h4 id="exp-33-2-wiring">接线指导</h4>
+  <pre aria-label="GPIO 外接 LED 接线"><code>J2 pin 9 GPIO4 ── 1 kΩ ── LED 阳极
+LED 阴极 ───────────────── J2 pin 1 GND
+DMM/逻辑分析仪 ── GPIO4 对 GND</code></pre>
+  <h4 id="exp-33-2-precheck">上电前检查</h4>
+  <ol>
+    <li>用二极管档确认 LED 极性，断开时测得 1 kΩ 电阻。</li>
+    <li>核对 J2 pin 1 与 pin 9，确认 pin 16 未误作 GND。</li>
+    <li>确认固件启动时 GPIO4 为高阻，命令只作用于预定通道。</li>
+  </ol>
+  <h4 id="exp-33-2-procedure">编号步骤</h4>
+  <ol>
+    <li>先不接 LED，上电后测 GPIO4 启动状态。</li>
+    <li>发送“输出低”命令，记录无负载电压；再发送“输出高”，记录电压。</li>
+    <li>断电，按图接 LED；重上电并重复低/高各 10 次。</li>
+    <li>设置 1 Hz 翻转，观察逻辑波形、外接 LED 和 USB 是否稳定。</li>
+    <li>单独执行板载 D1 的灭/亮/闪命令，确认它不改变 GPIO4。</li>
+    <li>复位，检查两路都回到固件规定的安全默认状态。</li>
+  </ol>
+  <h4 id="exp-33-2-expected">预期结果（非实测）</h4>
+  <p>低命令时节点应接近 GND，高命令时应接近 3.3 V；准确 VOH/VOL 应按当前 CH32V203 数据手册和实际负载判定。外接 LED 与命令同步，D1 独立响应。R1 尚无输出电平或 LED 电流实测。</p>
+  <h4 id="exp-33-2-record">记录表</h4>
+  <table>
+    <caption>表 33-3　数字输出记录</caption>
+    <thead><tr><th scope="col">通道/负载</th><th scope="col">命令</th><th scope="col">节点电压</th><th scope="col">LED 状态</th><th scope="col">10 次错误</th><th scope="col">复位默认</th></tr></thead>
+    <tbody>
+      <tr><td>GPIO4/无负载</td><td>低</td><td>____ V</td><td>—</td><td>____</td><td rowspan="3">____</td></tr>
+      <tr><td>GPIO4/无负载</td><td>高</td><td>____ V</td><td>—</td><td>____</td></tr>
+      <tr><td>GPIO4/1 kΩ+LED</td><td>翻转</td><td>低 ____ / 高 ____ V</td><td>____</td><td>____</td></tr>
+      <tr><td>D1</td><td>灭/亮/闪</td><td>LED_A ____ V</td><td>____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-2-criteria">通过/失败判据</h4>
+  <p>电平满足数据手册在实际负载下的保证值，命令与 LED/逻辑状态一一对应，10 次无错误，复位后无危险强驱动，且 USB 不重置。任何过压、错通道、状态粘连或复位异常为失败。</p>
+  <h4 id="exp-33-2-analysis">分析</h4>
+  <p>比较有/无 LED 时的高电平压降，可估算负载影响；用测得的 LED 两端电压和总电阻估算电流，但要注明 DMM 误差。若只看 LED 亮度，无法区分 GPIO 电平、LED 效率和环境光。</p>
+  <h4 id="exp-33-2-troubleshooting">故障排查</h4>
+  <p>节点正确但 LED 不亮：查极性和面包板。MCU 侧正确而 J2 侧不对：查 R18 开路。所有输出错位：查引脚映射/固件索引。D1 不亮而 GPIO 正常：查 D1 方向、R13 和 PB5 配置。</p>
+  <h4 id="exp-33-2-questions">思考题</h4>
+  <p>为什么 220 Ω 板载串联电阻不能替代外接 LED 的限流电阻，也不能被视为 5 V 容限保护？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-3">
+  <h2 id="sec-33-3">33.3 实验：数字输入与按键消抖</h2>
+  <h4 id="exp-33-3-purpose">目的</h4>
+  <p>观察机械按键的原始抖动，并验证固件在一次按压/释放中只产生一次有效事件。</p>
+  <h4 id="exp-33-3-theory">原理</h4>
+  <p>触点闭合不会瞬间从 0 跳到 1，而会在数十微秒到数毫秒内多次弹跳。GPIO5 从 J2 pin 10 经 R19 到 PA1。使用内部上拉时，开关断开读高、按下接地读低；消抖应要求输入在预定时间窗内保持稳定，而不是简单延时后盲读。</p>
+  <h4 id="exp-33-3-equipment">器材与量程</h4>
+  <ul>
+    <li>常开瞬时按键、短线；可选 10 kΩ 外部上拉，仅在内部上拉不可用时使用。</li>
+    <li>逻辑分析仪，输入兼容 3.3 V，采样率至少 1 MS/s；USB CDC 日志带时间戳。</li>
+  </ul>
+  <h4 id="exp-33-3-safety">安全与停止条件</h4>
+  <p>开关只把输入接 GND，不接 5 V。若误把 J2 pin 3 的 5V_SW 接到输入、出现板复位或输入电压超出 0～3.3 V，立即断电。</p>
+  <h4 id="exp-33-3-wiring">接线指导</h4>
+  <pre aria-label="GPIO 按键接线"><code>J2 pin 10 GPIO5 ── 常开按键 ── J2 pin 1 GND
+逻辑分析仪 CH0 ── GPIO5
+逻辑分析仪 GND ── J2 pin 2 GND
+固件：GPIO5 输入 + 内部上拉</code></pre>
+  <h4 id="exp-33-3-precheck">上电前检查</h4>
+  <ol>
+    <li>用通断档确认按键未按时开路、按下时闭合。</li>
+    <li>确认分析仪阈值适合 3.3 V，地线先接。</li>
+    <li>在固件配置中记录消抖时间和判定算法；若未知，本实验只能表征，不能判定通过。</li>
+  </ol>
+  <h4 id="exp-33-3-procedure">编号步骤</h4>
+  <ol>
+    <li>上电但不按键，记录 10 s 空闲电平和是否有伪事件。</li>
+    <li>捕获一次缓慢按下和释放的原始波形，标记第一边沿、最后边沿和总抖动时间。</li>
+    <li>以正常速度按下/释放 20 次，同时记录原始边沿数和固件事件数。</li>
+    <li>快速连按 20 次，重复记录；不要超过固件声明的最短有效间隔。</li>
+    <li>轻触而不完全按下，观察算法是否把短毛刺误判为事件。</li>
+    <li>复位后保持按键按下，验证启动状态与释放后的恢复。</li>
+  </ol>
+  <h4 id="exp-33-3-expected">预期结果（非实测）</h4>
+  <p>原始波形可能包含多次边沿；抖动持续时间取决于具体按键，不能预填。固件应在每次符合最短稳定时间的按压和释放中各报告一次事件，空闲时不产生伪事件。</p>
+  <h4 id="exp-33-3-record">记录表</h4>
+  <table>
+    <caption>表 33-4　输入与消抖数据</caption>
+    <thead><tr><th scope="col">条件</th><th scope="col">次数</th><th scope="col">最大原始抖动</th><th scope="col">原始边沿</th><th scope="col">固件事件</th><th scope="col">漏报/重复</th></tr></thead>
+    <tbody>
+      <tr><td>空闲</td><td>10 s</td><td>—</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>正常按压</td><td>20</td><td>____ ms</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>快速按压</td><td>20</td><td>____ ms</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>短毛刺</td><td>____</td><td>____ ms</td><td>____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-3-criteria">通过/失败判据</h4>
+  <p>在预先声明的有效按压定义内，20 次按压与 20 次释放均一一报告；空闲无伪事件；短于拒绝窗的毛刺不被接受；启动时按住按键不会导致危险输出。缺少已声明消抖参数时不得签署“通过”。</p>
+  <h4 id="exp-33-3-analysis">分析</h4>
+  <p>比较最大实测抖动与固件稳定窗，说明裕量；过短会重复触发，过长会增加延迟并吞掉快速输入。机械按键结果不能直接推广到编码器或外部高速数字信号。</p>
+  <h4 id="exp-33-3-troubleshooting">故障排查</h4>
+  <p>一直低：查按键短路、pin 号和上拉配置。一直高：查开关地线、R19 开路。日志重复但波形稳定：查中断重复注册/状态机。波形噪声大：缩短线、确认共同地，必要时评估外部 RC，但不要先改板。</p>
+  <h4 id="exp-33-3-questions">思考题</h4>
+  <p>消抖时间过长除了让按键“变慢”，还可能怎样影响快速双击或故障急停输入？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-4">
+  <h2 id="sec-33-4">33.4 实验：PWM 频率与占空比测量</h2>
+  <h4 id="exp-33-4-purpose">目的</h4>
+  <p>验证 TIM3 的四个 PWM 通道具有共同频率、各自可设占空比，并量化频率误差、占空比误差和边沿稳定性。</p>
+  <h4 id="exp-33-4-theory">原理</h4>
+  <p>PA6、PA7、PB0、PB1 对应 TIM3 CH1～CH4，经 R14～R17 到 J2 pins 5～8。理想平均值近似 <var>V</var><sub>AVG</sub> ≈ <var>D</var> × <var>V</var><sub>HIGH</sub>，但 PWM 不是任意负载上的直流。频率由时钟和计数器分频决定，占空比受计数分辨率量化；Y1 频率准确度尚未实测。</p>
+  <h4 id="exp-33-4-equipment">器材与量程</h4>
+  <ul>
+    <li>≥20 MHz 示波器或逻辑分析仪；采样率至少为被测 PWM 的 10 倍，优先 50 倍以上。</li>
+    <li>10× 探头、短地弹簧；输入范围设为 0～5 V，阈值适合 3.3 V。</li>
+    <li>USB CDC 控制终端；四通道同时测量时使用相同探头类型。</li>
+  </ul>
+  <h4 id="exp-33-4-safety">安全与停止条件</h4>
+  <p>本实验先保持所有 PWM 无负载。示波器地只接 GND；若探头导致 USB 断开、波形超出 0～3.6 V 或通道意外驱动受控电源，立即停止。</p>
+  <h4 id="exp-33-4-wiring">接线指导</h4>
+  <pre aria-label="四通道 PWM 接线"><code>CH1 → J2 pin 5 PWM0     CH2 → J2 pin 6 PWM1
+CH3 → J2 pin 7 PWM2     CH4 → J2 pin 8 PWM3
+所有探头地 → J2 pin 1/2 GND（短回路）</code></pre>
+  <h4 id="exp-33-4-precheck">上电前检查</h4>
+  <ol>
+    <li>补偿探头并核对最大输入；确认四通道不与其他输出相连。</li>
+    <li>记录固件定时器时钟、预分频、周期计数和占空比计数的计算方法。</li>
+    <li>定义本实验接受限，例如频率 ±1%、占空比 ±1 个百分点；这是教学门限，不是已证明的 R1 规格。</li>
+  </ol>
+  <h4 id="exp-33-4-procedure">编号步骤</h4>
+  <ol>
+    <li>复位后捕获四路 100 ms，确认 PWM 默认停止。</li>
+    <li>命令四路共同为 1 kHz，分别设 10%、30%、50%、90%；记录实际频率、高时间和占空比。</li>
+    <li>把 PWM0 依次设为 0%、1%、50%、99%、100%，检查端点行为和是否出现窄毛刺。</li>
+    <li>改变共同频率到固件支持范围内的低、中、高三个点，每次记录计数器配置与实际值。</li>
+    <li>连续捕获至少 1000 个周期，记录周期最小、最大和峰峰抖动。</li>
+    <li>停止 PWM 并复位，确认所有通道回到安全状态。</li>
+  </ol>
+  <h4 id="exp-33-4-expected">预期结果（非实测）</h4>
+  <p>四路预期共享同一频率，独立占空比与命令一致到定时器量化精度；0%/100% 应为稳定电平而非周期窄脉冲。真实频率误差和抖动仍待测，不能仅凭 12 MHz 标称晶体推断。</p>
+  <h4 id="exp-33-4-record">记录表</h4>
+  <table>
+    <caption>表 33-5　PWM 测量</caption>
+    <thead><tr><th scope="col">通道</th><th scope="col">命令 f / D</th><th scope="col">计数设置</th><th scope="col">实测 f</th><th scope="col">实测 D</th><th scope="col">周期 min/max</th><th scope="col">毛刺</th></tr></thead>
+    <tbody>
+      <tr><td>PWM0</td><td>____ / ____</td><td>____</td><td>____ Hz</td><td>____ %</td><td>____ / ____</td><td>____</td></tr>
+      <tr><td>PWM1</td><td>____ / ____</td><td>____</td><td>____ Hz</td><td>____ %</td><td>____ / ____</td><td>____</td></tr>
+      <tr><td>PWM2</td><td>____ / ____</td><td>____</td><td>____ Hz</td><td>____ %</td><td>____ / ____</td><td>____</td></tr>
+      <tr><td>PWM3</td><td>____ / ____</td><td>____</td><td>____ Hz</td><td>____ %</td><td>____ / ____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-4-criteria">通过/失败判据</h4>
+  <p>所有通道符合实验前声明的频率/占空比误差，0%/100% 无危险毛刺，1000 周期内无丢脉冲，停止与复位后不再输出。若未先写明容差，只能报告“已表征”，不能报告“通过”。</p>
+  <h4 id="exp-33-4-analysis">分析</h4>
+  <p>计算相对频率误差 (<var>f</var><sub>meas</sub>−<var>f</var><sub>cmd</sub>)/<var>f</var><sub>cmd</sub>，把固定偏差与周期抖动分开。固定偏差可能来自时钟/分频，随机抖动可能来自中断、测量阈值或供电噪声。</p>
+  <h4 id="exp-33-4-troubleshooting">故障排查</h4>
+  <p>四路频率不同：查固件定时器配置。只有一路缺失：查对应 R14～R17、引脚复用和焊接。频率约差整数倍：查时钟树/预分频。占空比在端点有毛刺：查更新顺序与影子寄存器。</p>
+  <h4 id="exp-33-4-questions">思考题</h4>
+  <p>为什么四路共享同一 TIM3 频率，却仍能具有不同占空比？改变计数周期会怎样影响分辨率？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-5">
+  <h2 id="sec-33-5">33.5 实验：UART 回环与帧错误</h2>
+  <h4 id="exp-33-5-purpose">目的</h4>
+  <p>验证 3.3 V UART 的发送、接收和多种波特率回环，并通过受控的波特率/帧格式不匹配确认错误检测路径。</p>
+  <h4 id="exp-33-5-theory">原理</h4>
+  <p>USART2_TX 从 PA2 经 R22 到 J2 pin 13，USART2_RX 从 J2 pin 14 经 R23 到 PA3。理想位时间 <var>t</var><sub>BIT</sub> = 1/baud；异步通信要求双方波特率、数据位、校验和停止位兼容。UART 是 3.3 V 逻辑，不是 ±电压 RS-232。</p>
+  <h4 id="exp-33-5-equipment">器材与量程</h4>
+  <ul>
+    <li>短跳线；逻辑分析仪采样率至少为最高波特率的 16 倍。</li>
+    <li>支持 3.3 V I/O 的 USB-UART 适配器，可独立设置波特率/帧格式；其 5 V 供电脚不连接。</li>
+    <li>USB CDC 控制终端和可生成带校验测试序列的软件。</li>
+  </ul>
+  <h4 id="exp-33-5-safety">安全与停止条件</h4>
+  <p>禁止连接真正的 RS-232 端口。两个 TX 不得相连对打；注入外部数据前断开板上 TX→RX 回环。若线路超出 0～3.6 V、适配器反向供电或器件发热，立即断开。</p>
+  <h4 id="exp-33-5-wiring">接线指导</h4>
+  <pre aria-label="UART 回环与错误注入接线"><code>阶段 A（板内回环）：
+J2 pin 13 UART_TX ───────── J2 pin 14 UART_RX
+逻辑分析仪 CH0/CH1 ─────── TX/RX，GND 共地
+
+阶段 B（帧错误）：
+断开 TX-RX 跳线
+3.3 V USB-UART TX ───────── J2 pin 14 UART_RX
+USB-UART GND ────────────── J2 GND
+板 UART_TX 可接适配器 RX；绝不连接适配器 5 V</code></pre>
+  <h4 id="exp-33-5-precheck">上电前检查</h4>
+  <ol>
+    <li>确认适配器 TX 空闲高电平约 3.3 V，且 5 V/3.3 V 供电脚均悬空。</li>
+    <li>记录固件支持的波特率和帧格式；选择低、中、高三个点，例如 9600、115200 及一个经固件声明的高点。</li>
+    <li>确认错误计数器/状态命令会区分数据不匹配、溢出与帧错误。</li>
+  </ol>
+  <h4 id="exp-33-5-procedure">编号步骤</h4>
+  <ol>
+    <li>按阶段 A 接回环，选择 8-N-1 和最低波特率，发送固定长度伪随机数据并比较回读。</li>
+    <li>在三个波特率各重复 10 轮，记录字节数、错字节、超时和波形位时间。</li>
+    <li>断电并改为阶段 B。先用完全匹配的设置发送，建立外部适配器基线。</li>
+    <li>把适配器波特率改为板端的约 90% 或 110%，发送同一短帧，记录帧错误/丢弃；不长时间连续轰击。</li>
+    <li>恢复正确波特率，再改变停止位或校验设置，记录错误处理。</li>
+    <li>恢复完全匹配设置，确认通信无需重新上电即可恢复；最后复位检查安全状态。</li>
+  </ol>
+  <h4 id="exp-33-5-expected">预期结果（非实测）</h4>
+  <p>匹配设置下预期数据逐字节一致；位时间接近 1/baud。故意不匹配时预期出现帧错误、丢字节或数据不匹配，而不是板损坏；具体错误计数取决于 UART 外设和固件，不能预填。</p>
+  <h4 id="exp-33-5-record">记录表</h4>
+  <table>
+    <caption>表 33-6　UART 回环与错误注入</caption>
+    <thead><tr><th scope="col">连接/设置</th><th scope="col">波特率/格式</th><th scope="col">发送字节</th><th scope="col">错字节</th><th scope="col">帧/溢出错误</th><th scope="col">实测位时间</th><th scope="col">恢复</th></tr></thead>
+    <tbody>
+      <tr><td>板内回环</td><td>____</td><td>____</td><td>____</td><td>____ / ____</td><td>____ µs</td><td>____</td></tr>
+      <tr><td>外部匹配</td><td>____</td><td>____</td><td>____</td><td>____ / ____</td><td>____ µs</td><td>____</td></tr>
+      <tr><td>错误波特率</td><td>____</td><td>____</td><td>____</td><td>____ / ____</td><td>____ µs</td><td>____</td></tr>
+      <tr><td>错误帧格式</td><td>____</td><td>____</td><td>____</td><td>____ / ____</td><td>____ µs</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-5-criteria">通过/失败判据</h4>
+  <p>匹配设置下所选数据量零错字节、零非预期超时；不匹配设置能被检测或至少不会把错误数据静默当作有效命令；恢复正确设置后通信恢复。错误输入导致死锁、复位、危险输出或静默执行错误命令均判失败。</p>
+  <h4 id="exp-33-5-analysis">分析</h4>
+  <p>用波形位时间反算实际 baud，并比较发送端与接收端误差。把物理帧错误与应用层校验失败分开；回环零错误只覆盖短线和同一时钟条件，不代表长线、不同地电位或工业噪声环境。</p>
+  <h4 id="exp-33-5-troubleshooting">故障排查</h4>
+  <p>完全无回读：查 TX/RX 是否交叉、R22/R23 和引脚复用。乱码：查电平、共同地、波特率和时钟。高波特率才失败：查采样误差、线长和边沿。错误计数不变：查固件是否清除/暴露了 UART 状态。</p>
+  <h4 id="exp-33-5-questions">思考题</h4>
+  <p>板内回环为什么不能覆盖两台设备具有独立时钟时的波特率误差，也不能代表长线抗扰度？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-6">
+  <h2 id="sec-33-6">33.6 实验：受控 5 V 与 3.3 V 电源轨</h2>
+  <h4 id="exp-33-6-purpose">目的</h4>
+  <p>验证 U4/U5 的关闭、使能和复位安全状态，分别测量 <code>5V_SW</code> 与 <code>3V3_SW</code> 在无负载和小负载下的电压。</p>
+  <h4 id="exp-33-6-theory">原理</h4>
+  <p>U4 把 VBUS_IN 切换到 5V_SW，R7 = 16.9 kΩ 给出约 0.402 A 的计算典型限流；U5 把 3V3_SYS 切换到 3V3_SW，R8 = 27 kΩ 给出约 0.252 A。R9/R10 各 100 kΩ 下拉使能，预期 MCU 复位时两路关闭。实际关断漏电、放电时间、压降和限流容差均未测量。</p>
+  <h4 id="exp-33-6-equipment">器材与量程</h4>
+  <ul>
+    <li>限流 5.0 V 台式电源；DMM 0～6 V 直流档。</li>
+    <li>电子负载 0～0.5 A，或经过功率核算的电阻负载；本实验只用 10 mA 小负载。</li>
+    <li>可选示波器，观察使能与输出上升/下降；探头输入范围 0～6 V。</li>
+  </ul>
+  <h4 id="exp-33-6-safety">安全与停止条件</h4>
+  <p>两路分开测试，先无负载再 10 mA。输出超过源电压、板进入 CC、3V3_SYS 离开第 31 章窗口、U4/U5 温升快速超过 10 °C或复位时输出意外带动外部设备，立即断电。</p>
+  <h4 id="exp-33-6-wiring">接线指导</h4>
+  <pre aria-label="受控电源轨实验接线"><code>J2 pin 3  5V_SW  ── DMM / 电子负载正端（只测 5 V 时）
+J2 pin 4  3V3_SW ── DMM / 电子负载正端（只测 3.3 V 时）
+J2 pin 1/2 GND   ── DMM / 电子负载负端
+VBUS_IN 由限流实验电源供电；不接 USB 主机</code></pre>
+  <h4 id="exp-33-6-precheck">上电前检查</h4>
+  <ol>
+    <li>电子负载关闭且设为 0 A，极性正确；核对 J2 pin 3 与 pin 4。</li>
+    <li>无电测量两输出对地没有硬短路，并确认外部负载不会反向供电。</li>
+    <li>确认固件命令可独立使能/关闭两路，并有复位/超时安全关闭机制。</li>
+  </ol>
+  <h4 id="exp-33-6-procedure">编号步骤</h4>
+  <ol>
+    <li>上电后不发送使能命令，分别记录 5V_SW、3V3_SW 和 3V3_SYS。</li>
+    <li>只使能 5V_SW，记录无负载电压；接入 10 mA，记录输出、VBUS 和板电流。</li>
+    <li>关闭 5V_SW，记录从命令到输出下降的时间和残余电压；不要假定有主动放电。</li>
+    <li>断开 5 V 负载，只使能 3V3_SW，重复无负载、10 mA 和关闭测量。</li>
+    <li>分别在每一路开启时触发 NRST，记录复位期间是否立即回到关闭状态。</li>
+    <li>最后短时同时使能两路但保持无负载，确认命令映射不互换；随后全部关闭。</li>
+  </ol>
+  <h4 id="exp-33-6-expected">预期结果（非实测）</h4>
+  <p>使能时 5V_SW 预期接近 VBUS_IN、3V3_SW 预期接近 3V3_SYS；关闭和复位时应停止向外部负载供能。由于 R1 未记录专用输出放电器件，空载电容可能保留电压，下降时间必须实测而不是预填为 0。</p>
+  <h4 id="exp-33-6-record">记录表</h4>
+  <table>
+    <caption>表 33-7　受控电源功能</caption>
+    <thead><tr><th scope="col">电源轨/状态</th><th scope="col">负载</th><th scope="col">输入</th><th scope="col">输出</th><th scope="col">板电流</th><th scope="col">关闭至阈值时间</th><th scope="col">复位行为</th></tr></thead>
+    <tbody>
+      <tr><td>5V_SW 关闭</td><td>0</td><td>____ V</td><td>____ V</td><td>____ mA</td><td>____ ms</td><td>____</td></tr>
+      <tr><td>5V_SW 开启</td><td>10 mA</td><td>____ V</td><td>____ V</td><td>____ mA</td><td>—</td><td>____</td></tr>
+      <tr><td>3V3_SW 关闭</td><td>0</td><td>____ V</td><td>____ V</td><td>____ mA</td><td>____ ms</td><td>____</td></tr>
+      <tr><td>3V3_SW 开启</td><td>10 mA</td><td>____ V</td><td>____ V</td><td>____ mA</td><td>—</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-6-criteria">通过/失败判据</h4>
+  <p>使能后的电压在实验前为目标负载声明的窗口内，10 mA 下无异常压降或复位；关闭/复位后不继续向目标提供超过其安全要求的能量；两路命令不串扰。若目标系统尚未定义关闭电压和截止时间，本项只能表征，不能签署最终通过。</p>
+  <h4 id="exp-33-6-analysis">分析</h4>
+  <p>计算小负载压降 <var>V</var><sub>DROP</sub> = <var>V</var><sub>IN</sub> − <var>V</var><sub>OUT</sub> 和等效路径电阻 <var>R</var><sub>PATH</sub> ≈ <var>V</var><sub>DROP</sub>/<var>I</var>。10 mA 结果不能外推到 0.4 A/0.25 A；温升和开关导通电阻会随电流变化。</p>
+  <h4 id="exp-33-6-troubleshooting">故障排查</h4>
+  <p>始终为 0：查 EN 命令、PB3/PB4、R9/R10 短路、U4/U5 和输出接线。无法关闭：先排除电容残压和外部反灌，再查 EN 是否低及开关击穿。使能后 3V3_SYS 下跌：查 U5 负载、U3 能力和 C5/C14。</p>
+  <h4 id="exp-33-6-questions">思考题</h4>
+  <p>EN 已经为低而空载电压仍缓慢存在时，怎样用一个安全电阻负载区分电容残压与开关持续导通？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-7">
+  <h2 id="sec-33-7">33.7 实验：负载阶跃响应与压降</h2>
+  <h4 id="exp-33-7-purpose">目的</h4>
+  <p>量化 5V_SW、3V3_SW 在受控负载变化时的稳态压降、最小电压、过冲和恢复时间，并观察负载是否扰动 3V3_SYS、USB 或 MCU。</p>
+  <h4 id="exp-33-7-theory">原理</h4>
+  <p>稳态压降近似 <var>V</var><sub>DROP</sub> = <var>I</var> × <var>R</var><sub>PATH</sub>；阶跃瞬间先由 C4/C5 供电，再由 U4/U5、U3 和上游 VBUS 响应。5V_SW 的设计目标约 0.4 A，3V3_SW 约 0.25 A，但限流容差、瞬态和热性能均未验证。</p>
+  <h4 id="exp-33-7-equipment">器材与量程</h4>
+  <ul>
+    <li>动态电子负载：5 V 通道至少 0.5 A，3.3 V 通道至少 0.3 A；具外部触发或可记录阶跃。</li>
+    <li>≥50 MHz 示波器、10× 低电容探头和短地弹簧；带宽限制状态必须记录。</li>
+    <li>5 V 台式电源，电流能力与限流经负责人批准；DMM 用于稳态交叉核对。</li>
+  </ul>
+  <h4 id="exp-33-7-safety">安全与停止条件</h4>
+  <p>先测一路，另一输出关闭。初始负载不超过计算限流目标的 80%：5V_SW 0.32 A、3V3_SW 0.20 A；这只是保守实验上限，不是额定证明。出现 CC、USB 断开、3V3_SYS 超窗、持续振荡、温升门限或输出反向时立即停止。</p>
+  <h4 id="exp-33-7-wiring">接线指导</h4>
+  <pre aria-label="负载阶跃实验接线"><code>受测 J2 输出 ── 短粗线 ── 电子负载 +
+J2 GND        ── 短粗线 ── 电子负载 −
+示波器 CH1：在 J2 输出对邻近 GND 测量
+示波器 CH2：3V3_SYS 对邻近 GND（观察系统扰动）
+USB 仅作通信时：确认 VBUS 供电策略，不与台式电源争用</code></pre>
+  <h4 id="exp-33-7-precheck">上电前检查</h4>
+  <ol>
+    <li>填写每条轨的允许电压窗口、最大过冲/跌落和恢复时间；没有目标就标记“表征”。</li>
+    <li>校验负载电流读数和导线极性，负载启动为 0 A。</li>
+    <li>先完成 10 mA 稳态测试，记录环境温度和第 31 章基线。</li>
+  </ol>
+  <h4 id="exp-33-7-procedure">编号步骤</h4>
+  <ol>
+    <li>选择 5V_SW，使能并从 10% 目标电流开始，记录输入/输出稳态电压。</li>
+    <li>依次升到 50%、80%，每档稳定 30 s；记录压降、电流和温度。</li>
+    <li>设置 10%↔50% 阶跃，捕获至少 20 次；再做 10%↔80%，记录最小/最大电压和恢复时间。</li>
+    <li>关闭负载与 5V_SW，确认放电后改接 3V3_SW；重复上述步骤，上限为 0.20 A。</li>
+    <li>每个阶跃期间发送 USB 心跳并监视 NRST/3V3_SYS，记录任何复位或通信中断。</li>
+    <li>全部关闭并等待冷却到环境温度附近。</li>
+  </ol>
+  <h4 id="exp-33-7-expected">预期结果（非实测）</h4>
+  <p>预期电流增加时产生可测压降，阶跃时先有短暂跌落/过冲后恢复；具体幅度和时间尚未知。5V_SW 阶跃不应直接拉低 3V3_SYS，3V3_SW 阶跃则会同时考验 U5 和 U3。</p>
+  <h4 id="exp-33-7-record">记录表</h4>
+  <table>
+    <caption>表 33-8　负载与瞬态</caption>
+    <thead><tr><th scope="col">轨</th><th scope="col">I 低→高</th><th scope="col">稳态 Vin/Vout</th><th scope="col">Vmin/Vmax</th><th scope="col">恢复时间</th><th scope="col">温度</th><th scope="col">USB/复位</th><th scope="col">波形文件</th></tr></thead>
+    <tbody>
+      <tr><td>5V_SW</td><td>____→____ A</td><td>____ / ____ V</td><td>____ / ____ V</td><td>____ µs</td><td>____ °C</td><td>____</td><td>____</td></tr>
+      <tr><td>5V_SW</td><td>____→____ A</td><td>____ / ____ V</td><td>____ / ____ V</td><td>____ µs</td><td>____ °C</td><td>____</td><td>____</td></tr>
+      <tr><td>3V3_SW</td><td>____→____ A</td><td>____ / ____ V</td><td>____ / ____ V</td><td>____ µs</td><td>____ °C</td><td>____</td><td>____</td></tr>
+      <tr><td>3V3_SW</td><td>____→____ A</td><td>____ / ____ V</td><td>____ / ____ V</td><td>____ µs</td><td>____ °C</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-7-criteria">通过/失败判据</h4>
+  <p>在预先声明的电流包络内，输出始终位于目标允许窗，恢复时间符合测试计划，无持续振荡、保护动作、USB 错误或 MCU 复位。若容差栏为空，本实验只生成 R2 需求，不得宣称性能通过。</p>
+  <h4 id="exp-33-7-analysis">分析</h4>
+  <p>分别绘制 Vout–I 与温升–I，计算路径等效电阻并检查是否随电流/温度上升。比较 J2 端与器件输出端可分离板上压降和导线压降。瞬态波形必须保留探头、带宽和时基设置。</p>
+  <h4 id="exp-33-7-troubleshooting">故障排查</h4>
+  <p>稳态压降大：查线缆、J2 接触、U4/U5 焊接和铜路径。只在阶跃复位：查 C3/C4/C5、U3 瞬态和地回流。波形振铃随长地线改变：先修正探测方法。电流未到设定值：检查是否已进入限流或负载欠压。</p>
+  <h4 id="exp-33-7-questions">思考题</h4>
+  <p>为什么在电子负载端测得的电压不能自动代表 J2 端电压？四线感测能消除哪些误差、不能消除哪些误差？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-8">
+  <h2 id="sec-33-8">33.8 实验：过流保护与恢复</h2>
+  <h4 id="exp-33-8-purpose">目的</h4>
+  <p>在教师或有资质工程师监督下，以电子负载缓慢逼近保护区，测量 U4/U5 的限流起点、保护模式和卸载后的恢复；禁止用导线硬短路。</p>
+  <h4 id="exp-33-8-theory">原理</h4>
+  <p>SY6280 的设计计算采用 <var>I</var><sub>LIMIT</sub> = 6800/<var>R</var><sub>SET</sub>：R7 = 16.9 kΩ 得 0.402 A，R8 = 27 kΩ 得 0.252 A。它们是典型计算值，不包含器件容差、温升、输入压降或保护时序。实际器件可能恒流、折返、打嗝或热关断，必须以当前数据手册和波形判定。</p>
+  <h4 id="exp-33-8-equipment">器材与量程</h4>
+  <ul>
+    <li>可编程电子负载，电流分辨率优于目标限流的 1%，具快速关闭和记录。</li>
+    <li>5 V 限流电源、示波器、电流探头或低感分流器、热电偶/红外相机。</li>
+    <li>当前版 SY6280 数据手册、U3/USB 供电预算和已批准的风险评估。</li>
+  </ul>
+  <h4 id="exp-33-8-safety">安全与停止条件</h4>
+  <p>未填写“最大测试电流、最长驻留、最高表面温度、最低允许轨电压”时禁止执行。硬短路、USB 主机直接供电、无人值守和同时测试两路均禁止。达到任一预设上限、U3/MCU 复位、温度继续上升或保护未出现时立即关负载并断电。</p>
+  <h4 id="exp-33-8-wiring">接线指导</h4>
+  <pre aria-label="过流保护实验接线"><code>限流 5 V 源 → VBUS_IN
+J2 受测输出 → 电子负载 +（从 0 A 开始）
+J2 GND      → 电子负载 −
+示波器：Vout、3V3_SYS；电流探头/分流器测 Iout
+USB 主机断开，另一受控轨关闭</code></pre>
+  <h4 id="exp-33-8-precheck">上电前检查</h4>
+  <ol>
+    <li>从数据手册填写允许窗口：5V_SW 最大 ____ A/____ ms；3V3_SW 最大 ____ A/____ ms；温度停止 ____ °C。</li>
+    <li>验证电子负载急停和电源限流，确认热传感器贴在 U4 或 U5。</li>
+    <li>重复 80% 目标电流稳态测试，无异常后才进入保护区。</li>
+    <li>确认固件在 USB 断开情况下仍可通过安全本地流程使能/关闭被测轨，或保留 USB 数据但隔离 VBUS 争用。</li>
+  </ol>
+  <h4 id="exp-33-8-procedure">编号步骤</h4>
+  <ol>
+    <li>使能 5V_SW，从计算限流的 70% 开始，每步增加不超过 5%，每步驻留按风险评估设定并记录温度。</li>
+    <li>检测到电流不再随设定增加、输出明显下降或周期保护时，保存波形并立即把负载降回 10%。</li>
+    <li>观察输出是否自动恢复；随后关闭再使能，记录恢复方式和时间。</li>
+    <li>完全断电、冷却并检查板外观与无电电阻。</li>
+    <li>在独立样板或经批准后对 3V3_SW 重复；监视 3V3_SYS，避免拖垮 MCU。</li>
+    <li>重复性测试最多按批准计划执行，不为获得“漂亮曲线”反复热冲击同一片板。</li>
+  </ol>
+  <h4 id="exp-33-8-expected">预期结果（非实测）</h4>
+  <p>预期在 0.402 A 和 0.252 A 计算值附近出现某种限流/保护，但真实阈值和模式未知。卸载后应能恢复到正常输出，且不会永久损坏或使关闭功能失效；这正是本实验要验证的内容。</p>
+  <h4 id="exp-33-8-record">记录表</h4>
+  <table>
+    <caption>表 33-9　过流保护记录</caption>
+    <thead><tr><th scope="col">轨/板号</th><th scope="col">计算典型</th><th scope="col">首次保护电流</th><th scope="col">Vout/模式</th><th scope="col">峰值温度</th><th scope="col">卸载恢复</th><th scope="col">再使能恢复</th><th scope="col">波形</th></tr></thead>
+    <tbody>
+      <tr><td>5V_SW / ____</td><td>0.402 A</td><td>____ A</td><td>____ V / ____</td><td>____ °C</td><td>____ ms</td><td>____</td><td>____</td></tr>
+      <tr><td>3V3_SW / ____</td><td>0.252 A</td><td>____ A</td><td>____ V / ____</td><td>____ °C</td><td>____ ms</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-8-criteria">通过/失败判据</h4>
+  <p>保护阈值和模式位于已从数据手册、USB 预算与目标负载推导的批准窗口内；不超过停止门限；卸载或重新使能后恢复；重复无永久漂移。只“看见限流”但没有阈值窗口、温度和恢复记录，不算通过。</p>
+  <h4 id="exp-33-8-analysis">分析</h4>
+  <p>计算实测阈值相对 6800/RSET 典型值的偏差，并按温度和样板分组。区分 U4/U5 限流、上游实验电源限流和 U3 限流；若三者设置过近，无法判定是谁先动作。</p>
+  <h4 id="exp-33-8-troubleshooting">故障排查</h4>
+  <p>过早限流：查输入压降、R7/R8 错值、负载校准和温升。毫无限流：立即停止，查 RSET 短路/错装和器件型号。无法恢复：完全掉电后复测无电电阻并检查热损伤。3V3_SW 测试使 USB 掉线：说明上游 3V3_SYS 受到影响，应降低负载并分析 U3。</p>
+  <h4 id="exp-33-8-questions">思考题</h4>
+  <p>若台式电源先进入限流，为什么不能据此宣称 U4/U5 的限流已经动作？应怎样拉开两个保护阈值？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-9">
+  <h2 id="sec-33-9">33.9 实验：USB 挂起与安全状态</h2>
+  <h4 id="exp-33-9-purpose">目的</h4>
+  <p>验证主机挂起、恢复和拔线期间，GPIO/PWM/UART 与两路受控电源进入设计要求的安全状态，并能恢复通信而不产生危险脉冲。</p>
+  <h4 id="exp-33-9-theory">原理</h4>
+  <p>USB 主机可停止总线活动并要求设备降低功耗。R1 的设计意图是挂起时 GPIO 高阻、PWM 停止、UART_TX 高阻、5V_SW/3V3_SW 关闭；硬件下拉 R9/R10 只有在 MCU 引脚高阻/低时才能保证关闭。固件回调、时钟切换和恢复顺序共同决定真实行为。</p>
+  <h4 id="exp-33-9-equipment">器材与量程</h4>
+  <ul>
+    <li>可确定触发 USB suspend/resume 的主机与日志工具；不要把屏幕熄灭等同于总线挂起。</li>
+    <li>四通道示波器/逻辑分析仪，监视一个 GPIO、一个 PWM、UART_TX 和 EN/输出轨。</li>
+    <li>每个信号一个 100 kΩ 弱偏置、每路受控电源一个不超过 10 mA 的安全指示负载。</li>
+  </ul>
+  <h4 id="exp-33-9-safety">安全与停止条件</h4>
+  <p>只接低能量负载。挂起或拔线后若受控电源仍驱动可能危险的目标、输出出现重复脉冲、板反向从目标取电或主机报过流，立即断开目标负载。</p>
+  <h4 id="exp-33-9-wiring">接线指导</h4>
+  <pre aria-label="USB 挂起安全状态接线"><code>J1 → 主机 USB
+J2 pin 5 PWM0、pin 13 UART_TX、pin 9 GPIO4 → 高阻探头
+受测输入节点可经 100 kΩ 弱拉到 GND 或 3.3 V
+J2 pin 3/4 → 各自 ≤10 mA 指示负载与 DMM
+所有仪器共地；不引入第二个 VBUS 源</code></pre>
+  <h4 id="exp-33-9-precheck">上电前检查</h4>
+  <ol>
+    <li>记录固件定义的挂起状态、进入截止时间和恢复顺序；空白要求不能用于签署通过。</li>
+    <li>在正常运行下验证各探头与弱偏置不改变功能。</li>
+    <li>先命令一个 PWM、一个 GPIO 和受控轨处于明确活动状态，使用无危险小负载。</li>
+  </ol>
+  <h4 id="exp-33-9-procedure">编号步骤</h4>
+  <ol>
+    <li>记录正常运行 5 s 基线，包括电流、输出和 USB 日志。</li>
+    <li>由主机明确发起 suspend，触发示波器捕获进入时序；保持 30 s。</li>
+    <li>测受控轨、GPIO 对弱偏置的响应、PWM 是否停止、UART_TX 是否高阻以及板电流。</li>
+    <li>发起 resume，记录 CDC 恢复时间和各输出是否保持安全，直到主机重新下命令。</li>
+    <li>在活动状态拔掉 USB，记录掉电顺序和是否由 J2 外部源反向维持板电。</li>
+    <li>重复 suspend/resume 20 次，统计失败、复位和异常脉冲。</li>
+  </ol>
+  <h4 id="exp-33-9-expected">预期结果（非实测）</h4>
+  <p>预期挂起与失去 USB 时受控输出进入安全态，恢复后 CDC 可重新通信，但外部输出仍应等待明确命令。实际截止时间、残余电压、挂起电流和恢复时间尚未测量。</p>
+  <h4 id="exp-33-9-record">记录表</h4>
+  <table>
+    <caption>表 33-10　挂起/恢复安全状态</caption>
+    <thead><tr><th scope="col">事件</th><th scope="col">进入/恢复时间</th><th scope="col">5V_SW/3V3_SW</th><th scope="col">GPIO/PWM/UART</th><th scope="col">板电流</th><th scope="col">异常脉冲</th><th scope="col">20 次失败</th></tr></thead>
+    <tbody>
+      <tr><td>Suspend</td><td>____ ms</td><td>____ / ____ V</td><td>____ / ____ / ____</td><td>____ mA</td><td>____</td><td rowspan="3">____</td></tr>
+      <tr><td>Resume</td><td>____ ms</td><td>____ / ____ V</td><td>____ / ____ / ____</td><td>____ mA</td><td>____</td></tr>
+      <tr><td>拔线</td><td>____ ms</td><td>____ / ____ V</td><td>____ / ____ / ____</td><td>____ mA</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-9-criteria">通过/失败判据</h4>
+  <p>在预先声明的截止时间内，两路受控电源和外部信号满足目标安全定义；20 次循环无异常驱动、复位锁死或反向供电；恢复后先报告安全状态，再接受输出命令。若硬件电容残压超过目标允许值，则即使 EN 已低也判系统要求未满足。</p>
+  <h4 id="exp-33-9-analysis">分析</h4>
+  <p>把“MCU 引脚已改高阻”“负载开关已关闭”和“连接器上电压已降到安全值”分开分析。若输出下降慢，估算负载与电容的放电时间常数；这可能形成 R2 增加放电路径的需求。</p>
+  <h4 id="exp-33-9-troubleshooting">故障排查</h4>
+  <p>挂起不发生：确认主机确实发送 suspend。EN 低但轨有电：查外部反灌和电容保持。恢复后输出自动重开：查状态恢复逻辑。弱偏置无法改变 GPIO：说明仍在强驱动或接线错误。重复失败：保存第一个失败前后的 USB 与电源波形。</p>
+  <h4 id="exp-33-9-questions">思考题</h4>
+  <p>“软件已经关闭负载开关”和“连接器已经无危险电压”为什么是两个不同的验证命题？</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-33-10">
+  <h2 id="sec-33-10">33.10 实验：不损坏电路的有意故障诊断</h2>
+  <h4 id="exp-33-10-purpose">目的</h4>
+  <p>训练“观察—假设—测量—隔离”的方法：由教师通过可逆、低能量故障治具引入一个未知故障，学生在不补焊、不刷固件、不制造短路的条件下定位根因。</p>
+  <h4 id="exp-33-10-theory">原理</h4>
+  <p>同一症状可能来自不同层级，例如 USB 不枚举可能是电源、复位、时钟、数据线或固件。有效诊断选择能最大区分候选假设的测量，并一次只改变一个变量。故障注入应模拟开路、配置错误或安全控制状态，而不是过压、反接和硬短路。</p>
+  <h4 id="exp-33-10-equipment">器材与量程</h4>
+  <ul>
+    <li>带独立开关的故障注入板/线束，可选择：USB 数据线开路、UART 波特率错误、GPIO 回路线开路、NRST 安全拉低、某受控轨命令禁用。</li>
+    <li>限流电源、DMM、逻辑分析仪、USB 系统日志、原理图和空白证据表。</li>
+    <li>密封故障卡，记录真实故障、治具位置和恢复步骤。</li>
+  </ul>
+  <h4 id="exp-33-10-safety">安全与停止条件</h4>
+  <p>允许的注入仅为开路、弱拉、协议/配置不匹配或正常控制命令。禁止短接电源、把 5 V 注入 I/O、反接电源、旁路限流、热插调试排针或故意 ESD。出现超基线电流、发热或未知电压立即中止并揭示故障卡。</p>
+  <h4 id="exp-33-10-wiring">接线指导</h4>
+  <pre aria-label="安全故障注入结构"><code>主机/仪器 ── 带编号开关的故障治具 ── R1
+                                   ├─ 仅开路某信号
+                                   ├─ 仅安全拉低 NRST
+                                   └─ 仅改变外部 UART 设置
+限流电源与共同 GND始终保持；治具不允许把电源接到信号</code></pre>
+  <h4 id="exp-33-10-precheck">上电前检查</h4>
+  <ol>
+    <li>教师在已知良好板上验证治具的“直通”状态，记录基线。</li>
+    <li>检查所有故障开关只能开路或连接规定的安全网络。</li>
+    <li>学生写下初始症状、最多五个候选原因和第一项最有区分度的测量。</li>
+  </ol>
+  <h4 id="exp-33-10-procedure">编号步骤</h4>
+  <ol>
+    <li>教师随机选择一个故障并封存答案；学生在限流条件下复现症状一次。</li>
+    <li>先检查电源、电流和复位，记录结果；未确认这些基础条件前不进入协议细节。</li>
+    <li>根据证据删除不符合的假设，并写出下一项测量为什么能区分剩余候选。</li>
+    <li>最多执行一次可逆替换，例如换已知好线缆或把治具置直通；不得同时改两个变量。</li>
+    <li>在揭示答案前提交根因、证据链、排除项和无损恢复步骤。</li>
+    <li>教师恢复治具，学生重复基线测试，确认症状消失且板没有新增损伤。</li>
+  </ol>
+  <h4 id="exp-33-10-expected">预期结果（非实测）</h4>
+  <p>每个预设故障应产生可解释症状，且恢复直通后板回到基线。学生不一定一次猜中，但应通过测量收敛；本实验不预先声称某块 R1 存在这些故障。</p>
+  <h4 id="exp-33-10-record">记录表</h4>
+  <table>
+    <caption>表 33-11　故障诊断证据链</caption>
+    <thead><tr><th scope="col">步骤</th><th scope="col">观察</th><th scope="col">当前假设</th><th scope="col">测量/改变</th><th scope="col">结果</th><th scope="col">保留/排除理由</th></tr></thead>
+    <tbody>
+      <tr><td>0 基线</td><td>____</td><td>____</td><td>电源/电流</td><td>____</td><td>____</td></tr>
+      <tr><td>1</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>2</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>3</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>结论</td><td colspan="2">根因：____</td><td colspan="2">恢复：____</td><td>置信度：____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="exp-33-10-criteria">通过/失败判据</h4>
+  <p>用至少两条独立证据定位唯一故障，未触发安全停止条件，未改变板或固件，恢复后基线全部通过，并能解释为何排除其他候选。仅凭猜测或一次替换“碰巧修好”不通过。</p>
+  <h4 id="exp-33-10-analysis">分析</h4>
+  <p>评价测量的信息增益：电源正常可一次排除多个候选；直接换板虽快，却很少说明根因。把成功路径整理成下一章的故障树，并记录哪个测试点或治具功能最能缩短诊断时间。</p>
+  <h4 id="exp-33-10-troubleshooting">故障排查</h4>
+  <p>若故障在直通状态仍存在，先停止教学并确认基线板/治具；不要叠加第二个故障。若学生测量互相矛盾，检查参考地、探头档位和时间条件。若恢复后仍异常，把板隔离并按真实故障处理，不再当教学样板。</p>
+  <h4 id="exp-33-10-questions">思考题</h4>
+  <p>在“换板立即恢复”和“测得某网络开路”两条证据中，哪一条更接近根因？还需要什么独立证据才能关闭故障单？</p>
+</section>
+
+<section aria-labelledby="ch33-summary">
+  <h2 id="ch33-summary">本章小结</h2>
+  <p>接口实验必须同时给出接线、能量边界、原始数据与判定依据。R1 的 3.3 V I/O、四路同频 PWM、UART、双受控电源和 USB 安全状态都有明确设计意图，但在填写这些工作表前仍是未验证硬件。下一章将把单次功能测试扩展为带测量不确定度、热、时序、线缆和多板散布的性能证据。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="32-programming-validation.html"><small>上一页</small>32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a><a class="next" rel="next" href="34-performance-reliability.html"><small>下一页</small>34. 性能与可靠性测量（Measuring Performance and Reliability）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

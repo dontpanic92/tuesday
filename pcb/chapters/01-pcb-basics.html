@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="1. PCB 是什么以及如何工作（What a PCB Is and How It Works） — USB GPIO PCB 离线教程">
+  <title>1. PCB 是什么以及如何工作（What a PCB Is and How It Works） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-01">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html" aria-current="page">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第一部分：基础知识（Part I — Foundations）</li><li aria-current="page">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第一部分：基础知识（Part I — Foundations）</p>
+          <h1>1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#learning-goals-1">学习目标</a></li><li class="toc-level-2"><a href="#section-1-1">1.1 从电路想法到物理产品</a></li><li class="toc-level-2"><a href="#section-1-2">1.2 电压、电流、电阻、功率与能量</a></li><li class="toc-level-2"><a href="#section-1-3">1.3 闭合电流环：为什么每个信号都需要返回路径</a></li><li class="toc-level-2"><a href="#section-1-4">1.4 导体、绝缘体、铜层、介质与阻焊</a></li><li class="toc-level-2"><a href="#section-1-5">1.5 焊盘、走线、过孔、孔、平面、铺铜、丝印与板框</a></li><li class="toc-level-2"><a href="#section-1-6">1.6 网络：原理图连接怎样变成物理铜</a></li><li class="toc-level-2"><a href="#section-1-7">1.7 原理图与 PCB 布局</a></li><li class="toc-level-2"><a href="#section-1-8">1.8 元件、符号、封装与 3D 实体</a></li><li class="toc-level-2"><a href="#section-1-9">1.9 通孔与表面贴装</a></li><li class="toc-level-2"><a href="#section-1-10">1.10 为什么电气检查通过仍可能机械上不可能</a></li><li class="toc-level-2"><a href="#section-1-11">1.11 实验：追踪简单 LED 板上的电流环</a></li><li class="toc-level-2"><a href="#section-1-12">1.12 复习题与常见误解</a></li><li class="toc-level-2"><a href="#summary-1">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="learning-goals-1">
+  <h2 id="learning-goals-1">学习目标</h2>
+  <p>学完本章后，你应能从物理电流回路而不是从“线条图案”理解 PCB，区分原理图中的逻辑连接与板上的真实几何，并能说明电气检查通过后为什么仍要进行机械审核。</p>
+  <ul>
+    <li>定义电压、电流、电阻、功率与能量，并在单位之间正确换算；</li>
+    <li>沿电源、负载和返回导体追踪一条闭合电流环；</li>
+    <li>识别焊盘、走线、过孔、孔、平面、铺铜、阻焊、丝印与板框；</li>
+    <li>解释网络、符号、封装和器件实体之间的对应关系；</li>
+    <li>用 USB GPIO R1 的真实数据区分设计事实、CAD 计算与待实物验证项目。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-1-1">
+  <h2 id="section-1-1">1.1 从电路想法到物理产品</h2>
+  <aside class="definition">
+    <p><strong>印制电路板（PCB）</strong>是用绝缘基材、铜层、孔和表面材料实现电气连接并承载元件的物理板。它既不是只有铜线的“接线图”，也不是原理图的彩色版本。</p>
+  </aside>
+  <p>一个电路想法通常从“需要什么功能”开始，例如“让电脑控制 8 路数字信号”。工程设计必须把这句话逐层具体化：电脑通过什么接口通信？逻辑电压是多少？目标设备断电时是否会被反向供电？元件能否买到？封装能否焊接？铜线能否承载电流？连接器能否插入？制造厂收到哪些文件？</p>
+  <ol>
+    <li><strong>需求：</strong>规定用户看到的功能、边界与安全状态。</li>
+    <li><strong>系统架构：</strong>把需求分成 USB、电源、控制、接口和保护等功能块。</li>
+    <li><strong>原理图：</strong>用符号、引脚和网络表达应当怎样电连接。</li>
+    <li><strong>PCB：</strong>把抽象连接变成有宽度、长度、层和间距的铜，同时安排真实元件。</li>
+    <li><strong>制造数据：</strong>输出铜层、阻焊、丝印、板框、钻孔、物料和坐标。</li>
+    <li><strong>装配与验证：</strong>检查焊接，限流上电，并测量功能、热与信号行为。</li>
+  </ol>
+  <figure data-figure="idea-to-physical-board">
+    <img src="../assets/svg/idea-to-physical-board.svg" alt="从用户问题依次经过工程规格、原理图、PCB、制造装配到实物验证，并由验证结果反馈到前序阶段的流程图。" width="960" height="520">
+    <figcaption>图 1-1　电路想法只有经过可追踪的设计与验证链，才成为物理产品。</figcaption>
+  </figure>
+  <p>R1 已完成到“原型制造发布”这一关：最终板名为 <code>USB_GPIO_R1</code>，名义尺寸 50 mm × 24 mm，两层铜，PCB 上有 48 个物理元件位号。发布审核通过不代表已经完成装配板上电；当前事实库中的实测记录仍为 0 条。</p>
+</section>
+
+<section aria-labelledby="section-1-2">
+  <h2 id="section-1-2">1.2 电压、电流、电阻、功率与能量</h2>
+  <dl>
+    <dt><strong>电压（Voltage，V）</strong></dt>
+    <dd>两个节点之间单位电荷的能量差。电压必须说明“相对于哪里”，例如 <code>3V3_SYS</code> 相对于 GND 的标称电压为 3.3 V。</dd>
+    <dt><strong>电流（Current，A）</strong></dt>
+    <dd>单位时间通过截面的电荷量。传统电流方向从较高电势流向较低电势；金属中的电子平均漂移方向与之相反。</dd>
+    <dt><strong>电阻（Resistance，Ω）</strong></dt>
+    <dd>在线性近似下描述导体对电流的阻碍。微观上，载流电子与晶格、缺陷和杂质相互作用，把电能转化为热。</dd>
+    <dt><strong>功率（Power，W）</strong></dt>
+    <dd>能量转换速率，<code>P = V × I</code>。功率过大意味着单位时间产生的热量过多，可能升温、限流或损坏。</dd>
+    <dt><strong>能量（Energy，J 或 Wh）</strong></dt>
+    <dd>一段时间内转换的总量，恒定功率时 <code>E = P × t</code>。电容和电感也会暂时储存能量。</dd>
+  </dl>
+  <aside class="example">
+    <p><strong>算例 1-1：220 Ω 串联电阻的保守故障估算。</strong>假设 R14 两端持续承受 3.3 V，这不是正常 GPIO 工作点，而是用于检查最坏情况的假设。</p>
+    <p><code>I = V/R = 3.3 V / 220 Ω = 0.015 A = 15 mA</code></p>
+    <p><code>P = V²/R = (3.3 V)² / 220 Ω = 0.0495 W = 49.5 mW</code></p>
+    <p>这是<strong>计算值</strong>，说明 220 Ω 会限制故障电流并耗散约 49.5 mW；它没有证明 MCU 引脚允许长期承受该状态，也不是 R14 的实测功耗。实际允许电流必须再查 U1 数据手册和电阻额定功率。</p>
+  </aside>
+  <table>
+    <caption>常见单位与前缀</caption>
+    <thead>
+      <tr><th scope="col">量</th><th scope="col">基本单位</th><th scope="col">常见换算</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">电流</th><td>A</td><td>1 mA = 0.001 A；1 µA = 0.000001 A</td></tr>
+      <tr><th scope="row">电阻</th><td>Ω</td><td>1 kΩ = 1,000 Ω；1 MΩ = 1,000,000 Ω</td></tr>
+      <tr><th scope="row">电容</th><td>F</td><td>1 µF = 10<sup>−6</sup> F；1 nF = 10<sup>−9</sup> F；1 pF = 10<sup>−12</sup> F</td></tr>
+      <tr><th scope="row">长度</th><td>m、mm</td><td>1 mil = 0.0254 mm；mil 不是毫米</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="section-1-3">
+  <h2 id="section-1-3">1.3 闭合电流环：为什么每个信号都需要返回路径</h2>
+  <p>电流不会在负载处消失。电源使电荷沿去程导体流过负载，电荷必须再沿某条返回导体回到源端，才形成闭合回路。若返回路径断开，稳态电流不能维持；若返回路径绕远，回路面积和阻抗增大，电压跌落、噪声与电磁辐射也会增加。</p>
+  <figure data-figure="closed-current-loop">
+    <img src="../assets/svg/closed-current-loop.svg" alt="电源正端经去程铜线向负载供电，电流再经邻近的地或返回铜线回到电源负端，形成闭合环路。" width="960" height="440">
+    <figcaption>图 1-2　任何电源或信号电流都与返回电流共同构成环路。</figcaption>
+  </figure>
+  <p>数字信号也遵守同一规律。U1 把 GPIO 从低电平切到高电平时，电流给目标输入及走线电容充电；返回电流通常在邻近地铜中流动。边沿越快，高频成分越强，返回路径的几何连续性越重要。因此“信号线已经连通”并不等于信号一定干净。</p>
+  <p>R1 是非隔离板，USB 主机、板上电路和目标接口共享 GND。这个共同参考使 3.3 V 逻辑有明确含义，也意味着错误接地可能把主机、目标或示波器之间形成意外大电流回路。</p>
+  <aside class="warning">
+    <p><strong>安全提醒：</strong>不要把示波器地夹接到任意信号节点。接地式示波器的地夹可能连接保护地，夹错位置会制造短路，而不是“观察返回路径”。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-1-4">
+  <h2 id="section-1-4">1.4 导体、绝缘体、铜层、介质与阻焊</h2>
+  <p><strong>导体</strong>含有较易移动的载流子，铜因电阻率低、可加工且可焊而用于 PCB 连接。<strong>绝缘体</strong>限制电荷自由移动，用于把不同铜层和相邻网络隔开。PCB 中的玻纤树脂基材既承载元件，又作为铜层之间的<strong>介质</strong>；介质厚度和介电性质还会影响高速走线阻抗。</p>
+  <p>两层板通常在绝缘基材的顶面与底面各有一层铜。制造时按图形去除不需要的铜，再覆盖<strong>阻焊层（Solder Mask）</strong>。阻焊层减少焊接桥连并保护大部分铜面，但它不是结构绝缘，也不能补救铜间距不足、潮湿污染或高压设计错误。</p>
+  <figure data-figure="two-layer-pcb-stack">
+    <img src="../assets/svg/two-layer-pcb-stack.svg" alt="两层 PCB 概念剖面，从上到下为顶层丝印、顶层阻焊、顶层铜、绝缘基材、底层铜、底层阻焊和底层丝印。" width="900" height="560">
+    <figcaption>图 1-3　两层 PCB 的概念剖面；真实铜厚、介质厚度和材料应由生产叠层确定。</figcaption>
+  </figure>
+  <p>R1 的发布文件证明它有 Top 与 Bottom 两个铜层，但没有提供可用于阻抗认证的生产叠层。因此 USB 走线长度匹配属于 CAD 计算事实，不能据此声称阻抗或眼图已经合格。</p>
+</section>
+
+<section aria-labelledby="section-1-5">
+  <h2 id="section-1-5">1.5 焊盘、走线、过孔、孔、平面、铺铜、丝印与板框</h2>
+  <table>
+    <caption>PCB 常见图元及工程后果</caption>
+    <thead>
+      <tr><th scope="col">图元</th><th scope="col">定义</th><th scope="col">设计错误的后果</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">焊盘（Pad）</th><td>焊接器件引脚或接触测试探针的铜区域</td><td>尺寸或编号错误会导致无法焊接、引脚错接</td></tr>
+      <tr><th scope="row">走线（Track）</th><td>铜层上的线状导体</td><td>过窄会增加压降与温升；过近会违反间距</td></tr>
+      <tr><th scope="row">过孔（Via）</th><td>用金属化孔连接不同铜层</td><td>增加寄生电感、占用空间；孔盘过小会降低制造裕量</td></tr>
+      <tr><th scope="row">PTH / NPTH</th><td>PTH 孔壁有铜，可导电；NPTH 孔壁无铜，通常用于机械定位</td><td>孔类型错误会影响连接、装配或机械配合</td></tr>
+      <tr><th scope="row">平面/铺铜</th><td>连接某网络的大面积铜，常用于 GND 或电源</td><td>孤岛、狭颈或错误网络会破坏回流，边界存在也不保证生成了铜</td></tr>
+      <tr><th scope="row">丝印</th><td>名称、方向、警告与装配标记</td><td>压到焊盘会不可读或影响制造；方向标错会诱发装反</td></tr>
+      <tr><th scope="row">板框</th><td>定义成品外形的闭合制造边界</td><td>开口、重复或错误尺寸会使板厂无法正确铣板</td></tr>
+    </tbody>
+  </table>
+  <p>R1 最终有 608 条走线图元和 130 个通孔过孔；过孔钻孔为 12 mil、焊盘为 24 mil。它没有保留原生铺铜对象，而是使用 17 个已在 Gerber 中确认的静态 GND 填充区域。静态填充不会随元件或走线变化自动重算，因此任何几何修改后都必须重新生成并复核。</p>
+  <aside class="error-case">
+    <p><strong>错误案例：</strong>设计过程中曾出现铺铜边界位于板外，以及“看见边界却没有实际制造铜”的风险。最终发布删除了两个畸形原生边界，并在 Gerber 中确认顶层 11 个、底层 6 个 GND 铜区域。工程结论应来自实际输出，而不是来自编辑器中的一个轮廓。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-1-6">
+  <h2 id="section-1-6">1.6 网络：原理图连接怎样变成物理铜</h2>
+  <p><strong>网络（Net）</strong>是电气上应互相连接的一组引脚、焊盘和铜图元。网络名不是装饰标签，而是原理图与 PCB 之间的连接契约。例如 <code>3V3_SYS</code> 包含 U3 的稳压输出、U1 的电源脚、去耦电容和 U5 输入；这些点无论在图上相距多远，都应属于同一电气节点。</p>
+  <p>有意串联的元件会把路径分成不同网络。GPIO0 的路径不是一个从 U1 直达连接器的网络，而是：</p>
+  <ol>
+    <li>U1 封装 12 脚 PA6 位于 <code>GPIO0_MCU</code>；</li>
+    <li>R14 的一端连接 <code>GPIO0_MCU</code>；</li>
+    <li>R14 的另一端连接 <code>GPIO0_PWM0</code>；</li>
+    <li><code>GPIO0_PWM0</code> 到达 J2 的 5 脚。</li>
+  </ol>
+  <p>R14 的存在改变了网络名称，也明确了保护边界。若把 R14 两端错误地赋成同一网络，EDA 工具可能认为电阻被铜短接；若网络名拼写不一致，逻辑上相同的连接可能变成开路。</p>
+  <p>R1 发布审核把 48/48 个原理图元件映射到 PCB，并把 172/172 个引脚按元件身份、引脚号和网络映射到焊盘；47 个命名网络的几何连通检查为 47/47。这些是设计文件的交叉核对，不是装配板的万用表测量。</p>
+</section>
+
+<section aria-labelledby="section-1-7">
+  <h2 id="section-1-7">1.7 原理图与 PCB 布局</h2>
+  <p><strong>原理图（Schematic）</strong>按功能关系表达元件、引脚和网络，通常故意忽略物理距离。<strong>PCB 布局（Layout）</strong>则必须处理坐标、旋转、层、走线宽度、孔、板边、实体空间和回流路径。</p>
+  <table>
+    <caption>两种视图回答的问题不同</caption>
+    <thead>
+      <tr><th scope="col">问题</th><th scope="col">原理图</th><th scope="col">PCB</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">哪些引脚应相连？</th><td>主要证据</td><td>必须实现该连接</td></tr>
+      <tr><th scope="row">元件相距多远？</th><td>通常不表达</td><td>由坐标和实体决定</td></tr>
+      <tr><th scope="row">电流回路面积多大？</th><td>只能推断功能路径</td><td>由真实走线和地返回决定</td></tr>
+      <tr><th scope="row">连接器能否插入？</th><td>不能证明</td><td>需结合板边、3D/实体尺寸审核</td></tr>
+      <tr><th scope="row">制造厂会得到什么铜？</th><td>不能直接证明</td><td>还要检查 Gerber 与钻孔输出</td></tr>
+    </tbody>
+  </table>
+  <p>因此，同一电路可以有正确的原理图和很差的 PCB：例如去耦电容在逻辑上并联于电源与地，但若物理上离 U1 很远，高频电流仍要绕行，去耦效果会变差。</p>
+</section>
+
+<section aria-labelledby="section-1-8">
+  <h2 id="section-1-8">1.8 元件、符号、封装与 3D 实体</h2>
+  <dl>
+    <dt><strong>元件（Component）</strong></dt>
+    <dd>设计中的一个具体实例，例如 U1 或 R14。</dd>
+    <dt><strong>符号（Symbol）</strong></dt>
+    <dd>原理图中的功能模型，包含可读的引脚名称、编号和电气类型。</dd>
+    <dt><strong>封装（Footprint / Land Pattern）</strong></dt>
+    <dd>PCB 上的焊盘、孔、丝印和装配边界几何。</dd>
+    <dt><strong>3D 实体或器件本体</strong></dt>
+    <dd>真实器件占据的空间，包括高度、外壳、引脚、连接器插拔区和制造公差。</dd>
+  </dl>
+  <p>四者必须一致。以 U1 为例，符号的封装 1 脚必须对应 CH32V203K8T6 LQFP-32 实体的 1 脚标记；若符号网络正确但封装焊盘编号旋转或错位，生产出的板会把功能接到错误引脚。</p>
+  <p>3D 模型只是辅助证据。模型可能缺失、尺寸简化或原点错误，所以还要用数据手册机械图、封装尺寸与装配包络核对。R1 最终对全部 1,128 对元件进行了实体包络和封装形状两套检查。</p>
+</section>
+
+<section aria-labelledby="section-1-9">
+  <h2 id="section-1-9">1.9 通孔与表面贴装</h2>
+  <p><strong>通孔元件（Through-Hole）</strong>的引脚穿过 PTH 并在另一面焊接，机械固定通常较强，适合连接器和教学手焊，但占用两面空间且自动装配成本可能较高。<strong>表面贴装元件（Surface-Mount Device，SMD）</strong>焊在表面焊盘上，体积小、寄生参数低、适合自动贴装，但细小封装需要更好的工艺和返修工具。</p>
+  <p>R1 的拟装配元件全部在顶面。大多数电阻、电容和芯片采用表面贴装；J2 的 2×8、2.54 mm 目标排针与 J3 的 1×5、1.27 mm 调试接口在 PCB/CPL 中存在，但被明确设为 DNP，即制造 BOM 不安装，用户按需要焊接或使用夹具。</p>
+  <table>
+    <caption>装配方式的典型权衡</caption>
+    <thead>
+      <tr><th scope="col">维度</th><th scope="col">通孔</th><th scope="col">表面贴装</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">机械承力</th><td>适合频繁插拔的连接器，但仍需正确固定脚</td><td>小型器件足够，纯焊盘承受大插拔力时需谨慎</td></tr>
+      <tr><th scope="row">高频性能</th><td>引脚和孔通常带来更大寄生参数</td><td>回路可更紧凑</td></tr>
+      <tr><th scope="row">手工返修</th><td>引脚间距大时直观</td><td>0603、SOT-23 和 LQFP 需要合适工具与练习</td></tr>
+      <tr><th scope="row">板面积</th><td>孔贯穿板，限制两面走线</td><td>可高密度布置</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="section-1-10">
+  <h2 id="section-1-10">1.10 为什么电气检查通过仍可能机械上不可能</h2>
+  <p>ERC 和 DRC 主要检查它们已被配置去理解的规则。一个焊盘可以与正确网络连通、铜间距也合格，但器件本体仍可能互相穿透，连接器可能朝向板内，电容可能被压在连接器外壳下，或板边可能挡住插头。</p>
+  <aside class="error-case">
+    <p><strong>R1 的真实教训：</strong>设计过程需要纠正 R1 与 USB-C 连接器的实体关系以及 C8/C9 的重叠风险。最终检查清单明确确认 R1 不在连接器实体下；C8 与 C9 的本体间隙为 49.650 mil，封装形状间隙为 45.709 mil，并且 1,128 对器件没有实体或包络重叠。</p>
+  </aside>
+  <p>机械审核至少应同时查看：</p>
+  <ul>
+    <li>数据手册本体尺寸和高度；</li>
+    <li>封装庭院或装配包络；</li>
+    <li>连接器插头、线缆和手指操作空间；</li>
+    <li>板边、固定孔、螺钉、外壳和工具空间；</li>
+    <li>极性、1 脚方向和可见标记；</li>
+    <li>制造与返修所需间隙。</li>
+  </ul>
+  <p>最终 R1 的 J1 朝左、旋转 −90°，连接器本体有意越过左板边；这不是错误，但必须在板框和机械审核中被明确记录。工程上的关键不是“是否越界”，而是“越界是否有意、可装配且与制造数据一致”。</p>
+</section>
+
+<section class="experiment" aria-labelledby="section-1-11">
+  <h2 id="section-1-11">1.11 实验：追踪简单 LED 板上的电流环</h2>
+  <p><strong>目的：</strong>把原理图中的节点转换为实际去程与返回路径，并用万用表验证断电连通关系。实验使用独立的 3.3 V 低压电源、1 kΩ 电阻和 LED；不要在尚未完成上电检查的 R1 上进行。</p>
+  <p><strong>器材：</strong>面包板、LED、1 kΩ 电阻、可设 3.3 V 且具电流限制的电源、数字万用表、导线。建议把电流限制设为不高于 20 mA。</p>
+  <aside class="warning">
+    <p><strong>停止条件：</strong>极性不确定、接线未经复核、上电后电流达到限制、LED 或电阻发热、出现气味时立即断电。禁止把 LED 不经电阻直接跨接电源。</p>
+  </aside>
+  <p><strong>接线：</strong>电源正端 → 1 kΩ 电阻 → LED 阳极；LED 阴极 → 电源负端。电源负端是本实验的 GND。</p>
+  <ol>
+    <li>保持断电，按 LED 数据手册或外观标记确认阳极、阴极。</li>
+    <li>画出传统电流方向，并用另一种颜色画出从 LED 阴极返回电源负端的路径。</li>
+    <li>用万用表电阻或连续性模式检查导线，确认电源正负端没有直接短路。</li>
+    <li>将电源设为 3.3 V 和不高于 20 mA 的电流限制，输出仍保持关闭。</li>
+    <li>复核接线后开启输出，观察 LED；记录电源显示值，不把显示值预先填入表格。</li>
+    <li>断电。移除返回导线，再上电观察；随后立即断电并恢复接线。</li>
+    <li>解释为什么去程连接全部存在时，返回路径断开仍不能维持 LED 电流。</li>
+  </ol>
+  <table>
+    <caption>实验 1-1 原始记录</caption>
+    <thead>
+      <tr><th scope="col">状态</th><th scope="col">设定电压</th><th scope="col">电源显示电流</th><th scope="col">LED 现象</th><th scope="col">备注</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">闭合回路</th><td></td><td></td><td></td><td></td></tr>
+      <tr><th scope="row">返回导线断开</th><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  <p><strong>预期而非实测：</strong>接线和极性正确时，闭合回路应使 LED 发光；返回导线断开时应熄灭。实际亮度和电流取决于 LED 正向压降、电阻误差与电源。</p>
+  <p><strong>通过判据：</strong>学生能在实物上指出完整去程和返回路径，原始记录完整，并能用“回路断开”而不是“地把电吸走”解释现象。</p>
+  <p><strong>故障排查：</strong>若闭合回路不亮，先断电检查 LED 极性、面包板行列连接、电阻值和导线；不要通过提高电压绕过检查。</p>
+</section>
+
+<section aria-labelledby="section-1-12">
+  <h2 id="section-1-12">1.12 复习题与常见误解</h2>
+  <ol>
+    <li>为什么“某点是 3.3 V”是不完整的说法？应补充什么参考节点？</li>
+    <li>用自己的话区分功率与能量，并写出各自单位。</li>
+    <li>信号走线已经从 U1 连到 J2，为什么仍要检查邻近的地返回路径？</li>
+    <li>解释原理图网络、PCB 铜和装配板导通测量三者证据强度的差别。</li>
+    <li>R1 的 47/47 网络几何连通是否证明每块装配板都没有虚焊？为什么？</li>
+    <li>PTH 与 NPTH 的孔壁有什么差别？误用可能带来什么后果？</li>
+    <li>为什么阻焊层不能当作修复铜间距不足的方法？</li>
+    <li>列出两个电气 DRC 很可能发现不了的机械问题。</li>
+  </ol>
+  <table>
+    <caption>需要主动纠正的常见误解</caption>
+    <thead>
+      <tr><th scope="col">误解</th><th scope="col">正确理解</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>“地会吸收所有电流。”</td><td>GND 是参考与返回网络，电流必须回到源端。</td></tr>
+      <tr><td>“线宽只影响能不能连上。”</td><td>线宽还影响电阻、压降、温升、制造裕量与阻抗。</td></tr>
+      <tr><td>“有铺铜边界就有地平面。”</td><td>必须重铺并检查实际生成的铜，最终还要看 Gerber。</td></tr>
+      <tr><td>“DRC 为 0 就能生产且一定工作。”</td><td>DRC 只覆盖配置的规则；机械、热、固件、信号和实物缺陷仍需独立验证。</td></tr>
+      <tr><td>“3D 模型没有碰撞就绝对安全。”</td><td>模型也可能错误，必须回查数据手册尺寸、庭院和真实配合。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="checkpoint" aria-labelledby="summary-1">
+  <h2 id="summary-1">本章小结</h2>
+  <p>PCB 同时是电气网络、机械载体和制造对象。电压描述节点间能量差，电流必须形成闭合环，电阻导致压降和发热，功率决定能量转换速率。原理图说明“应怎样连接”，PCB 决定“实际如何连接和占据空间”。自动电气检查、机械审核、制造输出检查与实物测量互不替代。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>本章事实依据：</strong>R1 最终项目事实库、制造发布清单和制造检查清单。板尺寸、元件数、网络数、走线与机械间隙属于设计或 CAD/制造文件计算事实；本章没有把任何性能数值写成实测结果。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="../about.html"><small>上一页</small>关于本教程（About This Tutorial）</a><a class="next" rel="next" href="02-reading-schematics.html"><small>下一页</small>2. 阅读电子原理图（Reading Electronic Schematics）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

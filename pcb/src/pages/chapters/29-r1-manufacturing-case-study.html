@@ -1,0 +1,272 @@
+<section class="notice" aria-labelledby="ch29-case-boundary">
+  <h2 id="ch29-case-boundary">案例边界与结论</h2>
+  <p>本章复盘 USB GPIO R1 从“电气 DRC 看起来干净”到“制造资料可追溯”的完整过程。
+    最终结论是 <strong>可送原型制造</strong>，不是“原型已制造并调通”。当前实物测量事实数为 0；
+    所有电压、纹波、温升、USB、GPIO、PWM、UART、晶振和固件行为仍待样板验证。</p>
+</section>
+
+<section aria-labelledby="ch29-learning-goals">
+  <h2 id="ch29-learning-goals">学习目标</h2>
+  <ul>
+    <li>用最终 R1 文件重建板尺寸、层、器件、焊盘、网络、走线、过孔和地铜统计。</li>
+    <li>从碰撞、连接器方向、旧布线、连接缓存和铺铜失败中提取可复用的审核方法。</li>
+    <li>正确解释 USB CAD 长度匹配的价值和边界。</li>
+    <li>说明为什么零错误 DRC 仍必须由机械、Gerber、BOM/CPL 和完整性证据补足。</li>
+    <li>把纠错历史转化为下一版可执行的质量门，而不是只记录“最后成功”。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch29-1-final-counts">
+  <h2 id="ch29-1-final-counts">29.1 最终板尺寸、层、器件、焊盘与网络</h2>
+  <table>
+    <caption>USB GPIO R1 发布基线</caption>
+    <thead>
+      <tr><th scope="col">项目</th><th scope="col">最终事实</th><th scope="col">状态与证据</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>板名/修订</td><td><code>USB_GPIO_R1</code> / R1</td><td>最终项目源与 manifest</td></tr>
+      <tr><td>EasyEDA 版本</td><td>3.2.166</td><td>项目归档与 Gerber 头信息</td></tr>
+      <tr><td>名义尺寸</td><td>50 × 24 mm（1968.5 × 944.9 mil）</td><td>设计值</td></tr>
+      <tr><td>Gerber 外框</td><td>49.999900 × 24.000460 mm，闭合</td><td>由 GKO 坐标计算</td></tr>
+      <tr><td>铜层</td><td>2 层：Top + Bottom</td><td>GTL/GBL 与项目源</td></tr>
+      <tr><td>PCB 物理器件</td><td>48，全部位于顶面</td><td>项目源与 48 行 CPL</td></tr>
+      <tr><td>拟装配 / DNP</td><td>46 / 2（J2、J3）</td><td>21 行 BOM、项目 DNP 属性</td></tr>
+      <tr><td>焊盘</td><td>172</td><td>项目归档；172/172 原理图引脚映射</td></tr>
+      <tr><td>命名网络</td><td>47</td><td>项目源与独立几何连通分析</td></tr>
+      <tr><td>明确不连接引脚</td><td>9</td><td>设计审核记录</td></tr>
+    </tbody>
+  </table>
+  <p>这些数字形成了第一条发布不变量：<code>48 = 46 + 2</code>，且 48 个原理图器件、48 个 PCB 器件和
+    48 个 CPL 位号的集合一致。尺寸、数量和连通属于文件验证，不是实物测量。</p>
+</section>
+
+<section aria-labelledby="ch29-2-placement-audit">
+  <h2 id="ch29-2-placement-audit">29.2 布局组织与零重叠审核</h2>
+  <p>R1 的机械审核不是随机抽查。48 个器件产生 1128 个不重复器件对，每一对都分别用数据手册实体包络和
+    封装元件外形/庭院包络检查。两个审核通道的重叠数均为 0，且没有实体间隙低于 0.25 mm。</p>
+  <table>
+    <caption>重点机械复验结果</caption>
+    <thead>
+      <tr><th scope="col">对象</th><th scope="col">最终结果</th><th scope="col">为何被重点复验</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>C8 / C9</td><td>实体间隙 49.650 mil；外形/庭院间隙 45.709 mil</td><td>早期布局曾发生实体碰撞。</td></tr>
+      <tr><td>R1 / J1</td><td>R1 不再位于 USB-C 外壳下方</td><td>焊盘合法时，连接器身体仍可能覆盖小器件。</td></tr>
+      <tr><td>最小描边庭院到板边/器件裕量</td><td>10.748 mil</td><td>组织化布局验收包络的独立最小裕量，约 0.273 mm。</td></tr>
+      <tr><td>J1</td><td>中心 (200.5, 472) mil；-90°；朝左</td><td>早期方向错误会使线缆朝板内。</td></tr>
+      <tr><td>J1 有意悬边</td><td>外壳包络 min X = -5.055 mil</td><td>区分外壳悬边与铜/板框越界。</td></tr>
+    </tbody>
+  </table>
+  <p>C6、C7、C8、C9 最终沿 <code>x=680 mil</code> 形成有序竖列。组织化布局不仅改善可读性；
+    它让间距异常、漏件和装配方向更容易被人工发现。</p>
+</section>
+
+<section aria-labelledby="ch29-3-routing">
+  <h2 id="ch29-3-routing">29.3 线宽、608 条走线与 130 个过孔</h2>
+  <p>最终 PCB 含 608 个走线图元，其中顶层 427、底层 181；另有 130 个通孔过孔，孔径 12 mil、焊盘 24 mil。
+    独立几何分析确认 47/47 个命名网络完全连通。</p>
+  <table>
+    <caption>R1 最终布线统计与线宽</caption>
+    <thead>
+      <tr><th scope="col">网络/类别</th><th scope="col">线宽</th><th scope="col">审核关注</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>普通信号</td><td>6 mil</td><td>制造能力、间距和意外细线。</td></tr>
+      <tr><td>USB D+/D−</td><td>8 mil</td><td>成对拓扑、长度、过孔和地参考。</td></tr>
+      <tr><td>GND</td><td>12 mil</td><td>173 条显式 GND 走线与 32 个地过孔共同形成返回网络。</td></tr>
+      <tr><td><code>BUCK_SW</code></td><td>14 mil</td><td>开关环路紧凑并远离反馈节点。</td></tr>
+      <tr><td><code>3V3_SW</code></td><td>16 mil</td><td>负载路径与限流开关连接。</td></tr>
+      <tr><td><code>3V3_SYS</code></td><td>20 mil</td><td>MCU、去耦和 U5 输入路径。</td></tr>
+      <tr><td><code>5V_SW</code></td><td>16 mil</td><td>J2 输出路径和回流。</td></tr>
+      <tr><td><code>VBUS_IN</code></td><td>24 mil 主干；12 mil 短逃逸</td><td>确认 12 mil 只存在于连接器短颈缩。</td></tr>
+    </tbody>
+  </table>
+  <p>“608”是图元数量，不是网络数量，也不是独立导线数量；一条电气路径常由多个线段和过孔组成。
+    审核必须按网络重建连通性，不能从总图元数推断“已连完”。</p>
+</section>
+
+<section aria-labelledby="ch29-4-usb-geometry">
+  <h2 id="ch29-4-usb-geometry">29.4 USB 长度与偏斜测量</h2>
+  <table>
+    <caption>R1 USB D−/D+ 三段 CAD 几何长度</caption>
+    <thead>
+      <tr><th scope="col">区段</th><th scope="col">D−</th><th scope="col">D+</th><th scope="col">绝对偏斜</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>连接器 → ESD</td><td>700.884800 mil</td><td>700.884807 mil</td><td>0.000007 mil</td></tr>
+      <tr><td>ESD → 串联电阻</td><td>483.619088 mil</td><td>483.619146 mil</td><td>0.000058 mil</td></tr>
+      <tr><td>串联电阻 → MCU</td><td>361.880010 mil</td><td>361.880026 mil</td><td>0.000016 mil</td></tr>
+    </tbody>
+  </table>
+  <p>三段均在不放宽差分规则的前提下完成几何匹配。USB 附近过孔到最近地层转换的最大记录距离为 155.33 mil，
+    供样板回流路径复核。以上数据只能证明 CAD 中心线几何；没有已知生产叠层、场求解、眼图、EMI 或 ESD 实测，
+    因而不能声称受控阻抗或 USB 合规。</p>
+</section>
+
+<section aria-labelledby="ch29-5-ground-fills">
+  <h2 id="ch29-5-ground-fills">29.5 十七个已连接 GND 填充区域</h2>
+  <p>最终板没有原生 EasyEDA <code>POUR</code> 对象。制造铜由 17 个静态、已连接的 GND <code>FILL</code> 图元提供：</p>
+  <table>
+    <caption>R1 地铜的源与制造证据</caption>
+    <thead>
+      <tr><th scope="col">层</th><th scope="col">FILL 数量</th><th scope="col">计算面积</th><th scope="col">Gerber 证据</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Top</td><td>11</td><td>562.422 mm²</td><td>GTL 中 11 对 G36/G37 实体区域</td></tr>
+      <tr><td>Bottom</td><td>6</td><td>520.456 mm²</td><td>GBL 中 6 对 G36/G37 实体区域</td></tr>
+    </tbody>
+  </table>
+  <p>每个区域都分配给 GND，并与 173 条显式地走线和 32 个地缝合/树状过孔共同构成回流网络。
+    静态 FILL 不会像原生铺铜那样自动随几何变化可靠重算；任何后续修改都必须重新生成和审核。</p>
+</section>
+
+<section aria-labelledby="ch29-6-missing-copper">
+  <h2 id="ch29-6-missing-copper">29.6 发现并修正“没有物理铜”的问题</h2>
+  <p>R1 过程曾出现“编辑器中有铺铜边界，但制造输出没有所需实体铜”的问题。根因是把边界对象的存在误当成填充成功。
+    这类错误可以与零 DRC 同时存在，因为规则检查可能只看到对象定义，或没有把缺失回流区域建模为违规。</p>
+  <table>
+    <caption>缺铜问题的审核闭环</caption>
+    <thead>
+      <tr><th scope="col">阶段</th><th scope="col">R1 处理方法</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>现象</td><td>源文件中可见边界意图，但导出铜层缺少可制造实体区域。</td></tr>
+      <tr><td>检测</td><td>独立显示 GTL/GBL，直接计数 G36/G37 区域，而非计数边界对象。</td></tr>
+      <tr><td>修正</td><td>建立 17 个具备间距、连接到 GND 的静态 FILL 区域。</td></tr>
+      <tr><td>复验</td><td>项目源中确认 11 顶层 + 6 底层；Gerber 中得到相同区域数；最终 DRC 仍为空。</td></tr>
+      <tr><td>预防</td><td>今后优先使用可重铺原生铜区；若必须静态填充，每次几何变化后重新生成和导出。</td></tr>
+    </tbody>
+  </table>
+  <p>关键方法是从“对象是否存在”转向“工厂文件里是否有目标铜、是否连接正确、是否保持间距”。</p>
+</section>
+
+<section aria-labelledby="ch29-7-off-board-pours">
+  <h2 id="ch29-7-off-board-pours">29.7 发现并移除板外铺铜边界</h2>
+  <p>制造就绪审核发现两个畸形、位于板外的原生铺铜边界，ID 为
+    <code>5296498eb95b5e66</code> 和 <code>d420c7c130568fae</code>。二者均被删除。
+    最终活动 PCB 含 0 个原生 <code>PCB_PrimitivePour</code> 对象和 0 个板外铺铜区域。</p>
+  <ol>
+    <li>取得每个铺铜边界的全部坐标和包围盒。</li>
+    <li>与单一闭合板框的最小/最大 X、Y 比较，而不是只凭缩放后的画面判断。</li>
+    <li>确认边界位于目标层、目标网络，且没有自交、异常远点或退化线段。</li>
+    <li>重铺并检查实际铜；若删除对象，确认没有残留缓存铜。</li>
+    <li>重新导出 Gerber，检查板外无铜，板内 17 个 GND 区域仍存在。</li>
+  </ol>
+  <aside class="warning" aria-labelledby="ch29-static-fill-warning">
+    <h3 id="ch29-static-fill-warning">修正方案也有维护代价</h3>
+    <p>R1 的静态 FILL 已经制造文件验证，但不是理想的长期可维护方案。若 R2 改动布局或布线，应优先重建可重铺的原生铜区，
+      再审核边界和 Gerber，而不是复制 R1 的静态几何后继续修改。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch29-8-drc-insufficient">
+  <h2 id="ch29-8-drc-insufficient">29.8 为什么零错误 DRC 必要但不充分</h2>
+  <table>
+    <caption>R1 的“零 DRC”之外还需要什么</caption>
+    <thead>
+      <tr><th scope="col">问题</th><th scope="col">DRC 能否充分证明</th><th scope="col">R1 的补充证据</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>47 个网络物理连通</td><td>否，连接缓存可能过期</td><td>保存、关闭、重开后 DRC + 独立几何连通 47/47。</td></tr>
+      <tr><td>器件可装</td><td>否</td><td>1128 对实体与庭院双审核，重叠均为 0。</td></tr>
+      <tr><td>J1 朝向可用</td><td>否</td><td>配合方向、板边、有意悬边和装配图审核。</td></tr>
+      <tr><td>地铜真实制造</td><td>否</td><td>GTL 11 区域、GBL 6 区域直接验证。</td></tr>
+      <tr><td>BOM/CPL/DNP 正确</td><td>否</td><td>46 拟装配 + J2/J3 DNP = 48，位号集合交叉核对。</td></tr>
+      <tr><td>USB、热与电源性能</td><td>否</td><td>当前明确标为待样板测量，没有伪造通过结论。</td></tr>
+    </tbody>
+  </table>
+  <p>最终 DRC 的连接、间距、差分对和其他类别均为 0，这是一项必要发布门；它之所以可信，是因为同时保存了规则外的证据，
+    而不是因为“0”本身具有魔力。</p>
+</section>
+
+<section aria-labelledby="ch29-9-package">
+  <h2 id="ch29-9-package">29.9 最终制造包的内容</h2>
+  <table>
+    <caption><code>USB_GPIO_R1_fabrication.zip</code> 的 8 个有效载荷文件</caption>
+    <thead>
+      <tr><th scope="col">文件</th><th scope="col">大小</th><th scope="col">内容与已验证数量</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>usb_gpio_R1_Gerber.zip</code></td><td>99,055 B</td><td>14 个有效条目；铜、阻焊、顶层钢网、丝印、板框和三类钻孔。</td></tr>
+      <tr><td><code>usb_gpio_R1_BOM.csv</code></td><td>4,142 B</td><td>UTF-16 表格；10 列；21 个分组行；46 个拟装配位号。</td></tr>
+      <tr><td><code>usb_gpio_R1_BOM.xlsx</code></td><td>8,383 B</td><td>可读 Excel 形式的同一 BOM。</td></tr>
+      <tr><td><code>usb_gpio_R1_CPL.csv</code></td><td>14,922 B</td><td>UTF-16 表格；18 列；48 个唯一顶面位置。</td></tr>
+      <tr><td><code>usb_gpio_R1_Assembly.pdf</code></td><td>748,752 B</td><td>有效 PDF，7 页，保留全部 48 位号。</td></tr>
+      <tr><td><code>usb_gpio_R1_Schematic.pdf</code></td><td>246,384 B</td><td>有效 PDF，1 页。</td></tr>
+      <tr><td><code>usb_gpio_R1_project.epro2</code></td><td>431,250 B</td><td>有效 EasyEDA 项目归档，含最终源和预览。</td></tr>
+      <tr><td><code>usb_gpio_R1_manifest.txt</code></td><td>6,806 B</td><td>记录身份、数量、纠错、DRC、交付物和哈希。</td></tr>
+    </tbody>
+  </table>
+  <p>外层 ZIP 还含一个 <code>R1/</code> 目录项，不应误计为第九个交付文件。8 个有效载荷与 R1 源目录逐字节一致，
+    ZIP 完整性测试通过；外层 SHA-256 为
+    <code>9338b27dd72e221447259a6c77af5f8c95fc479c06f6b3febff2278b2fd916fd</code>。</p>
+</section>
+
+<section aria-labelledby="ch29-10-lessons">
+  <h2 id="ch29-10-lessons">29.10 经验教训与流程改进</h2>
+  <table>
+    <caption>R1 纠错历史：现象—修正—预防</caption>
+    <thead>
+      <tr><th scope="col">实际问题</th><th scope="col">最终修正与证据</th><th scope="col">应固化的流程</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>板框曾未闭合</td><td>最终为一个锁定、显式闭合的折线；GKO 独立测得 49.999900 × 24.000460 mm。</td><td>在布局前和发布后分别检查源板框与导出板框。</td></tr>
+      <tr><td>J1 曾朝向错误</td><td>最终中心 (200.5, 472) mil、-90°、朝左；-5.055 mil 外壳悬边有意且记录。</td><td>连接器放置必须审核配合件运动方向，不只审核引脚。</td></tr>
+      <tr><td>R1 与 USB-C 外壳、C8/C9 曾发生机械冲突</td><td>R1 已移出外壳；C8/C9 两种包络间隙分别为 49.650/45.709 mil；1128 对全审重叠为 0。</td><td>自动枚举全部器件对，实体和庭院各做一次。</td></tr>
+      <tr><td>重新布局使旧布线失效</td><td>移除陈旧铜并完成 608 条最终走线；47/47 网络独立连通。</td><td>任何器件移动都使旧连通与局部签核失效。</td></tr>
+      <tr><td>EasyEDA 连接图缓存过期</td><td>保存、关闭、重开后运行最终 DRC，详细结果为空。</td><td>把重开刷新写入发布程序，而非临时排障技巧。</td></tr>
+      <tr><td>铺铜只有边界、没有所需实体铜</td><td>GTL/GBL 最终直接确认 11 + 6 个 GND 实体区域。</td><td>“Gerber 有铜”才是制造证据，不能以源对象数量代替。</td></tr>
+      <tr><td>两个原生铺铜边界畸形并越出板外</td><td>删除两个记录 ID；最终原生 POUR 为 0，板外铺铜为 0。</td><td>重铺前先检查边界坐标和包围盒，重铺后再检查 Gerber。</td></tr>
+    </tbody>
+  </table>
+  <p>文档也必须跟随最终源纠错：早期提案约 45 × 20 mm，最终为 50 × 24 mm；早期 8 MHz 晶振意图被
+    12 MHz X322512MSB4SI 取代；旧 LDO 表述被 U3 SY8089 Buck 取代；5 V 限流电阻最终为 R7=16.9 kΩ，
+    不是只写“约 17 kΩ”。R1 没有外部 GPIO ESD 阵列，也没有负载开关故障输出网络，教材不得把建议写成已实现功能。</p>
+  <p>流程改进的核心是：设计对象、导出文件和硬件行为分属三种证据层。每次变更都从受影响的最早质量门重新开始，
+    并把失败案例保留下来用于防错，而不是只保存最后一张“全绿”截图。</p>
+</section>
+
+<section class="error-case" aria-labelledby="ch29-failure-cases">
+  <h2 id="ch29-failure-cases">若只保留最终截图，会失去什么</h2>
+  <ul>
+    <li>无法知道零 DRC 之前曾有开板框、方向和碰撞问题，因而下一版会重复。</li>
+    <li>无法区分 17 个静态 FILL 与可重铺原生 POUR，后续移动器件后可能保留过时铜。</li>
+    <li>无法解释 46 BOM 位号与 48 CPL 位号的差异，DNP 容易被误装。</li>
+    <li>无法证明发送给制造商的 ZIP 与审核过的目录是同一批字节。</li>
+    <li>最危险的是把“可制造文件”误写成“硬件已验证”，从而跳过安全上电和功能测试。</li>
+  </ul>
+</section>
+
+<section class="experiment" aria-labelledby="ch29-exercise">
+  <h2 id="ch29-exercise">案例练习：重建一份独立发布结论</h2>
+  <ol>
+    <li>仅用本章表格写出 R1 的尺寸、层数、器件、拟装配、DNP、焊盘、网络、走线和过孔基线。</li>
+    <li>从纠错历史中选择三个问题，分别指出为什么 DRC 不能单独发现或证明修正。</li>
+    <li>为“17 个地铜区域”建立源文件证据、Gerber 证据和变更失效条件。</li>
+    <li>解释 USB 偏斜数据为什么不能支持“受控阻抗已经验证”的结论。</li>
+    <li>写出送样批准后仍必须完成的五项实物测试。</li>
+  </ol>
+  <p><strong>通过判据：</strong>结论必须明确写成“可送原型制造”，并把硬件测试列为未完成；若出现“已调通”或“已量产验证”，
+    即判失败。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="ch29-quality-gate">
+  <h2 id="ch29-quality-gate">案例最终质量门</h2>
+  <p>R1 只有在以下证据同时成立时才获放行：刷新后 DRC 全部为 0；47/47 网络连通；1128 对双包络审核无重叠；
+    板框、板边和连接器正确；46+2=48 的装配闭环成立；17 个 GND 区域在实际 Gerber 中存在；8 文件发布包字节和哈希一致。
+    该门只批准原型制造文件。</p>
+</section>
+
+<section aria-labelledby="ch29-summary">
+  <h2 id="ch29-summary">本章小结</h2>
+  <p>USB GPIO R1 的价值不只在最终数字，而在纠错链条：开板框、错方向、实体碰撞、旧布线、缓存和假铺铜都曾绕过局部检查。
+    最终发布通过独立连通、全机械审核、Gerber 实体铜、BOM/CPL/DNP、文件哈希和明确的未验证清单，把“看起来正确”
+    转化为“证据足以送样”。</p>
+</section>
+
+<section aria-labelledby="ch29-sources">
+  <h2 id="ch29-sources">事实来源</h2>
+  <p>案例以最终 EasyEDA 项目归档、fabrication checklist、manifest、BOM、CPL、Gerber/钻孔、原理图/装配 PDF
+    和外层发布 ZIP 为权威来源；纠错项目来自已批准实施计划和最终审核记录。早期 proposal 仅用于说明设计演进，
+    与最终源冲突时以最终源为准。</p>
+</section>
