@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="35. 故障排查方法（Troubleshooting Method） — USB GPIO PCB 离线教程">
+  <title>35. 故障排查方法（Troubleshooting Method） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-35">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html" aria-current="page">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</li><li aria-current="page">35. 故障排查方法（Troubleshooting Method）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</p>
+          <h1>35. 故障排查方法（Troubleshooting Method）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch35-learning-objectives">学习目标与排障原则</a></li><li class="toc-level-2"><a href="#sec-35-1">35.1 观察、提出假设、测量并隔离</a></li><li class="toc-level-2"><a href="#sec-35-2">35.2 区分原理图、布局、装配与固件故障</a></li><li class="toc-level-2"><a href="#sec-35-3">35.3 电源轨排障</a></li><li class="toc-level-2"><a href="#sec-35-4">35.4 USB 枚举排障</a></li><li class="toc-level-2"><a href="#sec-35-5">35.5 时钟与复位排障</a></li><li class="toc-level-2"><a href="#sec-35-6">35.6 GPIO、PWM 与 UART 排障</a></li><li class="toc-level-3"><a href="#sec-35-6-gpio">GPIO</a></li><li class="toc-level-3"><a href="#sec-35-6-pwm">PWM</a></li><li class="toc-level-3"><a href="#sec-35-6-uart">UART</a></li><li class="toc-level-2"><a href="#sec-35-7">35.7 短路、开路、错值、反向器件和不良焊点</a></li><li class="toc-level-2"><a href="#sec-35-8">35.8 利用电流消耗与热迹象</a></li><li class="toc-level-2"><a href="#sec-35-9">35.9 记录证据，而不是一次改变多个变量</a></li><li class="toc-level-3"><a href="#sec-35-9-change-control">为何一次只改一个变量</a></li><li class="toc-level-2"><a href="#sec-35-10">35.10 完整排障情景</a></li><li class="toc-level-3"><a href="#scenario-35-a">情景 A：3V3_SYS 为 0，电流不高</a></li><li class="toc-level-3"><a href="#scenario-35-b">情景 B：USB 只在一个插头方向枚举</a></li><li class="toc-level-3"><a href="#scenario-35-c">情景 C：3V3_SW 关闭命令后仍有电压</a></li><li class="toc-level-3"><a href="#scenario-35-d">情景 D：UART 在高波特率偶发乱码</a></li><li class="toc-level-2"><a href="#ch35-summary">本章小结</a></li></ul></nav>
+        <section aria-labelledby="ch35-learning-objectives">
+  <h2 id="ch35-learning-objectives">学习目标与排障原则</h2>
+  <p>排障不是“把可能的东西都换一遍”，而是用最少、最安全的测量把候选原因逐步分开。本章所有案例都是依据 R1 设计和元件失效模式构造的教学情景，<strong>不是已经在实物上发生的故障</strong>；R1 当前仍没有硬件实测记录。</p>
+  <aside class="warning" aria-label="排障安全底线">
+    <p>发现过压、硬短路、烟、异味、快速温升或主机过流时，先断电。不要在故障板上绕过限流、反复热插拔、盲目补焊或把示波器地夹接到非 GND 节点。任何返修后都必须回到无电检查和限流首次上电。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="sec-35-1">
+  <h2 id="sec-35-1">35.1 观察、提出假设、测量并隔离</h2>
+  <p>一个有效循环包含四步：</p>
+  <ol>
+    <li><strong>观察（Observe）：</strong>把“坏了”改写成可重复事实，例如“5.0 V 输入、50 mA 限流时电源进入 CC，3V3_SYS 为 0.18 V”。</li>
+    <li><strong>假设（Hypothesize）：</strong>列出能解释全部观察的少量候选，并写出每个候选预测的下一项读数。</li>
+    <li><strong>测量（Measure）：</strong>选择最能区分候选且风险最低的测量；先电源、复位、时钟，再协议。</li>
+    <li><strong>隔离（Isolate）：</strong>一次只改变一个变量，把故障限制到电源域、接口、某段网络、器件或固件状态。</li>
+  </ol>
+  <table>
+    <caption>表 35-1　把模糊描述转化为可检验陈述</caption>
+    <thead><tr><th scope="col">模糊说法</th><th scope="col">可检验陈述</th><th scope="col">下一项区分测量</th></tr></thead>
+    <tbody>
+      <tr><td>USB 不工作</td><td>主机无连接事件；VBUS=____，3V3=____，NRST=____</td><td>检查设备日志与 D+/D−活动</td></tr>
+      <tr><td>电源不稳</td><td>3V3_SYS 每 ____ ms 从 ____ V 跌到 ____ V</td><td>同步捕获 VBUS、电流、3V3 和 NRST</td></tr>
+      <tr><td>UART 乱码</td><td>115200 8-N-1 下每 ____ 字节错 ____</td><td>测位时间、幅度和共同地</td></tr>
+      <tr><td>板很热</td><td>U3 表面从 ____ °C 在 ____ s 升到 ____ °C</td><td>关联输入/输出功率与热点位置</td></tr>
+    </tbody>
+  </table>
+  <p>每次循环都应产生新证据。如果一个动作不会改变候选概率，例如在没有 SWD 错误证据时反复刷同一固件，就不应优先执行。</p>
+</section>
+
+<section aria-labelledby="sec-35-2">
+  <h2 id="sec-35-2">35.2 区分原理图、布局、装配与固件故障</h2>
+  <table>
+    <caption>表 35-2　故障层级及其典型证据</caption>
+    <thead><tr><th scope="col">层级</th><th scope="col">例子</th><th scope="col">支持证据</th><th scope="col">反证</th></tr></thead>
+    <tbody>
+      <tr><td>原理图/规格</td><td>反馈阻值选择错误、缺少放电路径、引脚功能冲突</td><td>所有板同样失败；网络与最终源一致却不满足要求</td><td>同版本其他板稳定通过</td></tr>
+      <tr><td>PCB 布局/信号完整性</td><td>Buck 回路过大、USB 回流不连续、探测困难</td><td>工况/边沿相关；所有板趋势相似；对探法敏感</td><td>故障跟随单一器件返修</td></tr>
+      <tr><td>装配</td><td>焊桥、开焊、错值、反向、虚焊</td><td>单板异常；显微镜/X 射线/连通测试定位</td><td>多片同点同症状且装配无差异</td></tr>
+      <tr><td>固件</td><td>引脚复用错、缓冲溢出、挂起未关输出</td><td>SWD/硬件正常，行为随构建或命令改变</td><td>无论固件/停机状态都存在硬短路</td></tr>
+      <tr><td>测试系统</td><td>坏线缆、探头地太长、负载校准错误</td><td>故障跟随仪器/治具，已知良好板也复现</td><td>换治具后同一板仍在相同内部节点失败</td></tr>
+    </tbody>
+  </table>
+  <p>不要把“DRC 为 0”当成排除原理图/布局故障的证据。R1 的 CAD 已确认 47/47 网络连通、机械无重叠，但这不证明电源稳定、时钟起振、USB 合规或固件安全。</p>
+</section>
+
+<section aria-labelledby="sec-35-3">
+  <h2 id="sec-35-3">35.3 电源轨排障</h2>
+  <p>按能量流方向排查，而不是从最复杂的 MCU 开始：</p>
+  <figure aria-labelledby="fig-35-1-caption">
+    <pre><code>受控源 → 夹具/J1 → VBUS_IN → U3/L1 → 3V3_SYS → U1
+                         ├→ U4/EN_5V  → 5V_SW
+                         └→ U5/EN_3V3 → 3V3_SW</code></pre>
+    <figcaption id="fig-35-1-caption">图 35-1　先确认上游，再判断下游；每一步都同时看电压与电流。</figcaption>
+  </figure>
+  <ol>
+    <li><strong>无电：</strong>测 VBUS/3V3/两路 SW 对 GND，交换表笔并与良板比较。稳定近零提示短路，但无统一“正常欧姆值”。</li>
+    <li><strong>低能量上电：</strong>1 V、20 mA 检查是否立即 CC；若是，故障多在 VBUS 侧硬短路或夹具。</li>
+    <li><strong>确认 VBUS：</strong>电源端有 5 V、板端没有，查线、J1、焊点和接触；板端被拉低则查 C1/C2/C13、U2/U3。</li>
+    <li><strong>确认 3V3_SYS：</strong>无输出查 U3、L1 开路/方向、C3 短路；偏高立即断电并查 R5/R6/BUCK_FB。</li>
+    <li><strong>确认使能：</strong>U4/U5 输入正常但输出为 0，测 EN；EN 正确再查开关、R7/R8 和输出短路。</li>
+    <li><strong>同步观察：</strong>轨周期跌落时，同时捕获 VBUS、3V3_SYS、NRST 和电流，区分上游限流、Buck 打嗝和固件复位。</li>
+  </ol>
+  <table>
+    <caption>表 35-3　关键元件失效与预期症状</caption>
+    <thead><tr><th scope="col">候选</th><th scope="col">预期症状</th><th scope="col">安全确认</th></tr></thead>
+    <tbody>
+      <tr><td>C1/C2/C13 短路</td><td>VBUS 对地低阻，低压即 CC</td><td>断电分区测阻、热定位</td></tr>
+      <tr><td>L1 开路</td><td>BUCK_SW 可能活动但 3V3_SYS 无输出</td><td>无电连通与显微镜</td></tr>
+      <tr><td>R5 开路/R6 过低</td><td>反馈偏低，输出可能危险升高</td><td>不继续上电；核对阻值和焊点</td></tr>
+      <tr><td>C3 低容/开路</td><td>纹波、瞬态跌落或稳定性恶化</td><td>地弹簧波形与替代测量</td></tr>
+      <tr><td>U4/U5 短路</td><td>输出无法关闭</td><td>EN=0 时测输出并排除外部反灌</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="sec-35-4">
+  <h2 id="sec-35-4">35.4 USB 枚举排障</h2>
+  <p>按“电源 → 复位/时钟 → 主机事件 → 物理链路 → 描述符 → CDC 数据”分层：</p>
+  <ol>
+    <li><strong>主机完全无事件：</strong>确认线缆可传数据、VBUS/3V3 正常、U1 在运行。换线是有控制的对照，不是结论。</li>
+    <li><strong>反复连接/断开：</strong>看电流、3V3_SYS 和 NRST 是否同步周期变化；先排除电源复位循环。</li>
+    <li><strong>未知设备/描述符失败：</strong>保存主机第一条错误，检查固件描述符、时钟准确度和端点初始化。</li>
+    <li><strong>仅一个 USB-C 方向有效：</strong>检查 J1 A/B 侧 D+/D−与 CC 焊点、连接器本体和 R1/R2 5.1 kΩ，不把问题归咎于操作系统。</li>
+    <li><strong>有枚举但传输失败：</strong>检查 CDC 缓冲、端点服务、主机流控和测试协议；再看 U2、R3/R4 与波形。</li>
+    <li><strong>仅某线/集线器失败：</strong>形成兼容矩阵，区分边沿/供电裕量与主机软件差异。</li>
+  </ol>
+  <p>U2 缺失/开路可能仍能枚举但 ESD 防护下降；U2 短路、漏电或方向错误则可能把 D+/D−钳住。R3/R4 开路会切断相应数据线，错值可能改变边沿。CAD 的极小几何偏斜不能排除焊接、阻抗或保护器件故障。</p>
+</section>
+
+<section aria-labelledby="sec-35-5">
+  <h2 id="sec-35-5">35.5 时钟与复位排障</h2>
+  <p>时钟和复位互相影响：没有稳定 3V3，复位不会可靠释放；外部晶体不起振时，固件可能无法建立 USB。推荐顺序：</p>
+  <ol>
+    <li>先测 3V3_SYS，确认没有周期跌落。</li>
+    <li>捕获 NRST 上电波形。R12/C10 名义时间常数为 1 ms，但不要把“不是 1 ms”自动判故障。</li>
+    <li>若 NRST 一直低，断开 J3 治具，查 C10 短路、R12 开路、焊桥和调试器开漏设置。</li>
+    <li>若 NRST 高但 SWD 无法连接，降低 SWD 时钟并用“连接并保持复位”；核对 SWDIO/SWCLK。</li>
+    <li>时钟优先通过 SWD 运行状态、时钟输出、PWM 长时频率或 USB 行为间接确认。</li>
+    <li>必须直接测 Y1 时使用低电容探头，比较接入前后行为。C11/C12 各 12 pF，而负载匹配尚未验证。</li>
+  </ol>
+  <table>
+    <caption>表 35-4　复位/时钟症状矩阵</caption>
+    <thead><tr><th scope="col">NRST</th><th scope="col">SWD</th><th scope="col">USB</th><th scope="col">优先候选</th></tr></thead>
+    <tbody>
+      <tr><td>持续低</td><td>可能仅保持复位可连</td><td>无</td><td>C10、R12、J3/治具、焊桥</td></tr>
+      <tr><td>周期低脉冲</td><td>间歇</td><td>反复重连</td><td>电源跌落、看门狗、异常复位</td></tr>
+      <tr><td>稳定高</td><td>可连</td><td>无</td><td>晶体/USB 固件/U2/R3/R4</td></tr>
+      <tr><td>稳定高</td><td>不可连</td><td>无</td><td>SWD 接线、选项字节、U1 焊接/损伤</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="sec-35-6">
+  <h2 id="sec-35-6">35.6 GPIO、PWM 与 UART 排障</h2>
+  <h3 id="sec-35-6-gpio">GPIO</h3>
+  <ul>
+    <li>先确认主机命令索引、J2 引脚和 MCU 映射，再测 MCU 侧与连接器侧。MCU 侧正常、J2 侧异常通常指向 R14～R21 或焊接。</li>
+    <li>输入一直高/低时，断开外部源，检查内部拉电阻、开关接地和是否误接 5V_SW。</li>
+    <li>安全状态失败时同时测引脚与 EN_5V/EN_3V3，区分 GPIO 配置和负载开关问题。</li>
+  </ul>
+  <h3 id="sec-35-6-pwm">PWM</h3>
+  <ul>
+    <li>四路频率都错相同比例：查 TIM3 时钟、预分频或 Y1；仅一路缺失：查通道复用和对应 R14～R17。</li>
+    <li>端点窄脉冲：检查比较寄存器更新顺序；频率正确而占空比错：检查计数上限和舍入。</li>
+    <li>只有示波器显示振铃而逻辑功能正常：先用短地弹簧复测，排除探头伪影。</li>
+  </ul>
+  <h3 id="sec-35-6-uart">UART</h3>
+  <ul>
+    <li>无数据：确认 TX/RX 交叉、3.3 V 电平、共同地和 R22/R23 连通。</li>
+    <li>乱码：测 <var>t</var><sub>BIT</sub> = 1/baud，核对数据位、校验和停止位；禁止接 RS-232。</li>
+    <li>高波特率或长线才错：比较边沿、线长、地回路和时钟误差；不要先把串联电阻短掉。</li>
+    <li>物理帧正确但命令失败：转向缓冲、协议状态机和校验，不再反复检查焊点。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sec-35-7">
+  <h2 id="sec-35-7">35.7 短路、开路、错值、反向器件和不良焊点</h2>
+  <table>
+    <caption>表 35-5　装配缺陷的检测组合</caption>
+    <thead><tr><th scope="col">缺陷</th><th scope="col">静态证据</th><th scope="col">动态症状</th><th scope="col">确认方法</th></tr></thead>
+    <tbody>
+      <tr><td>短路/焊桥</td><td>低阻、显微镜可见、热定位</td><td>限流、轨下降、局部热</td><td>断电分区测阻；清洁后复检</td></tr>
+      <tr><td>开路/虚焊</td><td>连通不稳定、引脚可移动</td><td>功能间歇、受按压/温度影响</td><td>轻微非破坏机械检查、四线连通、显微镜</td></tr>
+      <tr><td>错值</td><td>标记/采购/离线测量不符</td><td>输出设定、限流、时序偏差</td><td>与 BOM/装配图核对；必要时抬脚测量</td></tr>
+      <tr><td>反向/错方向</td><td>极性标志与装配图不符</td><td>无功能、钳位、过流</td><td>断电确认 D1、U2～U5、J1 方向</td></tr>
+      <tr><td>污染/助焊剂残留</td><td>表面残留、绝缘电阻变化</td><td>高阻节点漂移、潮湿敏感</td><td>受控清洗、干燥、复测；记录前后差异</td></tr>
+    </tbody>
+  </table>
+  <p>返修前拍照并记录原始症状。返修后不要只测“原故障消失”，还要检查相邻焊盘、器件值、无电电阻和完整回归。J2/J3 未装是设计 DNP，不应误判为漏装。</p>
+</section>
+
+<section aria-labelledby="sec-35-8">
+  <h2 id="sec-35-8">35.8 利用电流消耗与热迹象</h2>
+  <p>电流和热像能快速缩小范围，但不能单独给出根因。</p>
+  <table>
+    <caption>表 35-6　电流/热模式的解释</caption>
+    <thead><tr><th scope="col">模式</th><th scope="col">可能原因</th><th scope="col">需要的第二证据</th></tr></thead>
+    <tbody>
+      <tr><td>几乎无电流，3V3=0</td><td>供电开路、J1/夹具、U3/L1 开路</td><td>逐节点电压与连通</td></tr>
+      <tr><td>立即达到限流</td><td>硬短路、反向器件、错误夹具</td><td>无电阻值与低压热定位</td></tr>
+      <tr><td>周期性电流脉冲</td><td>Buck 打嗝、看门狗/复位循环、USB 重连</td><td>同步 3V3/NRST/USB 日志</td></tr>
+      <tr><td>U3/L1 热</td><td>3V3 过载、错误电感、稳定性/开关损耗</td><td>输入输出功率、纹波和负载</td></tr>
+      <tr><td>U4/U5 关闭时热</td><td>开关击穿、EN 错、反向供电</td><td>EN、电流方向与外部连接</td></tr>
+      <tr><td>J1/焊点热</td><td>接触电阻、焊接不足、过大电流</td><td>连接器两端压降与显微镜</td></tr>
+    </tbody>
+  </table>
+  <p>用 <var>P</var> = <var>V</var> × <var>I</var> 做功率守恒检查：若输入功率远大于已知输出功率，差值会成为热。红外热点只说明损耗位置附近，需要结合网络、压降和元件功能判断。</p>
+</section>
+
+<section aria-labelledby="sec-35-9">
+  <h2 id="sec-35-9">35.9 记录证据，而不是一次改变多个变量</h2>
+  <table>
+    <caption>表 35-7　最小排障日志</caption>
+    <thead><tr><th scope="col">时间/板号</th><th scope="col">复现条件</th><th scope="col">观察</th><th scope="col">假设与预测</th><th scope="col">唯一改变/测量</th><th scope="col">结果</th><th scope="col">下一步</th></tr></thead>
+    <tbody>
+      <tr><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <p>原始记录至少包含：固件哈希、发布板版本、供电/限流、负载、线缆、仪器与设置、环境、照片/波形文件名。文件名应能关联日志行，例如 <code>R1-03_3v3-reset_2026-__-__</code>，而不是 <code>scope1.png</code>。</p>
+  <h3 id="sec-35-9-change-control">为何一次只改一个变量</h3>
+  <p>如果同时换线、重刷固件和补焊 U2 后 USB 恢复，三个动作都成为候选，无法形成预防措施。先做可逆、低风险的对照；必须返修时，记录返修前后同一套测量。恢复并不等于根因已证明。</p>
+</section>
+
+<section aria-labelledby="sec-35-10">
+  <h2 id="sec-35-10">35.10 完整排障情景</h2>
+  <article class="example" aria-labelledby="scenario-35-a">
+    <h3 id="scenario-35-a">情景 A：3V3_SYS 为 0，电流不高</h3>
+    <p><strong>观察：</strong>限流源保持 CV，VBUS_IN 正常，3V3_SYS 为 0，U3/L1 不热。<strong>假设：</strong>L1 开路、U3 未开关、测点错误。<strong>区分：</strong>断电测 L1 两端连通；再用安全差分方法确认 U3 输入和开关活动。若 L1 开路得到确认，返修后回到第 31 章。该情景是教学构造，并非 R1 实测。</p>
+  </article>
+  <article class="example" aria-labelledby="scenario-35-b">
+    <h3 id="scenario-35-b">情景 B：USB 只在一个插头方向枚举</h3>
+    <p><strong>观察：</strong>电源和固件在两个方向一致，但方向 B 主机无设备事件。<strong>假设：</strong>J1 某侧 CC 或 D+/D−焊点开路、线缆方向相关故障。<strong>区分：</strong>换已知良好线仍随板端方向；断电检查 J1 A/B 触点至合并网络连通与 R1/R2。不要先改 USB 串联电阻。</p>
+  </article>
+  <article class="example" aria-labelledby="scenario-35-c">
+    <h3 id="scenario-35-c">情景 C：3V3_SW 关闭命令后仍有电压</h3>
+    <p><strong>观察：</strong>EN_3V3 已低，空载输出缓慢下降；接 10 kΩ 安全负载后快速下降。<strong>假设：</strong>C5 残压而非 U5 短路。<strong>区分：</strong>比较有/无负载放电时间并测电流方向。若输出持续供电且能带负载，再考虑 U5 击穿或外部反灌。由此可形成 R2 增加受控放电的需求。</p>
+  </article>
+  <article class="example" aria-labelledby="scenario-35-d">
+    <h3 id="scenario-35-d">情景 D：UART 在高波特率偶发乱码</h3>
+    <p><strong>观察：</strong>低速零错，高速仅 1 m 线出现错误；示波位时间正确，边沿慢且有地弹。<strong>假设：</strong>线缆/回流裕量、接收阈值、软件溢出。<strong>区分：</strong>缩短线、保持数据量；同时看 UART 硬件帧错误和软件溢出计数。错误随线长消失支持物理链路假设，若只在 USB 高负载出现则转查软件调度。</p>
+  </article>
+  <aside class="checkpoint" aria-label="故障关闭条件">
+    <p><strong>关闭故障单前：</strong>根因有至少两条独立证据；修复只针对根因；完整回归通过；相同缺陷的批次范围已评估；预防措施已落到设计、工艺、测试或文档，而不是只写“加强注意”。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch35-summary">
+  <h2 id="ch35-summary">本章小结</h2>
+  <p>系统排障从可重复观察开始，按电源、复位、时钟、接口和协议逐层隔离。电流、热像、显微镜和日志都只是证据的一部分；一次一个变量、保留原始记录并完成修复后回归，才能把一次“修好”变成可复用的工程知识。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="34-performance-reliability.html"><small>上一页</small>34. 性能与可靠性测量（Measuring Performance and Reliability）</a><a class="next" rel="next" href="36-engineering-trade-offs.html"><small>下一页</small>36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="37. R2 版本建议项目（Suggested Revision-B Projects） — USB GPIO PCB 离线教程">
+  <title>37. R2 版本建议项目（Suggested Revision-B Projects） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-37">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html" aria-current="page">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</li><li aria-current="page">37. R2 版本建议项目（Suggested Revision-B Projects）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</p>
+          <h1>37. R2 版本建议项目（Suggested Revision-B Projects）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch37-project-rules">R2 课程设计的共同规则</a></li><li class="toc-level-3"><a href="#ch37-common-workflow">共同工作流</a></li><li class="toc-level-2"><a href="#sec-37-1">37.1 用经过验证的原生铺铜替换静态填充</a></li><li class="toc-level-3"><a href="#proj-37-1-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-1-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-1-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-2">37.2 增加受控阻抗叠层要求</a></li><li class="toc-level-3"><a href="#proj-37-2-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-2-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-2-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-3">37.3 改善去耦位置与电源回路紧凑性</a></li><li class="toc-level-3"><a href="#proj-37-3-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-3-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-3-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-4">37.4 为外部 I/O 增加可选 ESD 保护</a></li><li class="toc-level-3"><a href="#proj-37-4-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-4-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-4-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-5">37.5 增加模拟输入或电流检测</a></li><li class="toc-level-3"><a href="#proj-37-5-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-5-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-5-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-6">37.6 增加电气隔离</a></li><li class="toc-level-3"><a href="#proj-37-6-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-6-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-6-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-7">37.7 增加硬件 UART 流控</a></li><li class="toc-level-3"><a href="#proj-37-7-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-7-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-7-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-8">37.8 在不牺牲机械间距的前提下缩小板尺寸</a></li><li class="toc-level-3"><a href="#proj-37-8-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-8-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-8-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-9">37.9 设计自动化生产测试治具</a></li><li class="toc-level-3"><a href="#proj-37-9-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-9-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-9-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#sec-37-10">37.10 用 R1 实测结果校正计算</a></li><li class="toc-level-3"><a href="#proj-37-10-inputs">输入与约束</a></li><li class="toc-level-3"><a href="#proj-37-10-tasks">任务与交付物</a></li><li class="toc-level-3"><a href="#proj-37-10-acceptance">专项验收</a></li><li class="toc-level-2"><a href="#ch37-summary">本章小结</a></li></ul></nav>
+        <section aria-labelledby="ch37-project-rules">
+  <h2 id="ch37-project-rules">R2 课程设计的共同规则</h2>
+  <p>本章把 R1 的已知局限转化为十个可独立完成的 Revision B（R2）项目。它们是设计题，不是对现有 R1 的直接修改指令；应在 R1 发布包的只读副本或新修订分支中工作，保留原始制造基线。R1 目前没有实物测量，任何依赖实验的数据都必须标为“待测”，不得填造结果。</p>
+  <h3 id="ch37-common-workflow">共同工作流</h3>
+  <ol>
+    <li>写出问题、使用场景、必须满足和可选要求。</li>
+    <li>建立 R1 基线，区分设计事实、计算值、预期值和实测值。</li>
+    <li>提出至少两个方案，用量化决策矩阵选择，不只凭偏好。</li>
+    <li>在新版本中完成原理图/PCB/机械/制造更新，并执行 ERC、DRC、3D 与 Gerber 复核。</li>
+    <li>编写安全、可执行的验证计划；没有硬件时提交空白记录表和预期范围，而不是虚构通过。</li>
+    <li>提交变更清单、风险清单、回滚路径和与 R1 的差异报告。</li>
+  </ol>
+  <table>
+    <caption>表 37-1　所有项目的基础评分（100 分）</caption>
+    <thead><tr><th scope="col">维度</th><th scope="col">分值</th><th scope="col">评价重点</th></tr></thead>
+    <tbody>
+      <tr><td>需求与事实追溯</td><td>15</td><td>目标可验证；事实状态正确；无假实测</td></tr>
+      <tr><td>方案比较与计算</td><td>20</td><td>至少两案；变量、单位、假设和容差完整</td></tr>
+      <tr><td>原理图/PCB/机械实现</td><td>25</td><td>接口、布局、回流、封装和可制造性</td></tr>
+      <tr><td>验证与安全</td><td>25</td><td>仪器、量程、停止条件、记录表和通过判据</td></tr>
+      <tr><td>文档与复现</td><td>15</td><td>变更日志、图纸、制造包、风险和复盘清晰</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="sec-37-1">
+  <h2 id="sec-37-1">37.1 用经过验证的原生铺铜替换静态填充</h2>
+  <p><strong>问题：</strong>R1 没有原生 POUR，而有 17 个已在 Gerber 验证连通的静态 GND FILL（顶层 11、底层 6）。静态图元不会随走线、板框或间距变化自动重铺，维护风险高。</p>
+  <h3 id="proj-37-1-inputs">输入与约束</h3>
+  <ul>
+    <li>R1 PCB、Gerber、17 区域清单、47 网络连通基线和现有地过孔/走线。</li>
+    <li>不得让铺铜跨越板框、形成悬空孤岛、吞没 USB 间距或改变非 GND 网络。</li>
+    <li>所有规则值必须来自选定制造商能力和项目间距规范，不能凭编辑器默认值。</li>
+  </ul>
+  <h3 id="proj-37-1-tasks">任务与交付物</h3>
+  <ol>
+    <li>在 R2 副本中删除/禁用旧静态区域，建立顶/底 GND 原生铺铜及明确优先级、热焊盘、孤岛和边界规则。</li>
+    <li>重铺后检查每个 GND 区域到主地的连接、窄颈、回流路径和板边距离。</li>
+    <li>输出铜层 Gerber，对照 R1 做图形差异；记录面积变化但不把“面积更大”自动等同于更好。</li>
+    <li>提交可重复的“修改几何→重铺→DRC→Gerber”流程和截图/报告。</li>
+  </ol>
+  <h3 id="proj-37-1-acceptance">专项验收</h3>
+  <p>原生铺铜可一键重铺；无板外边界、无未解释孤岛、无新增 DRC/连通错误；Gerber 实际铜与编辑器一致；关键 USB/Buck 回流获得图示证明。若只在 PCB 画面看见边界而未检查 Gerber，不通过。</p>
+</section>
+
+<section aria-labelledby="sec-37-2">
+  <h2 id="sec-37-2">37.2 增加受控阻抗叠层要求</h2>
+  <p><strong>问题：</strong>R1 的 USB D+/D−几何长度和偏斜已计算，但没有生产叠层、受控阻抗或眼图证据。极小偏斜不能替代差分阻抗。</p>
+  <h3 id="proj-37-2-inputs">输入与约束</h3>
+  <ul>
+    <li>J1→U2→R3/R4→U1 的三段路径、当前 8 mil 线宽和过孔/参考地几何。</li>
+    <li>至少两家制造商的可生产叠层：介质厚度、铜厚、阻焊、材料 Dk/Df 与公差。</li>
+    <li>目标差分阻抗及容差必须从适用 USB 要求和制造商能力正式写入项目规范。</li>
+  </ul>
+  <h3 id="proj-37-2-tasks">任务与交付物</h3>
+  <ol>
+    <li>比较两层微带与四层参考面方案，使用场求解器/制造商计算得到线宽、间距和容差。</li>
+    <li>评估阻焊、铜粗糙度、连接器焊盘、U2、R3/R4 和过孔的不连续性。</li>
+    <li>在 R2 规则中定义差分对、参考层、最大换层、回流过孔和禁布区域。</li>
+    <li>输出叠层表、阻抗 coupon 要求、制造备注和测量/眼图计划。</li>
+  </ol>
+  <h3 id="proj-37-2-acceptance">专项验收</h3>
+  <p>目标阻抗、容差和叠层可由制造商确认；计算输入完整可复现；整条 USB 路径持续有参考面；制造图明确要求阻抗记录。只把线宽改成某个网上常见值、没有叠层输入，不通过。</p>
+</section>
+
+<section aria-labelledby="sec-37-3">
+  <h2 id="sec-37-3">37.3 改善去耦位置与电源回路紧凑性</h2>
+  <p><strong>问题：</strong>R1 的 C6/C7/C8 到 MCU 计算路径约 6.65/6.71/8.99 mm，C9 储能路径约 13.82 mm；这些几何不证明高频电源阻抗。U3/L1/C2/C3 的关键开关回路也需由纹波/EMI 证据评价。</p>
+  <h3 id="proj-37-3-inputs">输入与约束</h3>
+  <ul>
+    <li>U1 每个电源/地引脚、C6～C9、过孔和地回流；U3、L1、C2、C3、R5/R6 的当前坐标和网络。</li>
+    <li>连接器、晶体、USB 差分和可探测性不能被新布局破坏。</li>
+  </ul>
+  <h3 id="proj-37-3-tasks">任务与交付物</h3>
+  <ol>
+    <li>为每个去耦电容画出“电源引脚→电容→地引脚”的闭合高频回路，而不只测中心距离。</li>
+    <li>把小容量去耦优先靠近对应电源引脚，减少共享过孔/细颈；保留 C9 的低频储能角色。</li>
+    <li>最小化 U3 输入热回路和 SW 回路面积，让反馈远离 BUCK_SW，并保留安全探点。</li>
+    <li>比较 R1/R2 路径长度、回路面积代理量和预计寄生；提交纹波、瞬态和近场扫描 A/B 计划。</li>
+  </ol>
+  <h3 id="proj-37-3-acceptance">专项验收</h3>
+  <p>每个电源引脚有明确本地电容和短回流；Buck 高 di/dt 环路图示可核；反馈网络隔离；未引入机械重叠或差分中断；验证计划能在同工况下比较 R1/R2，而非只凭“看起来更近”。</p>
+</section>
+
+<section aria-labelledby="sec-37-4">
+  <h2 id="sec-37-4">37.4 为外部 I/O 增加可选 ESD 保护</h2>
+  <p><strong>问题：</strong>R1 的 8 路 GPIO/PWM 与 UART 只有 220 Ω 串联电阻，没有外部 ESD 阵列。R2 可增加 DNP 选项，以适应裸露线缆或教学误接环境。</p>
+  <h3 id="proj-37-4-inputs">输入与约束</h3>
+  <ul>
+    <li>10 条外部信号、3.3 V 逻辑阈值、最大数据/边沿要求、J2 接触顺序与预期 ESD 场景。</li>
+    <li>器件需比较钳位电压、动态电阻、结电容、漏电、通道数、封装和失效模式。</li>
+    <li>保护回流必须短而直接到参考地；不能把放电电流引到 MCU 去耦路径。</li>
+  </ul>
+  <h3 id="proj-37-4-tasks">任务与交付物</h3>
+  <ol>
+    <li>选择至少两类阵列并计算/说明对 PWM、UART 和 GPIO 边沿的影响。</li>
+    <li>设计靠近 J2 的 DNP 封装与旁路策略，定义装/不装 BOM 变体。</li>
+    <li>保留 R14～R23 或重新论证串联值，检查钳位电流和 MCU 注入电流路径。</li>
+    <li>提交 ESD 预兼容计划、正常信号 A/B 测试和损坏后安全回归。</li>
+  </ol>
+  <h3 id="proj-37-4-acceptance">专项验收</h3>
+  <p>保护器件参数与应用边界有数据手册依据；布局位于连接器入口、回流短；DNP 变体可制造；正常功能和 ESD 计划均有判据。只在原理图加 TVS 而远离 J2、没有回流分析，不通过。</p>
+</section>
+
+<section aria-labelledby="sec-37-5">
+  <h2 id="sec-37-5">37.5 增加模拟输入或电流检测</h2>
+  <p><strong>问题：</strong>R1 只能控制数字 I/O 和电源，不能直接量化目标电压/电流。R2 可选择一项：受保护模拟输入，或 5V_SW/3V3_SW 电流检测。</p>
+  <h3 id="proj-37-5-inputs">输入与约束</h3>
+  <ul>
+    <li>测量范围、分辨率、带宽、共模、允许压降、精度预算和过压场景。</li>
+    <li>先审核 U1 可用 ADC 引脚、引脚复用和固件资源；不得假设任意空脚都可用。</li>
+    <li>电流采样电阻功耗按 <var>P</var> = <var>I</var>²<var>R</var> 计算，并计入开关压降和 Kelvin 走线。</li>
+  </ul>
+  <h3 id="proj-37-5-tasks">任务与交付物</h3>
+  <ol>
+    <li>比较分压+RC、运放缓冲、低侧/高侧电流检测等至少两种架构。</li>
+    <li>完成最坏情况输入、ADC 满量程、容差、偏置、噪声和热误差预算。</li>
+    <li>设计校准点与可追溯参考，定义零点/增益校准存储和版本。</li>
+    <li>提交安全接线、量程切换（如有）、开路/过压失效分析和校准记录表。</li>
+  </ol>
+  <h3 id="proj-37-5-acceptance">专项验收</h3>
+  <p>测量范围不会超过 MCU/前端额定；误差预算闭合；采样不会破坏原电源目标；有已知参考源的多点校准与通过判据。只展示 ADC 数字变化、没有单位和不确定度，不通过。</p>
+</section>
+
+<section aria-labelledby="sec-37-6">
+  <h2 id="sec-37-6">37.6 增加电气隔离</h2>
+  <p><strong>问题：</strong>R1 的 USB 主机地与目标地直接相连，不能阻断地环路或高共模故障。R2 隔离项目仅针对规定的安全低压系统；不得把课程设计擅自用于市电或生命安全设备。</p>
+  <h3 id="proj-37-6-inputs">输入与约束</h3>
+  <ul>
+    <li>隔离目的、工作/瞬态电压、污染等级、海拔、适用安全标准和所需数据通道。</li>
+    <li>USB 侧与目标侧的功率预算；隔离电源效率、浪涌和输出噪声。</li>
+    <li>爬电、间隙、开槽和器件认证值必须由标准/器件资料确定，本章不提供通用万能数字。</li>
+  </ul>
+  <h3 id="proj-37-6-tasks">任务与交付物</h3>
+  <ol>
+    <li>画出隔离边界，明确哪些 GPIO/PWM/UART/电源跨越、哪些留在 USB 侧。</li>
+    <li>比较数字隔离器、光耦与隔离式 UART/USB 方案；验证方向、默认状态、传播延迟和速率。</li>
+    <li>设计隔离 DC/DC 与两侧去耦，禁止铜、丝印、安装件或测试治具跨越隔离带。</li>
+    <li>提交适用标准清单、绝缘协调计算、生产耐压/绝缘测试计划和故障安全分析。</li>
+  </ol>
+  <h3 id="proj-37-6-acceptance">专项验收</h3>
+  <p>隔离边界在原理图、PCB、机械和治具中一致；标准输入完整；默认/掉电状态安全；跨隔离时序满足协议；验证由具备资质的实验室执行。没有明确安全标准或将 USB 屏蔽/地无意跨接，不通过。</p>
+</section>
+
+<section aria-labelledby="sec-37-7">
+  <h2 id="sec-37-7">37.7 增加硬件 UART 流控</h2>
+  <p><strong>问题：</strong>R1 仅有 UART_TX/UART_RX。持续高吞吐或主机调度延迟可能造成缓冲溢出；R2 可增加 RTS/CTS，但要同时解决 MCU 引脚、连接器和协议兼容。</p>
+  <h3 id="proj-37-7-inputs">输入与约束</h3>
+  <ul>
+    <li>目标吞吐、最大暂停延迟、缓冲深度、对端逻辑和电平。</li>
+    <li>完整 MCU 引脚复用审核；不能占用 SWD、USB、EN、PWM 或 BOOT0 的关键功能。</li>
+    <li>J2 现有 pin 16 未连接，但另一条流控线还需新引脚/连接器方案。</li>
+  </ul>
+  <h3 id="proj-37-7-tasks">任务与交付物</h3>
+  <ol>
+    <li>比较扩大缓冲、软件 XON/XOFF 与硬件 RTS/CTS，说明选择条件。</li>
+    <li>定义信号方向、有效电平、复位默认状态、超时和断线行为。</li>
+    <li>更新连接器 pinout、丝印和 3.3 V 保护，避免与旧线束误插造成损坏。</li>
+    <li>设计“对端长期不允许发送”“流控线开路/短到安全电平”的验证矩阵。</li>
+  </ol>
+  <h3 id="proj-37-7-acceptance">专项验收</h3>
+  <p>引脚复用无冲突；旧/新接口兼容策略明确；缓冲与最大响应延迟计算闭合；流控失效不会执行损坏命令；逻辑分析仪测试能证明无溢出。只加两根线而未定义协议状态机，不通过。</p>
+</section>
+
+<section aria-labelledby="sec-37-8">
+  <h2 id="sec-37-8">37.8 在不牺牲机械间距的前提下缩小板尺寸</h2>
+  <p><strong>问题：</strong>R1 为 50 mm × 24 mm，机械审核无实体/形状重叠，J1 有意伸出左板边。R2 可以缩小，但必须保持连接器可插拔、元件可装配、关键回路可布线且测试可访问。</p>
+  <h3 id="proj-37-8-inputs">输入与约束</h3>
+  <ul>
+    <li>J1/J2/J3 实体、庭院、配合件和线缆弯曲空间；U1、Buck、负载开关功能分区。</li>
+    <li>制造商板边到铜/孔/元件能力、装配吸嘴/返修空间、治具探针直径。</li>
+    <li>R1 的 1128 对机械检查和零重叠是基线，但最小接受间距需按新制造/装配规范重定义。</li>
+  </ul>
+  <h3 id="proj-37-8-tasks">任务与交付物</h3>
+  <ol>
+    <li>建立外壳/连接器/探针的机械 keepout，先固定不可移动对象，再优化面积。</li>
+    <li>提出至少两个外形方案，比较面积、USB/Buck 回路、走线层数、探点和装配风险。</li>
+    <li>执行实体、庭院、板边、插头配合和 3D 审核；制作 1:1 纸样或非带电机械样板验证。</li>
+    <li>输出面积缩减百分比、每个间距最小值和与 R1 的风险差异。</li>
+  </ol>
+  <h3 id="proj-37-8-acceptance">专项验收</h3>
+  <p>面积确有量化下降；所有机械/电气规则满足制造商和装配要求；J1 配合、J2/J3/测试点访问可验证；USB/Buck 回流未恶化。通过 DRC 但无法插线、返修或探测，不通过。</p>
+</section>
+
+<section aria-labelledby="sec-37-9">
+  <h2 id="sec-37-9">37.9 设计自动化生产测试治具</h2>
+  <p><strong>问题：</strong>手工探测容易错位且难以量产追溯。R2 治具项目应在不依赖预装 J2/J3 排针的情况下，完成限流上电、SWD、USB、GPIO/PWM/UART 和受控电源测试。</p>
+  <h3 id="proj-37-9-inputs">输入与约束</h3>
+  <ul>
+    <li>R1/R2 网络与测试覆盖矩阵、板定位孔/边、可接触焊盘、最大允许测试力。</li>
+    <li>唯一板号/批次、固件哈希、仪器校准和原始数据存储格式。</li>
+    <li>治具必须默认断电、限流、极性防错，并有急停；不得依赖操作者手持裸探针。</li>
+  </ul>
+  <h3 id="proj-37-9-tasks">任务与交付物</h3>
+  <ol>
+    <li>建立“需求→网络→刺激→测量→判据”的覆盖表，区分结构测试和功能测试。</li>
+    <li>设计定位、压板、pogo pin、USB/SWD 切换和负载模块；避免探针接触细间距器件脚。</li>
+    <li>定义状态机：扫码→无电短路→限流上电→编程/校验→安全状态→接口→断电→报告。</li>
+    <li>实现治具自检和黄金板验证；设计探针开路、粘连、错板方向的检测。</li>
+    <li>提交接线图、BOM、机械图、软件接口规范、维护周期和操作风险分析。</li>
+  </ol>
+  <h3 id="proj-37-9-acceptance">专项验收</h3>
+  <p>治具覆盖所有关键网络/功能并能发现自身故障；错误方向不能上电；每片自动生成可追溯报告；重复装夹的测量散布小于产品判定裕量；急停和断电恢复经过验证。</p>
+</section>
+
+<section aria-labelledby="sec-37-10">
+  <h2 id="sec-37-10">37.10 用 R1 实测结果校正计算</h2>
+  <p><strong>问题：</strong>R1 目前只有设计/计算/预期值：3V3_SYS 反馈计算 3.318 V、限流约 0.402/0.252 A、复位 RC 1 ms、晶体无杂散时等效负载 6 pF、USB CAD 偏斜等。R2 应用真实测量检查模型和裕量。</p>
+  <h3 id="proj-37-10-inputs">输入与约束</h3>
+  <ul>
+    <li>第 31～34 章原始工作表、波形、热像、板号、仪器不确定度和多板结果。</li>
+    <li>公式必须保留变量、单位、条件和近似；测量与计算不能混成一个“典型值”。</li>
+    <li>若尚未取得实物，只能提交测量计划和空白数据模型，本项目不能伪造完成。</li>
+  </ul>
+  <h3 id="proj-37-10-tasks">任务与交付物</h3>
+  <ol>
+    <li>为每个模型建立“计算中心值—容差范围—实测分布—残差”表。</li>
+    <li>分析反馈基准/电阻、导通电阻、温度、线缆、探头和寄生参数对残差的贡献。</li>
+    <li>用独立样板验证校正后的模型，避免用同一数据既拟合又证明。</li>
+    <li>把残差超出裕量的项目转化为 R2 元件值、布局、保护或规格变更。</li>
+    <li>保留不确定或反常结果，不为了匹配公式删除离群点。</li>
+  </ol>
+  <table>
+    <caption>表 37-2　计算—测量对照</caption>
+    <thead><tr><th scope="col">指标</th><th scope="col">R1 计算/设计</th><th scope="col">条件/容差模型</th><th scope="col">R1 实测</th><th scope="col">残差</th><th scope="col">R2 决策</th></tr></thead>
+    <tbody>
+      <tr><td>3V3_SYS</td><td>3.318 V（计算）</td><td>____</td><td>待测</td><td>待算</td><td>____</td></tr>
+      <tr><td>5V_SW 限流</td><td>0.402 A（计算典型）</td><td>____</td><td>待测</td><td>待算</td><td>____</td></tr>
+      <tr><td>3V3_SW 限流</td><td>0.252 A（计算典型）</td><td>____</td><td>待测</td><td>待算</td><td>____</td></tr>
+      <tr><td>NRST 时序</td><td>RC τ=1 ms</td><td>阈值/上电斜率 ____</td><td>待测</td><td>待算</td><td>____</td></tr>
+      <tr><td>PWM/晶体频率</td><td>12 MHz 标称</td><td>CL/温度 ____</td><td>待测</td><td>待算</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h3 id="proj-37-10-acceptance">专项验收</h3>
+  <p>每个结论能追溯到原始数据；仪器不确定度和样本散布进入模型；至少一组独立验证数据支持修正；R2 变更具有量化门限。没有实物数据时，正确状态是“项目待测/未完成”，而不是把预期值复制到实测栏。</p>
+</section>
+
+<section aria-labelledby="ch37-summary">
+  <h2 id="ch37-summary">本章小结</h2>
+  <p>好的 R2 项目从 R1 的明确证据缺口出发，提出可制造的设计改变和可执行的验证闭环。无论选择铺铜、叠层、去耦、保护、测量、隔离、流控、小型化、治具还是模型校正，最终成果都必须同时回答：改变了什么、为什么、怎样证明更好、失败时如何安全退出。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="36-engineering-trade-offs.html"><small>上一页</small>36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a><a class="next" rel="next" href="../appendices/a-schematic-walkthrough.html"><small>下一页</small>附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

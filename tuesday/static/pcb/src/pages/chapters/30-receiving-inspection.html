@@ -1,0 +1,145 @@
+<section aria-labelledby="ch30-learning-objectives">
+  <h2 id="ch30-learning-objectives">学习目标与事实边界</h2>
+  <p>收板检验的目的不是证明电路“能工作”，而是在上电之前回答三个问题：收到的是否是正确版本、制造结果是否与发布资料一致、是否存在会让后续上电变得危险的缺陷。完成本章后，你应能建立一条从订单、Gerber、装配图到实物批次的可追溯证据链，并把“外观看起来正常”转化为可记录、可复查的判定。</p>
+  <aside class="notice" aria-label="当前验证状态">
+    <p><strong>当前没有实物测量记录。</strong>事实库中的板尺寸、焊盘、过孔和连通性来自最终设计源、CAD 或制造输出；<code>measured_fact_count = 0</code>。本章出现的尺寸均是设计值或 Gerber 计算值，记录表中的实测栏必须由收到的板填写，不能预填“合格”。</p>
+  </aside>
+  <ul>
+    <li>设计名义外形为 <strong>50 mm × 24 mm</strong>；Gerber 外形计算值为 <strong>49.9999 mm × 24.00046 mm</strong>。</li>
+    <li>R1 为双层、顶层装配设计；PCB 中有 48 个元件位号，最终装配 BOM 安装 46 个，J2、J3 为 DNP（不装）。</li>
+    <li>CAD 统计为 172 个焊盘、130 个过孔、47 个命名网络；这些数字用于核对资料，不表示交付实物已经通过开短路测试。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sec-30-1">
+  <h2 id="sec-30-1">30.1 将交付板与 Gerber 和图纸比较</h2>
+  <p>检验必须以<strong>冻结的发布包</strong>为基准，而不是以编辑器当前画面、早期提案或聊天截图为基准。R1 的提案尺寸约为 45 mm × 20 mm，但最终发布设计为 50 mm × 24 mm；如果拿错基准，正确的板也会被误判。</p>
+  <h3 id="sec-30-1-reference-set">建立黄金参考集</h3>
+  <ol>
+    <li>记录订单号、供应商批次、数量、收货日期和包装标签。</li>
+    <li>锁定同一次发布的 Gerber、钻孔、BOM、CPL、装配图和制造清单；记录文件哈希或发布包版本。</li>
+    <li>从 Gerber 查看器分别检查顶/底铜、阻焊、丝印、板框和钻孔，不用 PCB 编辑器视图替代制造数据。</li>
+    <li>把实物的连接器方向、板边缺口、安装孔、功能丝印和元件面与装配图逐项对应。</li>
+    <li>随机抽取第二片板重复方向和关键特征核对，排除“只看一片”的偶然性。</li>
+  </ol>
+  <table>
+    <caption>表 30-1　发布资料与实物的一致性记录</caption>
+    <thead><tr><th scope="col">检查对象</th><th scope="col">发布资料预期</th><th scope="col">实物观察</th><th scope="col">判定/证据</th></tr></thead>
+    <tbody>
+      <tr><td>版本</td><td><code>USB_GPIO_R1</code>、丝印 <code>REV R1</code></td><td>待填</td><td>照片编号：____</td></tr>
+      <tr><td>J1 方向</td><td>位于左侧、开口朝板外；设计旋转为 −90°</td><td>待填</td><td>通过 / 隔离</td></tr>
+      <tr><td>装配面</td><td>元件仅在顶层</td><td>待填</td><td>通过 / 隔离</td></tr>
+      <tr><td>J2、J3</td><td>PCB 有孔位，成品 BOM 默认不装排针</td><td>待填</td><td>通过 / 偏差单号</td></tr>
+      <tr><td>功能丝印</td><td>含 USB GPIO、REV R1、SWD、GND、G0–G7、TX/RX 等功能标识</td><td>待填</td><td>通过 / 隔离</td></tr>
+    </tbody>
+  </table>
+  <p><strong>通过条件：</strong>板版本、方向、层面和关键特征都能追溯到同一发布包。任何版本不明、混批、连接器方向相反或板框明显不符的板先隔离，不进入上电流程。</p>
+</section>
+
+<section aria-labelledby="sec-30-2">
+  <h2 id="sec-30-2">30.2 板尺寸、外形、表面处理、阻焊和丝印</h2>
+  <p>外形检查既包含“有没有做出来”，也包含“是否能装进目标结构”。数显卡尺适合测总长、总宽和明显间距，但不能可靠评估薄铜厚度、阻焊厚度或很小的孔径。表面处理类型应从采购订单或供应商合格证读取；事实库没有记录 R1 的实际表面处理，不能仅凭颜色猜测 ENIG、HASL 或其他工艺。</p>
+  <ol>
+    <li>让板在室温下平放，清除会影响测量的包装碎屑，不刮擦焊盘。</li>
+    <li>用分辨率 0.01 mm 的校准卡尺测量长和宽，每个方向至少测两处并记录，而不是只写一个“约 50 × 24”。</li>
+    <li>在平整基准面上检查翘曲、毛刺、V-cut/锣边残留和板角损伤；采用订单规定的翘曲判据。</li>
+    <li>在斜射光和 5×～10× 放大下检查阻焊偏移、露铜、桥连、针孔、起泡和污染。</li>
+    <li>检查丝印是否压到焊盘、缺字或误导方向。R1 板面不显示全部位号，逐件定位应使用装配图，而不是猜测。</li>
+  </ol>
+  <table>
+    <caption>表 30-2　机械与表面检查记录</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">设计/订单依据</th><th scope="col">仪器</th><th scope="col">实测或观察</th><th scope="col">结论</th></tr></thead>
+    <tbody>
+      <tr><td>长度</td><td>名义 50 mm；Gerber 49.9999 mm</td><td>0.01 mm 卡尺</td><td>____ mm</td><td>按订单公差</td></tr>
+      <tr><td>宽度</td><td>名义 24 mm；Gerber 24.00046 mm</td><td>0.01 mm 卡尺</td><td>____ mm</td><td>按订单公差</td></tr>
+      <tr><td>板厚/表面处理</td><td>读取订单，不由本教程假定</td><td>千分尺/合格证</td><td>____</td><td>一致 / 偏差</td></tr>
+      <tr><td>阻焊</td><td>开窗与 Gerber 一致，无明显桥连或露铜</td><td>5×～10× 放大</td><td>____</td><td>通过 / 返工评估</td></tr>
+      <tr><td>丝印</td><td>可读且不覆盖可焊表面</td><td>目视/照片</td><td>____</td><td>通过 / 偏差</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="sec-30-3">
+  <h2 id="sec-30-3">30.3 孔、焊盘和连接器检查</h2>
+  <p>孔和焊盘缺陷常在焊接或插装时才暴露，因此应在上电前检查。R1 的 130 个过孔在 CAD 中采用 12 mil（0.3048 mm）钻孔、24 mil 焊盘的设计值；交付后的成品孔径会受电镀和制造补偿影响，应按制造图和供应商能力判定，不能把 0.3048 mm 当作已测成品孔径。</p>
+  <ul>
+    <li><strong>通孔：</strong>观察孔壁电镀是否连续，是否堵孔、破环、偏钻或有毛刺；J2/J3 未装排针是预期状态。</li>
+    <li><strong>SMD 焊盘：</strong>检查缺口、污染、氧化、阻焊侵入和相邻焊盘桥连。对 J1 的细间距引脚和外壳固定脚重点拍照。</li>
+    <li><strong>连接器：</strong>用匹配但不带电的 USB-C 插头轻插一次，确认板边与外壳没有机械干涉；不要用插头强行“修正”歪斜连接器。</li>
+    <li><strong>装配板：</strong>检查 J1 共面性、外壳固定焊点和引脚润湿；检查 U1 LQFP 四边是否有翘脚、桥连或引脚偏移。</li>
+  </ul>
+  <aside class="warning" aria-label="连接器检查警告">
+    <p>机械试插时不连接电脑、电源或目标设备。若 J1 松动、歪斜、外壳焊脚开裂或插拔需要异常力量，立即停止；继续插拔可能撕裂焊盘。</p>
+  </aside>
+  <p><strong>抽样与升级：</strong>首件和版本变更批应提高抽样比例；发现同一位置重复缺陷时，把问题升级为批次问题，而不是只返修发现的那一片。</p>
+</section>
+
+<section aria-labelledby="sec-30-4">
+  <h2 id="sec-30-4">30.4 裸板连通与短路检查</h2>
+  <p>裸板电测用于发现开路、短路和孔壁问题；装配板上的半导体、电容和 ESD 器件会改变万用表读数，不能直接套用裸板阈值。供应商飞针或专用治具报告比手工逐点测试 47 个网络更完整，但报告仍要与正确的网络表和版本绑定。</p>
+  <h3 id="sec-30-4-bare-board-method">未装配裸板的检查方法</h3>
+  <ol>
+    <li>确认板完全无电，万用表处于低压电阻/通断档，先短接表笔记录表线电阻。</li>
+    <li>按网络表选取同一网络的两个可接触焊盘，验证应连通路径；对跨层路径至少覆盖一个过孔。</li>
+    <li>在相邻细间距焊盘、各电源轨与 GND 之间检查不应存在的低阻连接。</li>
+    <li>移动和轻弯测试线，而不是弯曲 PCB；不稳定读数可能来自探针接触而非板故障。</li>
+    <li>保存供应商电测报告，并记录使用的网络表版本、测试日期和不良板序号。</li>
+  </ol>
+  <h3 id="sec-30-4-assembled-screen">装配板的无电筛查</h3>
+  <pre aria-label="装配板电源短路筛查接线"><code>红表笔 ── VBUS_IN 或 3V3_SYS 测试点
+黑表笔 ── GND
+USB、调试器、目标负载全部断开</code></pre>
+  <p>分别测 <code>VBUS_IN</code>—GND、<code>3V3_SYS</code>—GND、<code>5V_SW</code>—GND 和 <code>3V3_SW</code>—GND，记录初始值、5 s 后值和交换表笔后的值。电容充电会使读数变化，ESD/半导体会产生方向差异；这些现象本身不是故障。</p>
+  <table>
+    <caption>表 30-3　无电电阻筛查记录</caption>
+    <thead><tr><th scope="col">测量对</th><th scope="col">初始值</th><th scope="col">5 s 后</th><th scope="col">交换表笔</th><th scope="col">判定/备注</th></tr></thead>
+    <tbody>
+      <tr><td>VBUS_IN—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+      <tr><td>3V3_SYS—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+      <tr><td>5V_SW—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+      <tr><td>3V3_SW—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <p><strong>停止条件：</strong>通断蜂鸣持续、读数稳定接近表线电阻、同批板中某片显著偏离，或看到电源焊盘桥连时，不上电。先用显微镜、分区测阻和必要的四线低阻测量定位。由于 R1 尚无实测基线，本教程不虚构一个“正常电阻值”。</p>
+</section>
+
+<section aria-labelledby="sec-30-5">
+  <h2 id="sec-30-5">30.5 目视检查，以及何时使用 X 射线</h2>
+  <p>目视检查应按固定路线进行：连接器与板边 → 电源级 U3/L1/C2/C3 → MCU U1 与去耦 → USB 保护 U2/R3/R4 → 负载开关 U4/U5 → 其余无源器件。每次沿同一方向扫描，能减少漏检。</p>
+  <table>
+    <caption>表 30-4　缺陷、检测方式与升级措施</caption>
+    <thead><tr><th scope="col">缺陷候选</th><th scope="col">首选检查</th><th scope="col">何时升级到 X 射线/切片</th></tr></thead>
+    <tbody>
+      <tr><td>LQFP 翘脚、桥连、少锡</td><td>斜光显微镜，逐边检查 U1</td><td>焊点被器件或焊料遮挡、反复出现间歇故障时</td></tr>
+      <tr><td>J1 隐蔽引脚或外壳固定脚焊接不足</td><td>显微镜、轻微机械检查、连通测试</td><td>外观不可见而 USB/供电呈间歇性，或首件工艺验证</td></tr>
+      <tr><td>过孔孔壁空洞、内层连接异常</td><td>供应商电测、截面报告</td><td>同网开路但表面无缺陷，或批次可靠性调查</td></tr>
+      <tr><td>0603/SOT-23 偏移、立碑、反向</td><td>显微镜和装配图</td><td>通常不需要 X 射线；除非焊点被遮挡或失效分析要求</td></tr>
+    </tbody>
+  </table>
+  <p>R1 没有 BGA 或底部端子 QFN，因此 X 射线不是每片板的默认检查手段；它适合解决“关键焊点不可见”或“电气症状与外观矛盾”的问题。X 射线图像也需要工艺人员判读，不能把亮暗差异自动等同于合格或不合格。</p>
+</section>
+
+<section aria-labelledby="sec-30-6">
+  <h2 id="sec-30-6">30.6 记录批次、版本和检验结果</h2>
+  <p>没有记录的检查无法支持复现、供应商反馈或 R2 改版。每片样板至少应有唯一编号；批量板可采用批次号加样本号，并保存正反面、连接器和异常点照片。</p>
+  <table>
+    <caption>表 30-5　收板检验总表（每批一份）</caption>
+    <thead><tr><th scope="row">字段</th><th scope="col">记录</th><th scope="row">字段</th><th scope="col">记录</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">项目/版本</th><td>USB_GPIO_R1 / ____</td><th scope="row">检验员/日期</th><td>____ / ____</td></tr>
+      <tr><th scope="row">供应商/订单</th><td>____</td><th scope="row">批次/数量</th><td>____ / ____</td></tr>
+      <tr><th scope="row">发布包标识</th><td>____</td><th scope="row">抽样方案</th><td>____</td></tr>
+      <tr><th scope="row">机械结论</th><td>通过 / 隔离 / 让步</td><th scope="row">电气筛查</th><td>通过 / 隔离 / 未执行</td></tr>
+      <tr><th scope="row">异常单号</th><td>____</td><th scope="row">照片/报告位置</th><td>____</td></tr>
+      <tr><th scope="row">放行决定</th><td colspan="3">允许进入限流上电 / 返工后复检 / 整批隔离</td></tr>
+    </tbody>
+  </table>
+  <aside class="checkpoint" aria-label="收板放行门">
+    <p><strong>放行门：</strong>只有版本可追溯、机械特征一致、关键焊接可接受且电源轨无明显硬短路的板，才能进入第 31 章。此结论仍不证明 Buck、USB、时钟、固件或负载开关已经工作。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch30-summary">
+  <h2 id="ch30-summary">本章小结</h2>
+  <p>收板检验把制造资料、实物和批次记录连接起来。它能发现错版、机械缺陷、明显开短路和装配问题，却不能代替限流上电与功能测试。R1 的所有硬件表现仍待实测；下一章将用受控能量逐步建立第一条板级测量基线。</p>
+</section>

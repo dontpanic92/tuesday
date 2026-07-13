@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="32. 编程与基础固件验证（Programming and Basic Firmware Validation） — USB GPIO PCB 离线教程">
+  <title>32. 编程与基础固件验证（Programming and Basic Firmware Validation） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-32">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html" aria-current="page">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</li><li aria-current="page">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</p>
+          <h1>32. 编程与基础固件验证（Programming and Basic Firmware Validation）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch32-learning-objectives">学习目标与验证边界</a></li><li class="toc-level-2"><a href="#sec-32-1">32.1 安全连接 SWD</a></li><li class="toc-level-3"><a href="#sec-32-1-sequence">推荐接线顺序</a></li><li class="toc-level-2"><a href="#sec-32-2">32.2 读取器件身份并写入 Flash</a></li><li class="toc-level-2"><a href="#sec-32-3">32.3 GPIO 安全初始化</a></li><li class="toc-level-3"><a href="#sec-32-3-order">固件应采用的先后顺序</a></li><li class="toc-level-3"><a href="#sec-32-3-verification">不依赖“看起来没事”的验证</a></li><li class="toc-level-2"><a href="#sec-32-4">32.4 USB CDC 枚举</a></li><li class="toc-level-2"><a href="#sec-32-5">32.5 状态 LED 测试</a></li><li class="toc-level-2"><a href="#sec-32-6">32.6 复位与启动恢复测试</a></li><li class="toc-level-2"><a href="#sec-32-7">32.7 固件版本与板版本报告</a></li><li class="toc-level-2"><a href="#ch32-summary">本章小结</a></li></ul></nav>
+        <section aria-labelledby="ch32-learning-objectives">
+  <h2 id="ch32-learning-objectives">学习目标与验证边界</h2>
+  <p>本章把“电源能够稳定建立”推进到“MCU 可识别、可编程、能以安全状态启动，并能按固件定义枚举为 USB CDC 设备”。编程成功只证明调试链路和部分 MCU 功能，不证明 USB 信号完整性、GPIO 负载能力、Buck 纹波或长期可靠性。</p>
+  <aside class="notice" aria-label="硬件和固件状态">
+    <p><strong>R1 尚无实物编程或 USB 枚举记录。</strong>下列现象均是设计要求或预期结果。使用已经评审、可追溯的实验固件二进制及其哈希；本任务不修改板、固件或制造文件，也不把任何未执行步骤写成已通过。</p>
+  </aside>
+  <p>建议按以下质量门顺序操作：<strong>限流供电稳定 → SWD 识别 → 备份与擦写 → 下载后校验 → 安全状态 → LED → USB CDC → 复位/恢复 → 版本报告</strong>。</p>
+</section>
+
+<section aria-labelledby="sec-32-1">
+  <h2 id="sec-32-1">32.1 安全连接 SWD</h2>
+  <p>J3 是 1×5、1.27 mm 的调试接口，PCB 上存在但默认 DNP。使用焊接排针或弹簧针治具时，先用装配图和万用表确认 pin 1；不要仅凭线色或连接器缺口猜方向。</p>
+  <table>
+    <caption>表 32-1　J3 调试接口</caption>
+    <thead><tr><th scope="col">J3 引脚</th><th scope="col">网络</th><th scope="col">用途</th><th scope="col">注意</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>3V3_SYS</code></td><td>目标电压参考/供电连接，取决于调试器模式</td><td>默认由板端限流供电；禁止与调试器电源输出争用</td></tr>
+      <tr><td>2</td><td><code>GND</code></td><td>共同参考</td><td>最先连接、最后断开</td></tr>
+      <tr><td>3</td><td><code>SWDIO</code></td><td>双向调试数据</td><td>3.3 V 逻辑</td></tr>
+      <tr><td>4</td><td><code>SWCLK</code></td><td>调试时钟</td><td>线短、与地回路紧邻</td></tr>
+      <tr><td>5</td><td><code>NRST</code></td><td>硬件复位/连接恢复</td><td>只能用开漏或兼容驱动拉低</td></tr>
+    </tbody>
+  </table>
+  <h3 id="sec-32-1-sequence">推荐接线顺序</h3>
+  <ol>
+    <li>关闭板端限流电源与调试器输出，确认 <code>3V3_SYS</code> 已降到 0.2 V 以下。</li>
+    <li>把调试器设为“不向目标供电”或“仅检测目标电压”；若工具没有该模式，查阅工具手册后选择唯一供电源。</li>
+    <li>依次连接 GND、目标电压参考、SWDIO、SWCLK、NRST；用通断档复核治具到 J3 的映射。</li>
+    <li>从板端限流电源上电，确认 3V3_SYS 与电流仍处于第 31 章基线范围，再启动调试软件。</li>
+    <li>从低 SWD 时钟开始；通信稳定后才提高速度。长飞线、无地回流和过高时钟都会造成偶发错误。</li>
+  </ol>
+  <aside class="warning" aria-label="SWD 接线停止条件">
+    <p>若接上调试器后板端电流明显改变、3V3_SYS 被抬高、调试器发热或电源互相反灌，立即断电。不要通过反复插拔带电排针“碰运气”。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="sec-32-2">
+  <h2 id="sec-32-2">32.2 读取器件身份并写入 Flash</h2>
+  <p>U1 的最终设计型号为 CH32V203K8T6。丝印、采购记录和调试器读取值应共同支持同一器件身份；本事实库没有给出可安全抄写的数值器件 ID，因此必须由实际工具读取并与当前数据手册/编程工具数据库核对。</p>
+  <ol>
+    <li>记录板号、调试器型号/固件、编程软件版本、SWD 时钟和目标供电电压。</li>
+    <li>执行“连接并停机”，读取芯片族、器件 ID、Flash 容量、保护/选项字节；先保存截图或文本日志。</li>
+    <li>若允许且流程需要，读取出厂内容或至少保存选项字节；不要未经记录就执行全片擦除。</li>
+    <li>选择经批准的二进制，核对文件名、版本、构建时间、目标板版本和 SHA-256 哈希。</li>
+    <li>擦除、编程并执行逐字节或工具提供的 verify。写入成功但 verify 失败仍判为失败。</li>
+    <li>断开调试会话并冷启动一次，确认程序不是只在调试器保持复位/供电时运行。</li>
+  </ol>
+  <table>
+    <caption>表 32-2　器件识别与编程记录</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">实际记录</th><th scope="col">接受依据</th><th scope="col">判定</th></tr></thead>
+    <tbody>
+      <tr><td>读取的器件/ID</td><td>____</td><td>CH32V203K8T6 采购与工具数据库</td><td>通过 / 失败</td></tr>
+      <tr><td>目标电压</td><td>____ V</td><td>与实测 3V3_SYS 一致</td><td>通过 / 失败</td></tr>
+      <tr><td>固件文件与哈希</td><td>____</td><td>批准的实验发布记录</td><td>通过 / 失败</td></tr>
+      <tr><td>擦除/写入/校验</td><td>____ / ____ / ____</td><td>三步均无错误</td><td>通过 / 失败</td></tr>
+      <tr><td>冷启动</td><td>____</td><td>脱离调试会话仍启动</td><td>通过 / 失败</td></tr>
+    </tbody>
+  </table>
+  <p><strong>常见故障：</strong>目标未供电、J3 反接、SWD 时钟过高、NRST 被 C10/外部治具持续拉低、BOOT0 状态异常、芯片保护打开或焊接不良。一次只改变一个条件并保留日志。</p>
+</section>
+
+<section aria-labelledby="sec-32-3">
+  <h2 id="sec-32-3">32.3 GPIO 安全初始化</h2>
+  <p>安全启动要求是：外部 GPIO 为高阻输入、PWM 停止、UART_TX 在配置前为高阻、<code>5V_SW</code>/<code>3V3_SW</code> 在复位、启动和 USB 挂起期间关闭。该要求来自设计意图，尚未在硬件上验证。</p>
+  <h3 id="sec-32-3-order">固件应采用的先后顺序</h3>
+  <ol>
+    <li>最先把 PB3/<code>EN_5V</code> 与 PB4/<code>EN_3V3</code> 明确配置为低；R9/R10 的 100 kΩ 下拉只提供硬件默认，不替代固件。</li>
+    <li>把 PA6、PA7、PB0、PB1、PA0、PA1、PA4、PA5 对应的 8 路 GPIO 保持为输入或模拟高阻，禁止启动时产生脉冲。</li>
+    <li>保持 TIM3 CH1～CH4 停止并清除待输出比较状态，再按命令启用 PWM。</li>
+    <li>在设置 USART2 之前保持 PA2/UART_TX 高阻；配置完波特率和空闲电平后再切换复用功能。</li>
+    <li>最后初始化状态 LED 和 USB；错误路径、看门狗复位与挂起回调也必须回到同一安全状态。</li>
+  </ol>
+  <h3 id="sec-32-3-verification">不依赖“看起来没事”的验证</h3>
+  <p>在 J2 上为待测引脚外接 100 kΩ 到 GND 或 3.3 V 的弱偏置，观察复位期间节点是否跟随外部偏置；能跟随说明更接近高阻，固定强驱动则提示固件或焊接问题。测试时每次只偏置一个引脚，外部电压不得超过 3.3 V，并保留 R14～R23 的 220 Ω 串联电阻但不要把它们当作过压保护。</p>
+  <p><strong>通过条件：</strong>上电、复位、下载和 USB 未配置阶段都没有可观察的受控电源误开启或 I/O 强驱动；实际电平、时间和测试阻值记录完整。</p>
+</section>
+
+<section aria-labelledby="sec-32-4">
+  <h2 id="sec-32-4">32.4 USB CDC 枚举</h2>
+  <p>项目目标是 USB 2.0 Full-Speed 设备，并以 USB CDC ACM 提供虚拟串口。CAD 中 D+/D− 三段长度和偏斜已计算，但没有受控阻抗证明、眼图或实物枚举结果；几何接近不等于 USB 已验证。</p>
+  <ol>
+    <li>先用限流电源确认板稳定，再断电并移除板端 VBUS 供电夹具；防止与电脑 VBUS 并联。</li>
+    <li>选用已知可传数据的短 USB-C 线，记录线缆编号、主机端口、操作系统和是否通过集线器。</li>
+    <li>连接主机，记录从插入到系统出现设备的时间、VID/PID、产品字符串、序列号、配置和 CDC 端口名；具体值应与固件发布说明一致，不在本章猜测。</li>
+    <li>打开串口但先不发送命令，确认不会因 DTR/RTS 或端口打开而意外使能输出。</li>
+    <li>发送固件定义的只读“身份/状态”命令，保存原始响应；不要先执行 GPIO 或电源控制命令。</li>
+    <li>安全弹出或关闭端口，重复冷插拔三次，并记录是否每次稳定重现。</li>
+  </ol>
+  <table>
+    <caption>表 32-3　USB CDC 基础枚举记录</caption>
+    <thead><tr><th scope="col">轮次</th><th scope="col">线缆/端口</th><th scope="col">枚举时间</th><th scope="col">VID:PID/字符串</th><th scope="col">CDC 端口</th><th scope="col">身份命令响应</th><th scope="col">系统日志</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>____</td><td>____ s</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>2</td><td>____</td><td>____ s</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>3</td><td>____</td><td>____ s</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <p><strong>通过条件：</strong>主机稳定识别为固件声明的 CDC 设备，三次冷插拔结果一致，系统无持续重试/过流错误，身份命令返回可追溯信息。若失败，先换已验证线缆和直接端口，再检查电源、时钟、U2、R3/R4 和 D+/D− 焊接；不要立即重刷不同固件掩盖证据。</p>
+</section>
+
+<section aria-labelledby="sec-32-5">
+  <h2 id="sec-32-5">32.5 状态 LED 测试</h2>
+  <p>U1 的 PB5/<code>STATUS_LED</code> 经 R13 = 1 kΩ 接 D1 阳极，D1 阴极接 GND，因此设计上为高电平点亮。按 <var>I</var><sub>LED</sub> = (<var>V</var><sub>OH</sub> − <var>V</var><sub>F</sub>)/1 kΩ；若把 LED 正向压降极端地取 0，3.3 V 下电流上界为 3.3 mA。真实 <var>V</var><sub>OH</sub>、<var>V</var><sub>F</sub> 和亮度尚未测量。</p>
+  <ol>
+    <li>复位后先观察 LED 默认状态，确认固件不会把随机闪烁误当“成功”。</li>
+    <li>通过已定义的只读/测试命令依次执行灭、亮、1 Hz 闪烁；每种状态保持足够时间以便观察。</li>
+    <li>用 DMM 测 PB5 侧、LED_A 与 GND 的电压；必要时用示波器核对闪烁周期。</li>
+    <li>复位板，确认 LED 回到固件规定的安全默认状态。</li>
+  </ol>
+  <p><strong>判定：</strong>命令、逻辑电平和可见状态一致为通过。LED 不亮但 USB/SWD 正常时，优先查 D1 方向、R13 开路、焊点和引脚配置，不把它直接判为 MCU 死亡。</p>
+</section>
+
+<section aria-labelledby="sec-32-6">
+  <h2 id="sec-32-6">32.6 复位与启动恢复测试</h2>
+  <p>R12/C10 形成名义 1 ms 时间常数，R11 = 100 kΩ 把 BOOT0 默认拉低。真实复位释放时间和启动模式仍需实测；恢复步骤必须遵循 CH32V203 与所用编程器的当前文档。</p>
+  <ol>
+    <li><strong>热复位：</strong>保持 USB 连接，通过 J3 pin 5 将 NRST 短暂拉低；记录 CDC 是否断开、释放后是否重枚举，以及输出是否先回安全态。</li>
+    <li><strong>冷启动：</strong>断开所有电源至轨电压低于 0.2 V，再重新连接；比较版本报告与热复位结果。</li>
+    <li><strong>损坏应用恢复：</strong>使用已批准的“连接并保持复位”流程重新建立 SWD；不要随意改变选项字节。</li>
+    <li><strong>启动模式：</strong>确认 R11 使 BOOT0 默认低。若必须使用 ROM 启动恢复，按器件文档施加临时、可撤销的 BOOT0 状态，并在完成后验证恢复默认低。</li>
+  </ol>
+  <table>
+    <caption>表 32-4　复位与恢复矩阵</caption>
+    <thead><tr><th scope="col">情景</th><th scope="col">预期（待验证）</th><th scope="col">实际</th><th scope="col">安全输出</th><th scope="col">恢复结果</th></tr></thead>
+    <tbody>
+      <tr><td>NRST 热复位</td><td>程序停止、输出安全、随后重启</td><td>____</td><td>____</td><td>通过 / 失败</td></tr>
+      <tr><td>完全掉电再上电</td><td>可重复启动与枚举</td><td>____</td><td>____</td><td>通过 / 失败</td></tr>
+      <tr><td>调试器保持复位连接</td><td>可读取并重新编程</td><td>____</td><td>____</td><td>通过 / 失败</td></tr>
+      <tr><td>恢复后正常启动</td><td>BOOT0 默认低，回到应用</td><td>____</td><td>____</td><td>通过 / 失败</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="sec-32-7">
+  <h2 id="sec-32-7">32.7 固件版本与板版本报告</h2>
+  <p>“端口出现了”不足以证明刷入了正确程序。设备的只读身份响应应把实物、固件和测试记录绑定起来，且不能仅依赖操作者手写文件名。</p>
+  <table>
+    <caption>表 32-5　建议的机器可读身份字段</caption>
+    <thead><tr><th scope="col">字段</th><th scope="col">示例格式</th><th scope="col">用途</th></tr></thead>
+    <tbody>
+      <tr><td>协议版本</td><td><code>protocol=major.minor</code></td><td>主机工具兼容性</td></tr>
+      <tr><td>固件版本/构建</td><td><code>fw=…; build=…</code></td><td>定位二进制与源码提交</td></tr>
+      <tr><td>目标板版本</td><td><code>board=USB_GPIO_R1</code></td><td>防止 R1/R2 固件混用</td></tr>
+      <tr><td>功能能力</td><td><code>gpio=8; pwm=4; uart=1</code></td><td>主机不靠猜测启用功能</td></tr>
+      <tr><td>安全状态</td><td><code>rails=off; pwm=stopped</code></td><td>上位机连接前确认</td></tr>
+      <tr><td>唯一标识（若政策允许）</td><td>芯片 UID 的受控表示</td><td>测试追溯；注意隐私和克隆策略</td></tr>
+    </tbody>
+  </table>
+  <p>若 R1 没有硬件版本电阻或 EEPROM，固件报告的 <code>R1</code> 只是“构建目标”，不能自动证明所插实物就是 R1；仍需与板丝印、批次号和测试治具扫码交叉核对。</p>
+  <aside class="checkpoint" aria-label="编程验证放行门">
+    <p><strong>放行到接口实验：</strong>SWD 识别、Flash 校验、冷启动、安全初始化、LED、USB CDC、复位恢复和版本报告均有原始记录。任一项失败或固件哈希不明，板应保持隔离，不进入外部负载和过流实验。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch32-summary">
+  <h2 id="ch32-summary">本章小结</h2>
+  <p>可编程只是起点。可靠的基础验证要求唯一供电源、正确 SWD 引脚、可追溯二进制、写后校验、安全 I/O 顺序、稳定 CDC 枚举以及可恢复的复位路径。所有 R1 实测栏仍待实验填写；下一章才对外部接口逐项施加受控激励和负载。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="31-safe-power-up.html"><small>上一页</small>31. 安全首次上电（Safe First Power-Up）</a><a class="next" rel="next" href="33-interface-experiments.html"><small>下一页</small>33. 接口实验（Interface Experiments）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

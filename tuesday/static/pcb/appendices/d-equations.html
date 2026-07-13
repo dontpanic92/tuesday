@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="附录 D：核心公式与完整算例（Core Equations and Worked Calculations） — USB GPIO PCB 离线教程">
+  <title>附录 D：核心公式与完整算例（Core Equations and Worked Calculations） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="appendix-d">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="../chapters/01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="../chapters/02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="../chapters/03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="../chapters/04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="../chapters/05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="../chapters/06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="../chapters/07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="../chapters/08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="../chapters/09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="../chapters/10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="../chapters/11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="../chapters/12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="../chapters/13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="../chapters/14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="../chapters/15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="../chapters/16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="../chapters/17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="../chapters/18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="../chapters/19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="../chapters/20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="../chapters/21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="../chapters/22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="../chapters/23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="../chapters/24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="../chapters/25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="../chapters/26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="../chapters/27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="../chapters/28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="../chapters/29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="../chapters/30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="../chapters/31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="../chapters/32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="../chapters/33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="../chapters/34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="../chapters/35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="../chapters/36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="../chapters/37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="d-equations.html" aria-current="page">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>附录（Appendices）</li><li aria-current="page">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">附录（Appendices）</p>
+          <h1>附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#d-conventions">D.1 计算约定：先写状态，再写数字</a></li><li class="toc-level-2"><a href="#d-resistive">D.2 电阻、电流、功率与压降</a></li><li class="toc-level-3"><a href="#eq-ohms-law">D.2.1 欧姆定律</a></li><li class="toc-level-3"><a href="#eq-resistor-power">D.2.2 电阻功耗</a></li><li class="toc-level-3"><a href="#eq-voltage-drop">D.2.3 路径压降</a></li><li class="toc-level-2"><a href="#d-regulators">D.3 稳压器与负载开关</a></li><li class="toc-level-3"><a href="#eq-buck-feedback">D.3.1 SY8089 输出反馈</a></li><li class="toc-level-3"><a href="#eq-load-switch-limit">D.3.2 SY6280 限流设置</a></li><li class="toc-level-3"><a href="#eq-efficiency">D.3.3 转换效率</a></li><li class="toc-level-3"><a href="#eq-thermal">D.3.4 损耗与温升边界</a></li><li class="toc-level-2"><a href="#d-capacitors-time">D.4 电容、容抗、储能与时间常数</a></li><li class="toc-level-3"><a href="#eq-capacitor-charge">D.4.1 电荷与能量</a></li><li class="toc-level-3"><a href="#eq-capacitor-reactance">D.4.2 理想电容容抗</a></li><li class="toc-level-3"><a href="#eq-reset-rc">D.4.3 复位 RC 时间常数</a></li><li class="toc-level-2"><a href="#d-clock-inductor">D.5 晶振与 Buck 电感</a></li><li class="toc-level-3"><a href="#eq-crystal-load">D.5.1 晶振负载电容</a></li><li class="toc-level-3"><a href="#eq-inductor-ripple">D.5.2 Buck 电感纹波近似</a></li><li class="toc-level-2"><a href="#d-led-digital">D.6 LED、PWM 与 UART</a></li><li class="toc-level-3"><a href="#eq-led-current">D.6.1 LED 电流</a></li><li class="toc-level-3"><a href="#eq-pwm-average">D.6.2 PWM 平均值</a></li><li class="toc-level-3"><a href="#eq-uart-bit-time">D.6.3 UART 位时间</a></li><li class="toc-level-2"><a href="#d-usb-geometry">D.7 USB CAD 几何偏斜</a></li><li class="toc-level-2"><a href="#d-units">D.8 mil 与毫米换算</a></li><li class="toc-level-2"><a href="#d-calculation-record">D.9 可复核计算记录模板</a></li></ul></nav>
+        <section aria-labelledby="d-conventions">
+  <h2 id="d-conventions">D.1 计算约定：先写状态，再写数字</h2>
+  <p>本附录中的每个结果都应标明证据状态：</p>
+  <dl>
+    <dt><strong>设计值</strong></dt><dd>最终项目采用的标称元件值、网络或规则，不表示已经测量。</dd>
+    <dt><strong>计算值</strong></dt><dd>由设计值、公式或 CAD 几何推导；精度受模型和输入误差限制。</dd>
+    <dt><strong>预期值</strong></dt><dd>根据机理预测的行为；仍需样机确认。</dd>
+    <dt><strong>实测值</strong></dt><dd>应来自有日期、仪器、接法和原始数据的板上测量。当前事实库为 0 条。</dd>
+    <dt><strong>待验证</strong></dt><dd>缺少数据手册细节、生产叠层、器差或实物结果，不能下最终结论。</dd>
+  </dl>
+  <aside class="warning">
+    <p>公式给出的是模型，不是认证。不得把典型数据手册值写成保证值，也不得把 CAD 长度、设计限流或理论效率写成实物结果。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="d-resistive">
+  <h2 id="d-resistive">D.2 电阻、电流、功率与压降</h2>
+
+  <h3 id="eq-ohms-law">D.2.1 欧姆定律</h3>
+  <p class="equation"><strong>V = I × R</strong>；等价形式为 <strong>I = V/R</strong>、<strong>R = V/I</strong>。</p>
+  <table>
+    <caption>式 D-1 变量</caption>
+    <thead><tr><th scope="col">符号</th><th scope="col">含义</th><th scope="col">SI 单位</th></tr></thead>
+    <tbody><tr><th scope="row">V</th><td>元件两端电压</td><td>伏特（V）</td></tr><tr><th scope="row">I</th><td>流过元件的电流</td><td>安培（A）</td></tr><tr><th scope="row">R</th><td>电阻</td><td>欧姆（Ω）</td></tr></tbody>
+  </table>
+  <p><strong>适用条件：</strong>线性、近似恒阻元件，或在指定工作点做小范围近似。LED、MOSFET、负载开关和 MCU 引脚不能简单当作固定电阻。</p>
+  <div class="example">
+    <p><strong>R1 算例：</strong>若把 3.3 V 全部落在 R13=1 kΩ 上，则 <span aria-label="I equals 3 point 3 volts divided by 1000 ohms">I = 3.3/1000 = 3.3 mA</span>。这是令 LED 正向压降为零的数学上限，不是 D1 的实测电流。</p>
+  </div>
+
+  <h3 id="eq-resistor-power">D.2.2 电阻功耗</h3>
+  <p class="equation"><strong>P = V × I = I<sup>2</sup>R = V<sup>2</sup>/R</strong></p>
+  <p>稳态直流可直接使用；交流应使用一致的 RMS 量。以上述保守上限为例，R13 最大数学功耗为 <span aria-label="3 point 3 volts squared divided by 1000 ohms">3.3²/1000 = 0.01089 W = 10.89 mW</span>。这低于器件事实表用于审核的 0603 100 mW 量级，但实际额定值仍应以所采购料号、环境温度和降额规则为准。</p>
+
+  <h3 id="eq-voltage-drop">D.2.3 路径压降</h3>
+  <p class="equation"><strong>V<sub>DROP</sub> = I × R<sub>PATH</sub></strong></p>
+  <p><span aria-label="R path">R<sub>PATH</sub></span> 应包括线缆、连接器、走线、过孔、开关导通电阻和接触电阻。R1 没有发布这些量的板上总实测值，因此 5V_SW/3V3_SW 满载压降必须通过四线或明确接点的测量获得。工作表应记录“源端电压、负载端电压、负载电流、温度”，再由差值计算。</p>
+  <table>
+    <caption>式 D-3 建议记录</caption>
+    <thead><tr><th scope="col">量</th><th scope="col">记录</th><th scope="col">计算</th></tr></thead>
+    <tbody><tr><td>源端电压</td><td>______ V</td><td rowspan="3"><span aria-label="V drop equals V source minus V load">V<sub>DROP</sub>=V<sub>SOURCE</sub>−V<sub>LOAD</sub></span><br><span aria-label="R path equals V drop divided by I">R<sub>PATH</sub>=V<sub>DROP</sub>/I</span></td></tr><tr><td>负载端电压</td><td>______ V</td></tr><tr><td>负载电流</td><td>______ A</td></tr></tbody>
+  </table>
+</section>
+
+<section aria-labelledby="d-regulators">
+  <h2 id="d-regulators">D.3 稳压器与负载开关</h2>
+
+  <h3 id="eq-buck-feedback">D.3.1 SY8089 输出反馈</h3>
+  <p class="equation"><strong>V<sub>OUT</sub> = V<sub>FB</sub> × (1 + R<sub>TOP</sub>/R<sub>BOTTOM</sub>)</strong></p>
+  <p>R1 使用 R5=453 kΩ、R6=100 kΩ；已复核的器件资料给出典型 <span aria-label="V F B">V<sub>FB</sub></span>=0.6 V。</p>
+  <div class="example">
+    <p><strong>完整代入：</strong>V<sub>OUT</sub> = 0.6 × (1 + 453/100) = 0.6 × 5.53 = <strong>3.318 V</strong>。</p>
+    <p><strong>结论状态：</strong>3.318 V 是使用典型基准和标称电阻的计算值。电阻误差、反馈基准分布、负载、布局和测量点会改变板上结果。</p>
+  </div>
+
+  <h3 id="eq-load-switch-limit">D.3.2 SY6280 限流设置</h3>
+  <p class="equation"><strong>I<sub>LIMIT</sub>(A) = 6800 / R<sub>SET</sub>(Ω)</strong></p>
+  <table>
+    <caption>表 D-1　R1 两路设计限流计算</caption>
+    <thead><tr><th scope="col">电源</th><th scope="col">器件 / 电阻</th><th scope="col">代入</th><th scope="col">计算值</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><code>5V_SW</code></th><td>U4 / R7=16.9 kΩ</td><td>6800/16900</td><td>0.40237 A，约 402 mA</td></tr>
+      <tr><th scope="row"><code>3V3_SW</code></th><td>U5 / R8=27 kΩ</td><td>6800/27000</td><td>0.25185 A，约 252 mA</td></tr>
+    </tbody>
+  </table>
+  <p>这些是典型设计设定，不是承诺的精确跳闸点。器件容差、温升、USB 供电、输入压降和保护模式都需按数据手册并在安全条件下实测。</p>
+
+  <h3 id="eq-efficiency">D.3.3 转换效率</h3>
+  <p class="equation"><strong>η = P<sub>OUT</sub>/P<sub>IN</sub> × 100% = (V<sub>OUT</sub>I<sub>OUT</sub>)/(V<sub>IN</sub>I<sub>IN</sub>) × 100%</strong></p>
+  <p>输入和输出应在同一稳态时刻测量，仪表带宽、线损和辅助负载必须说明。R1 没有已发布效率数据。</p>
+  <table>
+    <caption>效率算例模板（填写实测值后再计算）</caption>
+    <tbody>
+      <tr><th scope="row">V<sub>IN</sub></th><td>______ V</td><th scope="row">I<sub>IN</sub></th><td>______ A</td></tr>
+      <tr><th scope="row">V<sub>OUT</sub></th><td>______ V</td><th scope="row">I<sub>OUT</sub></th><td>______ A</td></tr>
+      <tr><th scope="row">η</th><td colspan="3">________________ %</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="eq-thermal">D.3.4 损耗与温升边界</h3>
+  <p>电阻性损耗可先估算为 <strong>P<sub>LOSS</sub>=I²R</strong>。只有在已知且适用于实际 PCB、气流和铜面积的热阻 <span aria-label="theta">θ</span> 时，才可用 <strong>ΔT≈P<sub>LOSS</sub>×θ</strong> 做一阶估算。R1 没有可直接代入的板级热阻，故温升必须测量，不能由“DRC 通过”或单一封装典型值推出。</p>
+</section>
+
+<section aria-labelledby="d-capacitors-time">
+  <h2 id="d-capacitors-time">D.4 电容、容抗、储能与时间常数</h2>
+
+  <h3 id="eq-capacitor-charge">D.4.1 电荷与能量</h3>
+  <p class="equation"><strong>Q = C × ΔV</strong>；<strong>E = ½CV²</strong></p>
+  <p>Q 的单位为库仑（C），E 的单位为焦耳（J）。以标称 10 µF 电容在 3.3 V 为理想算例：</p>
+  <div class="example">
+    <p>Q = 10 µF × 3.3 V = <strong>33 µC</strong>；E = ½ × 10 µF × 3.3² = <strong>54.45 µJ</strong>。</p>
+    <p>实际 MLCC 有容差、直流偏压、温度和老化效应，故这只是使用标称电容的理想计算。</p>
+  </div>
+
+  <h3 id="eq-capacitor-reactance">D.4.2 理想电容容抗</h3>
+  <p class="equation"><strong>X<sub>C</sub> = 1/(2πfC)</strong></p>
+  <table>
+    <caption>表 D-2　理想化频率算例</caption>
+    <thead><tr><th scope="col">电容</th><th scope="col">频率</th><th scope="col">计算</th><th scope="col">理想 |X<sub>C</sub>|</th></tr></thead>
+    <tbody>
+      <tr><td>100 nF（如 C6）</td><td>1 MHz</td><td>1/(2π×10<sup>6</sup>×100×10<sup>−9</sup>)</td><td>约 1.59 Ω</td></tr>
+      <tr><td>10 µF（如 C9）</td><td>1 kHz</td><td>1/(2π×10<sup>3</sup>×10×10<sup>−6</sup>)</td><td>约 15.9 Ω</td></tr>
+    </tbody>
+  </table>
+  <p>真实电容还包含 ESR、ESL、自谐振和安装回路电感；因此“大电容”和“小电容”并联服务不同频段，不能只看标称容量。</p>
+
+  <h3 id="eq-reset-rc">D.4.3 复位 RC 时间常数</h3>
+  <p class="equation"><strong>τ = R × C</strong></p>
+  <div class="example">
+    <p>R12=10 kΩ，C10=100 nF：τ = 10000 × 100×10<sup>−9</sup> = 0.001 s = <strong>1 ms</strong>。</p>
+    <p>一阶充电电压可写为 V(t)=V<sub>FINAL</sub>(1−e<sup>−t/τ</sup>)；但 U1 的真实复位释放时间还取决于 NRST 阈值、电源斜率和内部电路，不能直接宣称“1 ms 后一定运行”。</p>
+  </div>
+</section>
+
+<section aria-labelledby="d-clock-inductor">
+  <h2 id="d-clock-inductor">D.5 晶振与 Buck 电感</h2>
+
+  <h3 id="eq-crystal-load">D.5.1 晶振负载电容</h3>
+  <p class="equation"><strong>C<sub>L</sub> ≈ (C11×C12)/(C11+C12) + C<sub>STRAY</sub></strong></p>
+  <div class="example">
+    <p>C11=C12=12 pF，忽略杂散时：(12×12)/(12+12)=<strong>6 pF</strong>。</p>
+    <p>Y1 元数据标称负载为 20 pF。由于 <span aria-label="C stray">C<sub>STRAY</sub></span>、MCU 振荡器模型和板上寄生未知，不能由 6 pF 直接判定匹配或失配；频偏、起振时间和裕量必须复核及测量。</p>
+  </div>
+
+  <h3 id="eq-inductor-ripple">D.5.2 Buck 电感纹波近似</h3>
+  <p class="equation"><strong>ΔI<sub>L</sub> ≈ (V<sub>IN</sub>−V<sub>OUT</sub>)D/(L f<sub>SW</sub>)</strong></p>
+  <p>适用于连续导通、理想化稳态近似。R1 的 L1=2.2 µH；若暂用理想 Buck 近似 D≈V<sub>OUT</sub>/V<sub>IN</sub>，取 V<sub>IN</sub>=5 V、计算 V<sub>OUT</sub>=3.318 V，可整理为：</p>
+  <p class="equation"><strong>ΔI<sub>L</sub> ≈ 5.07×10<sup>5</sup>/f<sub>SW</sub> A</strong>（f<sub>SW</sub> 以 Hz 输入）</p>
+  <p>事实库没有给出可无条件代入的最终开关频率和工作模式，故本附录不制造纹波数值。还需检查电感容差、饱和电流、负载范围和器件控制模式。</p>
+</section>
+
+<section aria-labelledby="d-led-digital">
+  <h2 id="d-led-digital">D.6 LED、PWM 与 UART</h2>
+
+  <h3 id="eq-led-current">D.6.1 LED 电流</h3>
+  <p class="equation"><strong>I<sub>LED</sub> = (V<sub>OH</sub>−V<sub>F</sub>)/R13</strong></p>
+  <p>R13=1 kΩ。最终项目没有记录板上 <span aria-label="V O H">V<sub>OH</sub></span> 或 D1 <span aria-label="V F">V<sub>F</sub></span> 的测量值，因此只给出公式和 3.3 mA 的零正向压降上限。正确实验应同时测电阻两端压降，再用 I=V<sub>R13</sub>/1 kΩ 计算。</p>
+
+  <h3 id="eq-pwm-average">D.6.2 PWM 平均值</h3>
+  <p class="equation"><strong>V<sub>AVG</sub> ≈ D × V<sub>HIGH</sub></strong></p>
+  <p>D 为 0–1 的占空比。以 3.3 V 高电平、25% 占空比为理想示例，充分低通平均后 V<sub>AVG</sub>≈0.25×3.3=<strong>0.825 V</strong>。没有滤波或面对非线性负载时，瞬时波形仍在高低电平之间切换，不能把 0.825 V 当作任意负载上的直流输出。</p>
+  <p>若计数器有效分辨率为 N 位，理想码数为 2<sup>N</sup>，占空比最小步进约为 1/2<sup>N</sup>；实际分辨率受定时器时钟、目标频率和固件配置限制。R1 四通道共用 TIM3 频率。</p>
+
+  <h3 id="eq-uart-bit-time">D.6.3 UART 位时间</h3>
+  <p class="equation"><strong>t<sub>BIT</sub> = 1/baud</strong></p>
+  <div class="example">
+    <p>设计提案以 115200 baud 作为名义串口示例：t<sub>BIT</sub>=1/115200≈<strong>8.681 µs</strong>。8N1 帧通常包含 1 起始位、8 数据位、1 停止位，共 10 位，理想单帧时间约 86.81 µs；这不包含缓冲、协议和 USB 传输开销，也不是板上误码率证明。</p>
+  </div>
+</section>
+
+<section aria-labelledby="d-usb-geometry">
+  <h2 id="d-usb-geometry">D.7 USB CAD 几何偏斜</h2>
+  <p class="equation"><strong>skew = |L<sub>DP</sub>−L<sub>DM</sub>|</strong></p>
+  <table>
+    <caption>表 D-3　最终 CAD 三段 USB 长度计算</caption>
+    <thead><tr><th scope="col">段</th><th scope="col">D− 长度</th><th scope="col">D+ 长度</th><th scope="col">绝对偏斜</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">连接器 → ESD</th><td>700.884800 mil</td><td>700.884807 mil</td><td>0.000007 mil</td></tr>
+      <tr><th scope="row">ESD → 串联电阻</th><td>483.619088 mil</td><td>483.619146 mil</td><td>0.000058 mil</td></tr>
+      <tr><th scope="row">串联电阻 → MCU</th><td>361.880010 mil</td><td>361.880026 mil</td><td>0.000016 mil</td></tr>
+    </tbody>
+  </table>
+  <p>这些数值证明 CAD 路径长度高度匹配；不证明差分阻抗、传播速度、回流连续性、眼图或 EMI 合规。生产叠层和实物测试仍是必要证据。</p>
+</section>
+
+<section aria-labelledby="d-units">
+  <h2 id="d-units">D.8 mil 与毫米换算</h2>
+  <p class="equation"><strong>1 mil = 0.001 inch = 0.0254 mm</strong></p>
+  <table>
+    <caption>表 D-4　R1 常用几何值换算</caption>
+    <thead><tr><th scope="col">mil</th><th scope="col">mm</th><th scope="col">R1 用途</th></tr></thead>
+    <tbody>
+      <tr><td>6</td><td>0.1524</td><td>一般信号线宽</td></tr>
+      <tr><td>8</td><td>0.2032</td><td>USB D+/D− 线宽</td></tr>
+      <tr><td>12</td><td>0.3048</td><td>GND 线宽；过孔钻径</td></tr>
+      <tr><td>14</td><td>0.3556</td><td><code>BUCK_SW</code> 线宽</td></tr>
+      <tr><td>16</td><td>0.4064</td><td><code>5V_SW</code>/<code>3V3_SW</code> 线宽</td></tr>
+      <tr><td>20</td><td>0.5080</td><td><code>3V3_SYS</code> 线宽</td></tr>
+      <tr><td>24</td><td>0.6096</td><td><code>VBUS_IN</code> 主干线宽；过孔焊盘直径</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="d-calculation-record">
+  <h2 id="d-calculation-record">D.9 可复核计算记录模板</h2>
+  <table>
+    <caption>每个工程计算都应保留输入来源与状态</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">填写内容</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">问题与目标</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">公式及适用条件</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">输入值、单位、容差</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">每个输入的来源</th><td>□ 项目源　□ 数据手册　□ CAD　□ 实测　□ 明确假设</td></tr>
+      <tr><th scope="row">代入与中间步骤</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">结果与有效数字</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">状态</th><td>□ 设计值　□ 计算值　□ 预期值　□ 实测值　□ 待验证</td></tr>
+      <tr><th scope="row">敏感性 / 最坏情况</th><td>____________________________________________________________</td></tr>
+      <tr><th scope="row">需要的验证</th><td>____________________________________________________________</td></tr>
+    </tbody>
+  </table>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="c-pin-mapping.html"><small>上一页</small>附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a><a class="next" rel="next" href="e-easyeda-quick-reference.html"><small>下一页</small>附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

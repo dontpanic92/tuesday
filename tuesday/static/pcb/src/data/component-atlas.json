@@ -1,0 +1,520 @@
+{
+  "schema_version": "1.0.0",
+  "scope": "USB GPIO R1 的全部 48 个 PCB 物理位号；J2/J3 为 PCB 存在但不装配。",
+  "state_note": "value/nets/function 为 design；CAD/BOM/CPL 交叉核对不等于实物 measured；failure_modes 为 expected；hardware 默认为 unverified。",
+  "part_catalog": {
+    "0603WAF5101T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C23186", "datasheet": "https://item.szlcsc.com/datasheet/0603WAF5101T5E/23913.html"},
+    "0603WAF220JT5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C23345", "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20200306/C422600_1E6D84923E4A46A82E41ADD87F860B5C.pdf"},
+    "0603WAF4533T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C25818", "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20200306/C422600_1E6D84923E4A46A82E41ADD87F860B5C.pdf"},
+    "0603WAF1003T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C25803", "datasheet": "https://item.szlcsc.com/datasheet/0603WAF1003T5E/26546.html"},
+    "0603WAF1692T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C25954", "datasheet": "https://item.szlcsc.com/datasheet/0603WAF1692T5E/26697.html"},
+    "0603WAF2702T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C22967", "datasheet": "https://item.szlcsc.com/datasheet/0603WAF2702T5E/23694.html"},
+    "0603WAF1002T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C25804", "datasheet": "https://item.szlcsc.com/datasheet/0603WAF1002T5E/26547.html"},
+    "0603WAF1001T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C21190", "datasheet": "https://item.szlcsc.com/datasheet/0603WAF1001T5E/21904.html"},
+    "0603WAF2200T5E": {"manufacturer": "UNI-ROYAL", "lcsc": "C22962", "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20200306/C422600_1E6D84923E4A46A82E41ADD87F860B5C.pdf"},
+    "GRM21BR61H106KE43L": {"manufacturer": "Murata", "lcsc": "C440198", "datasheet": "https://item.szlcsc.com/datasheet/GRM21BR61H106KE43L/439567.html"},
+    "CL21A226MAQNNNE": {"manufacturer": "Samsung", "lcsc": "C45783", "datasheet": "https://item.szlcsc.com/datasheet/CL21A226MAQNNNE/46786.html"},
+    "CC0603KRX7R9BB104": {"manufacturer": "Yageo", "lcsc": "C14663", "datasheet": "https://item.szlcsc.com/datasheet/CC0603KRX7R9BB104/15331.html"},
+    "CL10C120JB8NNNC": {"manufacturer": "Samsung", "lcsc": "C38523", "datasheet": "https://item.szlcsc.com/datasheet/CL10C120JB8NNNC/39506.html"},
+    "CH32V203K8T6": {"manufacturer": "WCH", "lcsc": "C5372188", "datasheet": "https://item.szlcsc.com/datasheet/CH32V203K8T6/6222515.html"},
+    "USBLC6-2SC6": {"manufacturer": "UMW", "lcsc": "C2687116", "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20231109/512642D850D9873E7C519F71E85B9A10.pdf"},
+    "SY8089AAAC": {"manufacturer": "Silergy", "lcsc": "C78988", "datasheet": "https://item.szlcsc.com/datasheet/SY8089AAAC/80125.html"},
+    "SY6280AAC": {"manufacturer": "Silergy", "lcsc": "C55136", "datasheet": "https://item.szlcsc.com/datasheet/SY6280AAC/56162.html"},
+    "TYPE-C-31-M-12": {"manufacturer": "HanYoung", "lcsc": "C165948", "datasheet": "https://item.szlcsc.com/datasheet/TYPE-C-31-M-12/177331.html"},
+    "2.54mm2*8Pinheader": {"manufacturer": "generic/project-local", "lcsc": "C9900156076", "datasheet": null},
+    "HDR-1X5": {"manufacturer": "generic/project-local", "lcsc": "C9900008152", "datasheet": null},
+    "SWPA252012S2R2MT": {"manufacturer": "Sunlord", "lcsc": "C23894", "datasheet": "https://item.szlcsc.com/datasheet/SWPA252012S2R2MT/24634.html"},
+    "19-217/G7C-BK2L2VY/3T": {"manufacturer": "Everlight", "lcsc": "C264462", "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20180817/C264462_2484FC304B145C231F26AC872E74E609.pdf"},
+    "X322512MSB4SI": {"manufacturer": "YXC", "lcsc": "C9002", "datasheet": "https://item.szlcsc.com/datasheet/X322512MSB4SI/9522.html"}
+  },
+  "components": [
+    {
+      "ref": "R1", "value": "5.1 kΩ", "part": "0603WAF5101T5E", "package": "R0603", "fitted": true,
+      "function": "USB-C CC1 的独立 Rd 下拉，使 J1 在任一插头方向都声明为受电设备。",
+      "nets": {"1": "CC1", "2": "GND"}, "placement_mm": {"x": 10.135, "y": 10.16, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "5.1 kΩ 是最终源采用的 USB-C 受电端 CC 下拉值；CC1/CC2 必须各自独立。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 J1，避免 CC 节点长支路和误接。", "state": "design"},
+      "failure_modes": [{"mode": "open/wrong-high", "effect": "该插头方向可能无法识别或供电。", "state": "expected"}, {"mode": "short/wrong-low", "effect": "CC 电流异常，可能违反 Type-C 检测要求。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R1", "final-bom#row-8", "final-cpl#R1", "proposal#USB-C-front-end"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R2", "value": "5.1 kΩ", "part": "0603WAF5101T5E", "package": "R0603", "fitted": true,
+      "function": "USB-C CC2 的独立 Rd 下拉。",
+      "nets": {"1": "CC2", "2": "GND"}, "placement_mm": {"x": 10.135, "y": 13.818, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R1 相同，为可翻转插头的另一个 CC 引脚提供独立 5.1 kΩ 下拉。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 J1，并保持 CC1 与 CC2 不短接。", "state": "design"},
+      "failure_modes": [{"mode": "open/wrong-high", "effect": "一个插头方向可能无法识别或供电。", "state": "expected"}, {"mode": "short/wrong-low", "effect": "CC 检测电流异常。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R2", "final-bom#row-8", "final-cpl#R2", "proposal#USB-C-front-end"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R3", "value": "22 Ω", "part": "0603WAF220JT5E", "package": "R0603", "fitted": true,
+      "function": "USB D- 在 ESD 级与 MCU 级之间的串联阻尼/源端调节电阻。",
+      "nets": {"1": "USB_DM_ESD", "2": "USB_DM_MCU"}, "placement_mm": {"x": 18.034, "y": 15.494, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "22 Ω 是最终值，符合提案的 USB 可选串联电阻方案；真实信号完整性仍需板级验证。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "与 R4 成对、靠近 MCU 端，并避免支路和不对称。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "USB D- 断路，无法枚举。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "阻尼改变；过大可削弱边沿，过小可增加振铃。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R3", "final-bom#row-9", "final-cpl#R3", "fabrication-manifest#USB-DIFFERENTIAL-GEOMETRY"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R4", "value": "22 Ω", "part": "0603WAF220JT5E", "package": "R0603", "fitted": true,
+      "function": "USB D+ 在 ESD 级与 MCU 级之间的串联阻尼/源端调节电阻。",
+      "nets": {"1": "USB_DP_ESD", "2": "USB_DP_MCU"}, "placement_mm": {"x": 18.288, "y": 20.32, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R3 配对采用 22 Ω；最终 CAD 长度匹配不等于阻抗已验证。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "与 R3 保持等效拓扑和成对走线，靠近 MCU。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "USB D+ 断路，无法枚举。", "state": "expected"}, {"mode": "mismatch/wrong-value", "effect": "差分不对称、振铃或眼图裕量下降。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R4", "final-bom#row-9", "final-cpl#R4", "fabrication-manifest#USB-DIFFERENTIAL-GEOMETRY"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R5", "value": "453 kΩ", "part": "0603WAF4533T5E", "package": "R0603", "fitted": true,
+      "function": "U3 输出到 BUCK_FB 的反馈分压上臂。",
+      "nets": {"1": "3V3_SYS", "2": "BUCK_FB"}, "placement_mm": {"x": 14.478, "y": 22.987, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R6=100 kΩ、典型 0.6 V FB 基准计算得到约 3.318 V。", "state": "calculated"},
+      "layout_importance": {"level": "critical", "text": "反馈节点应远离 BUCK_SW，并以安静地返回 U3。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "BUCK_FB 经 R6 偏低，U3 可能把输出抬高到危险或失控状态。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "3V3_SYS 设定错误，可能损坏或复位逻辑。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R5", "formula-facts#buck-feedback", "final-bom#row-10", "final-cpl#R5"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R6", "value": "100 kΩ", "part": "0603WAF1003T5E", "package": "R0603", "fitted": true,
+      "function": "BUCK_FB 到 GND 的反馈分压下臂。",
+      "nets": {"1": "BUCK_FB", "2": "GND"}, "placement_mm": {"x": 25.146, "y": 23.114, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R5 共同设置 3V3_SYS；最终值覆盖提案中未冻结的分压细节。", "state": "calculated"},
+      "layout_importance": {"level": "critical", "text": "GND 端应连接安静参考，FB 走线应短且避开开关节点。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "FB 被上拉，输出可能被压低。", "state": "expected"}, {"mode": "short/wrong-low", "effect": "FB 偏低，U3 可能把输出抬高。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R6", "formula-facts#buck-feedback", "final-bom#row-11", "final-cpl#R6"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R7", "value": "16.9 kΩ", "part": "0603WAF1692T5E", "package": "R0603", "fitted": true,
+      "function": "U4 的 ISET 电阻，设置 5V_SW 电流限制。",
+      "nets": {"1": "ISET_5V", "2": "GND"}, "placement_mm": {"x": 28.499, "y": 22.352, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "按 I_LIMIT=6800/R_SET 计算约 0.402 A，对应 400 mA 目标；最终 16.9 kΩ 覆盖提案的 nominal 17 kΩ。", "state": "calculated"},
+      "layout_importance": {"level": "high", "text": "靠近 U4 ISET，避免噪声或漏电改变限流设定。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "限流设定异常，具体保护行为需按数据手册处理。", "state": "expected"}, {"mode": "short/wrong-low", "effect": "允许电流可能过高，增加 USB、走线和 U4 热风险。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R7", "formula-facts#load-switch-current-limit", "final-bom#row-12", "final-cpl#R7"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R8", "value": "27 kΩ", "part": "0603WAF2702T5E", "package": "R0603", "fitted": true,
+      "function": "U5 的 ISET 电阻，设置 3V3_SW 电流限制。",
+      "nets": {"1": "ISET_3V3", "2": "GND"}, "placement_mm": {"x": 40.64, "y": 23.241, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "按 I_LIMIT=6800/R_SET 计算约 0.252 A，对应 250 mA 目标。", "state": "calculated"},
+      "layout_importance": {"level": "high", "text": "靠近 U5 ISET，保持安静地参考。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "限流设定异常。", "state": "expected"}, {"mode": "short/wrong-low", "effect": "可能超过 buck、U5 和 3V3_SW 热/压降预算。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R8", "formula-facts#load-switch-current-limit", "final-bom#row-13", "final-cpl#R8"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R9", "value": "100 kΩ", "part": "0603WAF1003T5E", "package": "R0603", "fitted": true,
+      "function": "EN_5V 下拉，使 U4/5V_SW 在 MCU 复位或高阻时默认关闭。",
+      "nets": {"1": "EN_5V", "2": "GND"}, "placement_mm": {"x": 32.512, "y": 15.748, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "100 kΩ 提供弱而明确的默认低电平，同时减小 MCU 拉高时的静态电流。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "应靠近 U4 EN，避免悬空段拾取噪声。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "EN_5V 可悬空，5V_SW 可能在启动时不确定。", "state": "expected"}, {"mode": "short", "effect": "5V_SW 无法使能，并可能使 MCU 输出过流。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R9", "final-bom#row-11", "final-cpl#R9", "proposal#controlled-power-outputs"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R10", "value": "100 kΩ", "part": "0603WAF1003T5E", "package": "R0603", "fitted": true,
+      "function": "EN_3V3 下拉，使 U5/3V3_SW 默认关闭。",
+      "nets": {"1": "EN_3V3", "2": "GND"}, "placement_mm": {"x": 40.386, "y": 18.669, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R9 相同，以低静态损耗建立安全默认状态。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U5 EN，减少悬空和耦合。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "3V3_SW 启动状态不确定。", "state": "expected"}, {"mode": "short", "effect": "3V3_SW 无法使能，并可能使 MCU 输出过流。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R10", "final-bom#row-11", "final-cpl#R10", "proposal#controlled-power-outputs"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R11", "value": "100 kΩ", "part": "0603WAF1003T5E", "package": "R0603", "fitted": true,
+      "function": "BOOT0 下拉，使 U1 默认从正常启动路径进入。",
+      "nets": {"1": "BOOT0", "2": "GND"}, "placement_mm": {"x": 33.528, "y": 5.588, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "100 kΩ 提供默认低电平且便于调试器或测试夹具覆盖。", "state": "design"},
+      "layout_importance": {"level": "medium", "text": "靠近 U1 BOOT0，避免长悬空线。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "BOOT0 可能受噪声影响而进入错误启动模式。", "state": "expected"}, {"mode": "short-to-high/wrong-fit", "effect": "板可能持续进入引导模式。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R11", "final-bom#row-11", "final-cpl#R11"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R12", "value": "10 kΩ", "part": "0603WAF1002T5E", "package": "R0603", "fitted": true,
+      "function": "NRST 到 3V3_SYS 的上拉电阻。",
+      "nets": {"1": "3V3_SYS", "2": "NRST"}, "placement_mm": {"x": 33.02, "y": 18.085, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 C10=100 nF 形成名义 1 ms RC；实际复位阈值和时序未实测。", "state": "calculated"},
+      "layout_importance": {"level": "high", "text": "靠近 U1 NRST，复位线远离 BUCK_SW 和快速边沿。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "NRST 可能悬空或复位不可靠。", "state": "expected"}, {"mode": "short/wrong-low", "effect": "复位驱动电流增大；若短到 GND 则 MCU 保持复位。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R12", "formula-facts#reset-rc", "final-bom#row-14", "final-cpl#R12"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R13", "value": "1 kΩ", "part": "0603WAF1001T5E", "package": "R0603", "fitted": true,
+      "function": "U1 PB5/STATUS_LED 与 D1 阳极之间的 LED 限流电阻。",
+      "nets": {"1": "STATUS_LED", "2": "LED_A"}, "placement_mm": {"x": 29.718, "y": 5.385, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "理论零 Vf 上限为 3.3 mA；实际电流取决于 GPIO 高电平和黄绿色 LED Vf。", "state": "expected"},
+      "layout_importance": {"level": "low", "text": "与 D1 相邻便于识别和缩短支路；不应妨碍晶振区域。", "state": "design"},
+      "failure_modes": [{"mode": "open/wrong-high", "effect": "D1 不亮但核心功能可继续。", "state": "expected"}, {"mode": "short/wrong-low", "effect": "LED/GPIO 电流过大，可能损坏 D1 或 U1。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R13", "formula-facts#led-current", "final-bom#row-15", "final-cpl#R13"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R14", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO0/PWM0 的 MCU 侧到外部侧串联保护/边沿阻尼。",
+      "nets": {"1": "GPIO0_MCU", "2": "GPIO0_PWM0"}, "placement_mm": {"x": 37.084, "y": 6.096, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "220 Ω 位于提案 100-330 Ω 范围中，在故障限流与边沿速度之间折中。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1，按通道整齐排列，外部支路保持短。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO0/PWM0 与 J2 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "过小降低保护，过大增加 RC 延迟并限制负载。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R14", "final-bom#row-16", "final-cpl#R14", "proposal#GPIO-protection"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R15", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO1/PWM1 串联保护/阻尼。",
+      "nets": {"1": "GPIO1_MCU", "2": "GPIO1_PWM1"}, "placement_mm": {"x": 37.084, "y": 7.874, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R14 同一通道策略。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1并保持通道排列和间距。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO1/PWM1 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "保护或边沿折中失效。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R15", "final-bom#row-16", "final-cpl#R15"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R16", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO2/PWM2 串联保护/阻尼。",
+      "nets": {"1": "GPIO2_MCU", "2": "GPIO2_PWM2"}, "placement_mm": {"x": 37.084, "y": 9.652, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R14 同一通道策略。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1并保持通道排列和间距。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO2/PWM2 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "保护或边沿折中失效。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R16", "final-bom#row-16", "final-cpl#R16"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R17", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO3/PWM3 串联保护/阻尼。",
+      "nets": {"1": "GPIO3_MCU", "2": "GPIO3_PWM3"}, "placement_mm": {"x": 37.084, "y": 11.43, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R14 同一通道策略。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1并保持通道排列和间距。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO3/PWM3 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "保护或边沿折中失效。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R17", "final-bom#row-16", "final-cpl#R17"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R18", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO4 串联保护/阻尼。",
+      "nets": {"1": "GPIO4_MCU", "2": "GPIO4"}, "placement_mm": {"x": 37.084, "y": 13.208, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R14 同一外部 GPIO 保护策略。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1并保持通道排列。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO4 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "故障电流或边沿行为偏离设计。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R18", "final-bom#row-16", "final-cpl#R18"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R19", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO5 串联保护/阻尼。",
+      "nets": {"1": "GPIO5_MCU", "2": "GPIO5"}, "placement_mm": {"x": 37.084, "y": 14.986, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R14 同一外部 GPIO 保护策略。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1并保持通道排列。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO5 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "故障电流或边沿行为偏离设计。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R19", "final-bom#row-16", "final-cpl#R19"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R20", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO6 串联保护/阻尼。",
+      "nets": {"1": "GPIO6_MCU", "2": "GPIO6"}, "placement_mm": {"x": 37.084, "y": 16.764, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R14 同一外部 GPIO 保护策略。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1并保持通道排列。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO6 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "故障电流或边沿行为偏离设计。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R20", "final-bom#row-16", "final-cpl#R20"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R21", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "GPIO7 串联保护/阻尼。",
+      "nets": {"1": "GPIO7_MCU", "2": "GPIO7"}, "placement_mm": {"x": 37.084, "y": 18.542, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R14 同一外部 GPIO 保护策略。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1并保持通道排列。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "GPIO7 断开。", "state": "expected"}, {"mode": "short/wrong-value", "effect": "故障电流或边沿行为偏离设计。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R21", "final-bom#row-16", "final-cpl#R21"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R22", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "目标 UART TX 串联保护/阻尼。",
+      "nets": {"1": "UART_TX_MCU", "2": "UART_TX"}, "placement_mm": {"x": 41.148, "y": 8.89, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "沿用 220 Ω 外部接口保护值；会与输入/线缆电容形成 RC，最高波特率需实测。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1/接口路径，避免长未保护支路。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "UART_TX 断开。", "state": "expected"}, {"mode": "wrong-high", "effect": "边沿过慢，可能在高波特率产生误码。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R22", "final-bom#row-16", "final-cpl#R22"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "R23", "value": "220 Ω", "part": "0603WAF2200T5E", "package": "R0603", "fitted": true,
+      "function": "目标 UART RX 串联保护/阻尼。",
+      "nets": {"1": "UART_RX_MCU", "2": "UART_RX"}, "placement_mm": {"x": 41.148, "y": 14.986, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "沿用 220 Ω 外部接口保护值；输入阈值和高波特率裕量需实测。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1，限制外部故障电流并缩短 MCU 侧支路。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "UART_RX 断开。", "state": "expected"}, {"mode": "wrong-high", "effect": "边沿过慢，可能产生接收误码。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/R23", "final-bom#row-16", "final-cpl#R23"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C1", "value": "10 µF", "part": "GRM21BR61H106KE43L", "package": "C0805", "fitted": true,
+      "function": "VBUS_IN 的本地储能/旁路电容；与 C2、C13 在电气上并联但服务于不同物理电流环。",
+      "nets": {"1": "VBUS_IN", "2": "GND"}, "placement_mm": {"x": 10.668, "y": 16.51, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终项目采用 10 µF X5R；提供 VBUS 瞬态电流，直流偏压后的有效电容未测。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "应靠近其服务的 VBUS 负载并缩小 VBUS-GND 回路。", "state": "design"},
+      "failure_modes": [{"mode": "open/omitted", "effect": "VBUS 瞬态和噪声裕量下降。", "state": "expected"}, {"mode": "short", "effect": "USB VBUS 对地短路，主机端可能限流。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C1", "final-bom#row-1", "final-cpl#C1"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C2", "value": "10 µF", "part": "GRM21BR61H106KE43L", "package": "C0805", "fitted": true,
+      "function": "U3 输入侧的 VBUS_IN 储能/去耦电容。",
+      "nets": {"1": "VBUS_IN", "2": "GND"}, "placement_mm": {"x": 3.81, "y": 20.32, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "10 µF 与 SY8089 输入电容指导一致；最终板另有并联 VBUS 电容。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "应缩小 U3 输入开关电流环，接地回路必须短而宽。", "state": "design"},
+      "failure_modes": [{"mode": "open/omitted", "effect": "输入纹波和 EMI 增大，buck 可能不稳定。", "state": "expected"}, {"mode": "short", "effect": "VBUS 短路，无法上电。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C2", "final-bom#row-1", "final-cpl#C2", "datasheet-sy8089"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C3", "value": "22 µF", "part": "CL21A226MAQNNNE", "package": "C0805", "fitted": true,
+      "function": "U3/L1 后的 3V3_SYS 输出储能和纹波滤波电容。",
+      "nets": {"1": "3V3_SYS", "2": "GND"}, "placement_mm": {"x": 15.24, "y": 17.653, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "22 µF X5R 是最终值并符合 SY8089 输出电容方向；有效电容和稳定性需实测。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "靠近 L1/U3 输出回路，GND 回流短而宽，避免把 BUCK_SW 扩大。", "state": "design"},
+      "failure_modes": [{"mode": "open/low-effective-C", "effect": "3V3_SYS 纹波、瞬态跌落或稳定性风险增加。", "state": "expected"}, {"mode": "short", "effect": "3V3_SYS 短路并使 U3 过流。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C3", "final-bom#row-2", "final-cpl#C3", "datasheet-sy8089"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C4", "value": "10 µF", "part": "GRM21BR61H106KE43L", "package": "C0805", "fitted": true,
+      "function": "5V_SW 输出端本地储能和负载瞬态电容。",
+      "nets": {"1": "5V_SW", "2": "GND"}, "placement_mm": {"x": 29.21, "y": 19.304, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终设计采用 10 µF；需要在真实 USB 主机、线缆和负载下验证浪涌与恢复。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U4/J2 输出路径，缩短高电流回路。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "5V_SW 负载阶跃跌落和噪声增大。", "state": "expected"}, {"mode": "short", "effect": "U4 进入限流/热保护，VBUS 负担增加。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C4", "final-bom#row-1", "final-cpl#C4", "proposal#controlled-power-outputs"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C5", "value": "10 µF", "part": "GRM21BR61H106KE43L", "package": "C0805", "fitted": true,
+      "function": "3V3_SW 输出端本地储能和负载瞬态电容。",
+      "nets": {"1": "3V3_SW", "2": "GND"}, "placement_mm": {"x": 41.91, "y": 21.209, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终设计采用 10 µF；其浪涌也由 U3 和 U5 共同承担，需实测。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U5/J2，缩短 3V3_SW 高电流回路。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "3V3_SW 负载阶跃跌落增大。", "state": "expected"}, {"mode": "short", "effect": "U5/U3 过流或热保护，系统 3.3 V 可能受扰。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C5", "final-bom#row-1", "final-cpl#C5", "proposal#controlled-power-outputs"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C6", "value": "100 nF", "part": "CC0603KRX7R9BB104", "package": "C0603", "fitted": true,
+      "function": "U1 的 3V3_SYS 高频本地去耦之一。",
+      "nets": {"1": "3V3_SYS", "2": "GND"}, "placement_mm": {"x": 17.272, "y": 6.604, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "100 nF X7R 用于高频旁路；最终审计记录到 MCU 的最短路径约 6.65 mm。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "回路面积越小越好；现有路径应在实物噪声测试中复核。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "U1 电源瞬态和 EMI 裕量下降。", "state": "expected"}, {"mode": "short", "effect": "3V3_SYS 对地短路。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C6", "fabrication-checklist#ground-and-power", "final-bom#row-3", "final-cpl#C6"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C7", "value": "100 nF", "part": "CC0603KRX7R9BB104", "package": "C0603", "fitted": true,
+      "function": "U1 的 3V3_SYS 高频本地去耦之一。",
+      "nets": {"1": "3V3_SYS", "2": "GND"}, "placement_mm": {"x": 17.272, "y": 8.89, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "100 nF X7R；最终审计记录到 MCU 的最短路径约 6.71 mm。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "靠近所服务电源脚，地返回不可绕行。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "U1 局部去耦减少。", "state": "expected"}, {"mode": "short", "effect": "3V3_SYS 对地短路。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C7", "fabrication-checklist#ground-and-power", "final-bom#row-3", "final-cpl#C7"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C8", "value": "100 nF", "part": "CC0603KRX7R9BB104", "package": "C0603", "fitted": true,
+      "function": "U1 的 3V3_SYS 高频本地去耦之一。",
+      "nets": {"1": "3V3_SYS", "2": "GND"}, "placement_mm": {"x": 17.272, "y": 11.176, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "100 nF X7R；最终审计记录到 MCU 的最短路径约 8.99 mm。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "曾发生 C8/C9 机械重叠；最终间距已通过，但电气回路仍需实测复核。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "U1 局部去耦减少。", "state": "expected"}, {"mode": "short", "effect": "3V3_SYS 对地短路。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C8", "fabrication-checklist#physical-placement", "final-bom#row-3", "final-cpl#C8"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C9", "value": "10 µF", "part": "GRM21BR61H106KE43L", "package": "C0805", "fitted": true,
+      "function": "U1 区域的 3V3_SYS 低频/负载瞬态储能电容。",
+      "nets": {"1": "3V3_SYS", "2": "GND"}, "placement_mm": {"x": 17.272, "y": 13.462, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "10 µF X5R 补充 C6-C8 的高频去耦；审计记录到 MCU 的路径约 13.82 mm。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U1 电源区域且不与 C8 碰撞；最终 C8/C9 间距已验证。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "U1 负载阶跃时 3V3_SYS 跌落增大。", "state": "expected"}, {"mode": "short", "effect": "3V3_SYS 对地短路。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C9", "fabrication-checklist#physical-placement", "final-bom#row-1", "final-cpl#C9"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C10", "value": "100 nF", "part": "CC0603KRX7R9BB104", "package": "C0603", "fitted": true,
+      "function": "NRST 到 GND 的复位滤波/上电延时电容。",
+      "nets": {"1": "NRST", "2": "GND"}, "placement_mm": {"x": 12.7, "y": 5.08, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R12=10 kΩ 形成 1 ms 名义时间常数；实际阈值和释放时间未测。", "state": "calculated"},
+      "layout_importance": {"level": "high", "text": "靠近 U1 NRST，避免复位线拾取开关噪声。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "复位抗噪和上电延时减弱。", "state": "expected"}, {"mode": "short", "effect": "NRST 被拉低，U1 无法运行。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C10", "formula-facts#reset-rc", "final-bom#row-3", "final-cpl#C10"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C11", "value": "12 pF", "part": "CL10C120JB8NNNC", "package": "C0603", "fitted": true,
+      "function": "Y1 OSC_IN 侧负载电容。",
+      "nets": {"1": "OSC_IN", "2": "GND"}, "placement_mm": {"x": 16.764, "y": 3.556, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终值为 12 pF C0G；与 C12 的理想串联等效为 6 pF，加杂散后是否匹配 Y1 标称 20 pF 尚未验证。", "state": "unverified"},
+      "layout_importance": {"level": "critical", "text": "紧靠 Y1/U1，短、对称、远离 BUCK_SW 和快速数字线。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "负载电容下降，频偏或不起振风险增加。", "state": "expected"}, {"mode": "short/wrong-high", "effect": "OSC_IN 被重载或接地，可能不起振。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C11", "formula-facts#crystal-load", "final-bom#row-4", "final-cpl#C11"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C12", "value": "12 pF", "part": "CL10C120JB8NNNC", "package": "C0603", "fitted": true,
+      "function": "Y1 OSC_OUT 侧负载电容。",
+      "nets": {"1": "OSC_OUT", "2": "GND"}, "placement_mm": {"x": 26.416, "y": 3.556, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 C11 相同；Y1 的 20 pF 负载匹配和起振裕量需在实物上确认。", "state": "unverified"},
+      "layout_importance": {"level": "critical", "text": "与 C11 对称布置，地回路短，避免跨越噪声电流路径。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "频偏或不起振风险增加。", "state": "expected"}, {"mode": "short/wrong-high", "effect": "OSC_OUT 被重载或接地。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C12", "formula-facts#crystal-load", "final-bom#row-4", "final-cpl#C12"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C13", "value": "100 nF", "part": "CC0603KRX7R9BB104", "package": "C0603", "fitted": true,
+      "function": "U4 的 VBUS_IN 输入高频旁路电容。",
+      "nets": {"1": "VBUS_IN", "2": "GND"}, "placement_mm": {"x": 20.828, "y": 22.352, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "100 nF X7R 为负载开关输入的高频本地旁路，补充 VBUS 大电容。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U4 IN/GND，缩小开关负载瞬态回路。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "U4 输入高频噪声和压降增加。", "state": "expected"}, {"mode": "short", "effect": "VBUS_IN 对地短路。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C13", "final-bom#row-3", "final-cpl#C13"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "C14", "value": "100 nF", "part": "CC0603KRX7R9BB104", "package": "C0603", "fitted": true,
+      "function": "U5 的 3V3_SYS 输入高频旁路电容。",
+      "nets": {"1": "3V3_SYS", "2": "GND"}, "placement_mm": {"x": 31.75, "y": 22.352, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "100 nF X7R 为 U5 输入提供高频旁路，减少 3V3_SYS 瞬态耦合。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "靠近 U5 IN/GND，回流短而宽。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "U5 输入噪声和瞬态压降增加。", "state": "expected"}, {"mode": "short", "effect": "3V3_SYS 对地短路。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/C14", "final-bom#row-3", "final-cpl#C14"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "U1", "value": null, "part": "CH32V203K8T6", "package": "LQFP-32_L7.0-W7.0-P0.80-LS9.0-BL", "fitted": true,
+      "function": "主 MCU：USB Full-Speed 设备、8 路 GPIO、4 路 TIM3 PWM、目标 UART、双电源使能、状态 LED 和 SWD。",
+      "nets": {"1": "3V3_SYS", "2": "OSC_IN", "3": "OSC_OUT", "4": "NRST", "5": "3V3_SYS", "6": "GPIO4_MCU", "7": "GPIO5_MCU", "8": "UART_TX_MCU", "9": "UART_RX_MCU", "10": "GPIO6_MCU", "11": "GPIO7_MCU", "12": "GPIO0_MCU", "13": "GPIO1_MCU", "14": "GPIO2_MCU", "15": "GPIO3_MCU", "16": "GND", "17": "3V3_SYS", "18": null, "19": null, "20": null, "21": "USB_DM_MCU", "22": "USB_DP_MCU", "23": "SWDIO", "24": "SWCLK", "25": null, "26": "EN_5V", "27": "EN_3V3", "28": "STATUS_LED", "29": null, "30": null, "31": "BOOT0", "32": "GND"},
+      "placement_mm": {"x": 24.892, "y": 11.989, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终选择 LQFP-32 CH32V203K8T6，以原生 USB、定时器、UART、调试和可返修性满足 R1。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "电源去耦、晶振、USB、复位和 SWD 回路均依赖 U1 周边布局；Pin 1 方向必须正确。", "state": "design"},
+      "failure_modes": [{"mode": "missing/reversed/bad-solder", "effect": "板无法运行或部分引脚失效。", "state": "expected"}, {"mode": "overvoltage/shorted-I/O", "effect": "MCU 永久损坏并可能拖垮 3V3_SYS/USB。", "state": "expected"}, {"mode": "firmware-not-safe", "effect": "GPIO 或受控电源在启动/挂起期间进入危险状态。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/U1", "final-bom#row-17", "final-cpl#U1", "proposal#MCU-selection", "datasheet-ch32v203"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "U2", "value": null, "part": "USBLC6-2SC6", "package": "SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL", "fitted": true,
+      "function": "J1 的 D+/D- 双线 ESD 导流器件，并以 VBUS_IN/GND 为钳位参考。",
+      "nets": {"1": "USB_DM_CONN", "2": "GND", "3": "USB_DP_CONN", "4": "USB_DP_ESD", "5": "VBUS_IN", "6": "USB_DM_ESD"},
+      "placement_mm": {"x": 13.843, "y": 8.89, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终采用低电容 USBLC6-2SC6 拓扑保护 USB 数据线；实物 ESD 等级未验证。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "必须位于连接器入口附近，连接器到 U2 的未保护段、地回路和支路都应最短。", "state": "design"},
+      "failure_modes": [{"mode": "open/missing", "effect": "正常 USB 可能仍工作，但 ESD 防护显著降低。", "state": "expected"}, {"mode": "short/leaky/wrong-orientation", "effect": "D+/D- 或 VBUS 被钳住，USB 无法枚举。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/U2", "final-bom#row-18", "final-cpl#U2", "datasheet-usblc6"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "U3", "value": null, "part": "SY8089AAAC", "package": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR", "fitted": true,
+      "function": "把 VBUS_IN 降压为始终开启的 3V3_SYS 同步 Buck 稳压器。",
+      "nets": {"1": "VBUS_IN", "2": "GND", "3": "BUCK_SW", "4": "VBUS_IN", "5": "BUCK_FB"},
+      "placement_mm": {"x": 8.89, "y": 20.32, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "Buck 取代早期 LDO 方案，以降低约 250 mA 外部负载下的热耗散并增加电流裕量。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "输入环、BUCK_SW-L1、输出环和 FB 路径必须紧凑分离；SOT-23-5 方向不可错。", "state": "design"},
+      "failure_modes": [{"mode": "missing/open", "effect": "无 3V3_SYS，U1 和 3V3_SW 不工作。", "state": "expected"}, {"mode": "short/wrong-orientation", "effect": "可能把 VBUS 或 BUCK_SW 错接到 3.3 V 域并损坏器件。", "state": "expected"}, {"mode": "layout-instability", "effect": "纹波、EMI、过热或振荡；DRC 无法证明稳定。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/U3", "final-bom#row-19", "final-cpl#U3", "proposal#3.3-V-supply", "datasheet-sy8089"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "U4", "value": null, "part": "SY6280AAC", "package": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BL", "fitted": true,
+      "function": "VBUS_IN 到 5V_SW 的高侧受控、限流负载开关。",
+      "nets": {"1": "5V_SW", "2": "GND", "3": "ISET_5V", "4": "EN_5V", "5": "VBUS_IN"},
+      "placement_mm": {"x": 25.146, "y": 20.32, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "80 mΩ 级高侧开关与 R7 形成约 400 mA 设计限流，并由 R9 保证默认关闭。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "靠近输出路径，IN/OUT 走线按电流加宽并留散热铜；ISET/EN 与噪声隔离。", "state": "design"},
+      "failure_modes": [{"mode": "open/missing", "effect": "5V_SW 无输出。", "state": "expected"}, {"mode": "shorted-switch", "effect": "5V_SW 无法关闭，安全状态失效。", "state": "expected"}, {"mode": "thermal/current-limit", "effect": "过载时压降、限流或热关断；实际阈值需测。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/U4", "final-bom#row-20", "final-cpl#U4", "formula-facts#load-switch-current-limit", "datasheet-sy6280"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "U5", "value": null, "part": "SY6280AAC", "package": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BL", "fitted": true,
+      "function": "3V3_SYS 到 3V3_SW 的高侧受控、限流负载开关。",
+      "nets": {"1": "3V3_SW", "2": "GND", "3": "ISET_3V3", "4": "EN_3V3", "5": "3V3_SYS"},
+      "placement_mm": {"x": 36.83, "y": 21.59, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "与 R8 形成约 250 mA 设计限流，并由 R10 保证默认关闭。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "靠近 J2/输出电容；IN/OUT 走线和散热必须兼顾 U3 总负载。", "state": "design"},
+      "failure_modes": [{"mode": "open/missing", "effect": "3V3_SW 无输出。", "state": "expected"}, {"mode": "shorted-switch", "effect": "3V3_SW 无法关闭并可能反向供电目标。", "state": "expected"}, {"mode": "thermal/current-limit", "effect": "过载影响 U5，并可能拖低 3V3_SYS。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/U5", "final-bom#row-20", "final-cpl#U5", "formula-facts#load-switch-current-limit", "datasheet-sy6280"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "J1", "value": null, "part": "TYPE-C-31-M-12", "package": "USB-C_SMD-TYPE-C-31-M-12_1", "fitted": true,
+      "function": "USB 主机连接器，提供 VBUS、GND、CC1/CC2 和可翻转的 USB 2.0 D+/D-。",
+      "nets": {"A1B12": "GND", "B1A12": "GND", "A4B9": "VBUS_IN", "B4A9": "VBUS_IN", "A5": "CC1", "B5": "CC2", "A6": "USB_DP_CONN", "B6": "USB_DP_CONN", "A7": "USB_DM_CONN", "B7": "USB_DM_CONN", "A8": null, "B8": null, "1": "GND", "2": "GND", "3": "GND", "4": "GND"},
+      "placement_mm": {"x": 5.093, "y": 11.989, "side": "Top", "rotation_deg": 270},
+      "value_rationale": {"text": "最终采用 16P USB2-only Type-C 母座，不含 SuperSpeed 或 USB-PD。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "左向板边外伸是有意设计；方向、壳体、插拔空间、固定脚和 D+/D- 扇出必须联合审核。", "state": "design"},
+      "failure_modes": [{"mode": "reversed/misaligned", "effect": "无法插线、焊盘错位或数据/电源不通。", "state": "expected"}, {"mode": "shell/pad-bad-solder", "effect": "机械强度、屏蔽或供电可靠性下降。", "state": "expected"}, {"mode": "VBUS-short", "effect": "主机端口保护动作并可能损坏板。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/J1", "final-bom#row-6", "final-cpl#J1", "fabrication-checklist#physical-placement"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "J2", "value": "2×8, 2.54 mm", "part": "2.54mm2*8Pinheader", "package": "HDR-TH_16P-P2.54-V-M-R2-C8-S2.54-1", "fitted": false,
+      "function": "目标侧 GPIO/PWM/UART、复位、GND 和双受控电源接口；PCB/CPL 存在但采购 BOM 不装配。",
+      "nets": {"1": "GND", "2": "GND", "3": "5V_SW", "4": "3V3_SW", "5": "GPIO0_PWM0", "6": "GPIO1_PWM1", "7": "GPIO2_PWM2", "8": "GPIO3_PWM3", "9": "GPIO4", "10": "GPIO5", "11": "GPIO6", "12": "GPIO7", "13": "UART_TX", "14": "UART_RX", "15": "NRST", "16": null},
+      "placement_mm": {"x": 46.99, "y": 11.989, "side": "Top", "rotation_deg": 90},
+      "value_rationale": {"text": "2.54 mm 2×8 便于原型接线；最终 Add into BOM=no，由用户按需焊接。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "靠右板边并明确 Pin 1/方向；需验证真实排针、线缆和外壳配合。", "state": "design"},
+      "failure_modes": [{"mode": "wrong-orientation/user-miswire", "effect": "电源与信号错接，可能损坏目标或 USB 主机。", "state": "expected"}, {"mode": "unfitted", "effect": "这是预期状态；需要焊接或测试夹具才能使用。", "state": "design"}],
+      "evidence": ["final-project-archive#SCH/J2:Add-into-BOM=no", "final-project-archive#PCB/J2", "final-cpl#J2", "fabrication-checklist#DNP"],
+      "status": {"value": "design", "nets": "design", "function": "design", "assembly": "design-dnp", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "J3", "value": "1×5, 1.27 mm", "part": "HDR-1X5", "package": "HDR-TH_5P-P1.27_C9900008152", "fitted": false,
+      "function": "WCH-Link/SWD 调试与恢复接口；提供 3V3_SYS、GND、SWDIO、SWCLK、NRST。",
+      "nets": {"1": "3V3_SYS", "2": "GND", "3": "SWDIO", "4": "SWCLK", "5": "NRST"},
+      "placement_mm": {"x": 40.132, "y": 2.54, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "1.27 mm 1×5 节省面积；最终 Add into BOM=no，可用排针或夹具。", "state": "design"},
+      "layout_importance": {"level": "high", "text": "Pin 1 和电压方向必须清楚，需留探针/连接器操作空间。", "state": "design"},
+      "failure_modes": [{"mode": "wrong-orientation/miswire", "effect": "可能把电源接错或无法调试。", "state": "expected"}, {"mode": "unfitted", "effect": "这是预期状态；量产/开发需准备夹具或焊接排针。", "state": "design"}],
+      "evidence": ["final-project-archive#SCH/J3:Add-into-BOM=no", "final-project-archive#PCB/J3", "final-cpl#J3", "fabrication-checklist#DNP"],
+      "status": {"value": "design", "nets": "design", "function": "design", "assembly": "design-dnp", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "L1", "value": "2.2 µH", "part": "SWPA252012S2R2MT", "package": "IND-SMD_L2.5-W2.0_SWPA2520", "fitted": true,
+      "function": "U3 Buck 的储能电感，把 BUCK_SW 脉冲能量传到 3V3_SYS。",
+      "nets": {"1": "BUCK_SW", "2": "3V3_SYS"}, "placement_mm": {"x": 12.954, "y": 20.32, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "2.2 µH 与 SY8089 典型应用相符；项目元数据给出 1.25 A 额定、2.07 A 饱和电流，热/饱和裕量未实测。", "state": "design"},
+      "layout_importance": {"level": "critical", "text": "紧靠 U3，BUCK_SW 铜面积要小，输出回路短并远离 USB/晶振/FB。", "state": "design"},
+      "failure_modes": [{"mode": "open", "effect": "3V3_SYS 无输出。", "state": "expected"}, {"mode": "short/saturation/wrong-L", "effect": "电流纹波、峰值、效率和温升恶化，可能触发 U3 保护。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/L1", "final-bom#row-7", "final-cpl#L1", "datasheet-sy8089"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "D1", "value": "黄绿色 LED", "part": "19-217/G7C-BK2L2VY/3T", "package": "LED0603-R-RD_GREEN", "fitted": true,
+      "function": "由 U1 STATUS_LED 控制的板载状态指示灯。",
+      "nets": {"1": "LED_A", "2": "GND"}, "placement_mm": {"x": 33.528, "y": 3.048, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终料号为黄绿色 0603 LED；正向压降未写入最终源，因此电流只可按公式预期。", "state": "design"},
+      "layout_importance": {"level": "medium", "text": "极性和可视方向必须正确，避免被连接器或丝印遮挡。", "state": "design"},
+      "failure_modes": [{"mode": "reversed/open", "effect": "不发光，不一定影响核心功能。", "state": "expected"}, {"mode": "short", "effect": "STATUS_LED 经 R13 被持续拉低并增加 GPIO 电流。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/D1", "final-bom#row-5", "final-cpl#D1", "formula-facts#led-current"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    },
+    {
+      "ref": "Y1", "value": "12 MHz, 20 pF nominal load", "part": "X322512MSB4SI", "package": "CRYSTAL-SMD_4P-L3.2-W2.5-BL", "fitted": true,
+      "function": "U1 外部高速时钟谐振器；引脚 2/4 接地，1/3 接 OSC_IN/OSC_OUT。",
+      "nets": {"1": "OSC_IN", "2": "GND", "3": "OSC_OUT", "4": "GND"}, "placement_mm": {"x": 21.59, "y": 3.556, "side": "Top", "rotation_deg": 0},
+      "value_rationale": {"text": "最终项目明确为 12 MHz，覆盖提案的 8 MHz；20 pF 标称负载与 12 pF/12 pF 外接电容的匹配需复核。", "state": "unverified"},
+      "layout_importance": {"level": "critical", "text": "紧靠 U1，OSC_IN/OUT 短、对称、无支路，地护卫且远离 BUCK_SW/USB。", "state": "design"},
+      "failure_modes": [{"mode": "open/bad-solder", "effect": "外部时钟不起振，USB/固件可能无法工作。", "state": "expected"}, {"mode": "wrong-frequency/load", "effect": "频率偏差、起振裕量不足或 USB 时钟不合格。", "state": "expected"}],
+      "evidence": ["final-project-archive#PCB/Y1", "final-project-archive#DEVICE/X322512MSB4SI", "final-bom#row-21", "final-cpl#Y1", "formula-facts#crystal-load"],
+      "status": {"value": "design", "nets": "design", "function": "design", "failures": "expected", "hardware": "unverified"}
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="24. 铺铜与地平面（Copper Pours and Ground Planes） — USB GPIO PCB 离线教程">
+  <title>24. 铺铜与地平面（Copper Pours and Ground Planes） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-24">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html" aria-current="page">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</li><li aria-current="page">24. 铺铜与地平面（Copper Pours and Ground Planes）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</p>
+          <h1>24. 铺铜与地平面（Copper Pours and Ground Planes）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#chapter-24-goals">学习目标</a></li><li class="toc-level-2"><a href="#section-24-1">24.1 铺铜边界做什么</a></li><li class="toc-level-2"><a href="#section-24-2">24.2 原生 EasyEDA 铺铜与静态填充图元</a></li><li class="toc-level-2"><a href="#section-24-3">24.3 间距、热焊盘、优先级、孤岛与网络分配</a></li><li class="toc-level-2"><a href="#section-24-4">24.4 优先使用可随几何重算的原生铺铜</a></li><li class="toc-level-2"><a href="#section-24-5">24.5 把每个边界与闭合板框比较</a></li><li class="toc-level-2"><a href="#section-24-6">24.6 在任何几何或规则变化后重铺</a></li><li class="toc-level-2"><a href="#section-24-7">24.7 确认实际铜，而不是相信可见边界</a></li><li class="toc-level-2"><a href="#section-24-8">24.8 在导出的 Gerber 中检查铜区域</a></li><li class="toc-level-2"><a href="#section-24-9">24.9 案例：板外畸形边界与缺失的生成铜</a></li><li class="toc-level-2"><a href="#section-24-10">24.10 地连续性、返回路径与孤立铜岛</a></li><li class="toc-level-2"><a href="#section-24-11">24.11 实验：移动走线、重铺并检查间距变化</a></li><li class="toc-level-2"><a href="#chapter-24-summary">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="chapter-24-goals">
+  <h2 id="chapter-24-goals">学习目标</h2>
+  <p>铺铜不是“画一个大框然后变绿”。完成本章后，你应能区分原生铺铜边界、重铺后生成的铜和静态 FILL，正确设置网络、间距、热焊盘、优先级与孤岛策略，并通过源对象、DRC 和 Gerber 三层证据确认制造铜真实存在。</p>
+  <ul>
+    <li>解释铺铜边界与生成铜之间的关系；</li>
+    <li>比较可重算的原生 EasyEDA 铺铜和静态填充；</li>
+    <li>在每次几何或规则变更后重铺并审核；</li>
+    <li>发现越出板框、孤岛、狭颈和“只有边界没有铜”；</li>
+    <li>在独立 Gerber 查看器中确认实际铜区域。</li>
+  </ul>
+  <aside class="warning">
+    <p>R1 的冻结发布源最终包含 0 个原生 <code>POUR</code>、17 个静态 GND <code>FILL</code>。本章推荐未来修改优先使用经过验证的原生铺铜，但不要在没有重新完成全部审核的情况下直接改写已发布 R1。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-24-1">
+  <h2 id="section-24-1">24.1 铺铜边界做什么</h2>
+  <p>原生铺铜边界定义“工具可以在哪个区域尝试生成某个网络的铜”。它还携带层、网络、优先级、填充方式、最小颈宽和是否保留孤岛等属性。边界本身不是最终铜。</p>
+  <p>EasyEDA 源格式把两者分开：</p>
+  <ul>
+    <li><code>POUR</code>：覆铜边框，保存网络、层、路径、顺序、类型和孤岛策略；</li>
+    <li><code>POURED</code>：根据某个 <code>POUR</code> 和当前障碍/规则计算出的覆铜结果；</li>
+    <li><code>FILL</code>：固定多边形铜，几何不会因为附近走线移动而自动重算。</li>
+  </ul>
+  <p>因此，看到一个可选中的边界只证明“存在一个生成请求”，不能证明工具已经得到有效 <code>POURED</code> 结果，更不能证明导出的 Gerber 中有铜。</p>
+</section>
+
+<section aria-labelledby="section-24-2">
+  <h2 id="section-24-2">24.2 原生 EasyEDA 铺铜与静态填充图元</h2>
+  <table>
+    <caption>原生铺铜与静态 FILL 的维护差异</caption>
+    <thead><tr><th scope="col">属性</th><th scope="col">原生 POUR/POURED</th><th scope="col">静态 FILL</th></tr></thead>
+    <tbody>
+      <tr><td>几何变更后</td><td>执行重铺可按新障碍和规则重新计算</td><td>保持旧多边形，必须人工再生成/修改</td></tr>
+      <tr><td>间距</td><td>由当前铺铜规则重新应用</td><td>只有创建时或人工审核时的几何</td></tr>
+      <tr><td>热焊盘/孤岛</td><td>可由铺铜设置动态生成</td><td>需要静态几何明确表达</td></tr>
+      <tr><td>维护风险</td><td>边界、重铺状态或生成失败可能被忽略</td><td>元件/走线移动后容易遗留陈旧铜</td></tr>
+      <tr><td>推荐用途</td><td>持续编辑的 PCB 优先</td><td>仅在有明确原因和完整再审核流程时使用</td></tr>
+    </tbody>
+  </table>
+  <p>R1 的最终制造铜由 17 个已连接、间距安全的静态 GND 区域组成：顶层 11 个、底层 6 个。它们已在 Gerber 中确认，但任何后续 PCB 几何修改都会使这份确认失效。</p>
+</section>
+
+<section aria-labelledby="section-24-3">
+  <h2 id="section-24-3">24.3 间距、热焊盘、优先级、孤岛与网络分配</h2>
+  <p>创建铺铜时至少明确以下参数：</p>
+  <dl>
+    <dt><strong>网络</strong></dt>
+    <dd>R1 地铜应分配给 GND。无网络或错误网络铜可能成为浮铜或短路源。</dd>
+    <dt><strong>层</strong></dt>
+    <dd>顶、底层分别建立边界；不能假设一个对象自动覆盖两层。</dd>
+    <dt><strong>间距</strong></dt>
+    <dd>对不同网络焊盘、走线、过孔和板边应用制造规则。</dd>
+    <dt><strong>热焊盘（Thermal Relief）</strong></dt>
+    <dd>用辐条连接大铜与焊盘，改善可焊性；辐条宽度和数量仍需满足电流。</dd>
+    <dt><strong>优先级</strong></dt>
+    <dd>多个铺铜重叠时决定计算顺序；规则系统也可针对特定铺铜选择规则。</dd>
+    <dt><strong>孤岛</strong></dt>
+    <dd>与目标网络没有有效连接的铜块。除非有明确屏蔽目的和连接策略，通常删除。</dd>
+    <dt><strong>最小颈宽</strong></dt>
+    <dd>防止生成细长、难制造或高阻抗的铜丝。</dd>
+  </dl>
+  <p>设置值必须与板厂能力、电流、可焊性和回流目标共同审核，不能仅采用软件默认值。</p>
+</section>
+
+<section aria-labelledby="section-24-4">
+  <h2 id="section-24-4">24.4 优先使用可随几何重算的原生铺铜</h2>
+  <p>对仍会继续修改的设计，原生铺铜更容易保持规则一致：元件、过孔或走线移动后，重铺会重新避让障碍并更新热焊盘。静态填充则可能仍占据旧位置。</p>
+  <ol>
+    <li>在板框完成并锁定后，于目标铜层创建边界；</li>
+    <li>明确选择 GND、层、间距、热焊盘、孤岛和优先级；</li>
+    <li>让边界位于闭合板框内，并给板边规则留出空间；</li>
+    <li>执行重铺，确认生成结果而不是只看边界；</li>
+    <li>运行 DRC并检查地连通、狭颈和敏感回流；</li>
+    <li>导出 Gerber，在独立查看器中确认实际铜。</li>
+  </ol>
+  <p>“优先原生铺铜”不是“原生铺铜永不出错”。R1 的真实故障恰恰说明边界坐标、重铺结果和导出铜都必须检查。</p>
+</section>
+
+<section aria-labelledby="section-24-5">
+  <h2 id="section-24-5">24.5 把每个边界与闭合板框比较</h2>
+  <p>铺铜边界应采用与 PCB 相同的坐标、原点和单位，并在预期板框内。审核不能只缩放到“看起来大概覆盖板子”，而要计算边界包围盒并与单一闭合板框比较。</p>
+  <ol>
+    <li>确认板框只有一个闭合片段且尺寸正确；</li>
+    <li>列出每个铺铜对象的 ID、层、网络和边界包围盒；</li>
+    <li>检查边界最小/最大 X、Y 是否落在板框或允许内缩范围；</li>
+    <li>检查多边形首尾闭合、方向、内洞和自相交；</li>
+    <li>检查边界是否因原点移动、单位混淆或复制粘贴出现在远处；</li>
+    <li>删除无法解释的重复、板外或无网络边界。</li>
+  </ol>
+  <aside class="warning">
+    <p>隐藏或不可见的板外铺铜仍属于设计对象，可能影响导出、性能或后续编辑。不要仅因当前视窗看不到它就认为不存在。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-24-6">
+  <h2 id="section-24-6">24.6 在任何几何或规则变化后重铺</h2>
+  <p>以下任一变化都会使旧铺铜结果失效：</p>
+  <ul>
+    <li>移动、旋转、替换或删除元件/封装；</li>
+    <li>新增、删除或移动走线、过孔、焊盘和禁止区；</li>
+    <li>改变线宽、间距、热焊盘、优先级、孤岛或网络类别；</li>
+    <li>改变板框、原点、层设置或铜到板边规则；</li>
+    <li>改变铺铜网络、边界或层。</li>
+  </ul>
+  <p>重铺后的流程是固定的：保存 → 重铺全部相关层 → 检查生成状态 → DRC → 地连通/回流人工审核 → 保存、关闭并重开 → 再次 DRC → 导出 Gerber。不要在重铺前保存一张截图，随后用它证明修改后的铜仍然正确。</p>
+</section>
+
+<section aria-labelledby="section-24-7">
+  <h2 id="section-24-7">24.7 确认实际铜，而不是相信可见边界</h2>
+  <p>最少使用三层证据：</p>
+  <table>
+    <caption>铺铜证据链</caption>
+    <thead><tr><th scope="col">证据</th><th scope="col">要确认的内容</th><th scope="col">不能单独证明</th></tr></thead>
+    <tbody>
+      <tr><td>源对象</td><td>边界网络、层、坐标和设置正确；生成结果对象存在</td><td>导出的制造文件一定包含铜</td></tr>
+      <tr><td>DRC/连通分析</td><td>铜与目标网络连接，间距和孤岛符合配置</td><td>Gerber 版本最新、板厂实际看到该铜</td></tr>
+      <tr><td>Gerber 铜层</td><td>最终输出中存在所需铜几何、热焊盘和避让</td><td>源网络语义、原理图逻辑或实物焊接正确</td></tr>
+    </tbody>
+  </table>
+  <p>在编辑器里关闭边界显示，只显示生成铜，可以快速发现“只有轮廓没有填充”；再高亮 GND，检查每个区域是否真正连接到地焊盘或地过孔。</p>
+</section>
+
+<section aria-labelledby="section-24-8">
+  <h2 id="section-24-8">24.8 在导出的 Gerber 中检查铜区域</h2>
+  <ol>
+    <li>重新生成 Gerber，不复用旧 ZIP；</li>
+    <li>在独立查看器打开顶层 GTL 与底层 GBL；</li>
+    <li>叠加板框、钻孔和阻焊，确认铜没有越出外形或侵入孔；</li>
+    <li>检查 GND 铜在 USB、MCU、Buck 和连接器区域的连续性；</li>
+    <li>放大热焊盘、狭颈、孤岛和板边避让；</li>
+    <li>统计或解析铜区域，并与源设计记录比较；</li>
+    <li>保存查看器截图、文件哈希和审核日期。</li>
+  </ol>
+  <p>R1 最终 Gerber 包含顶层 11 个、底层 6 个 G36/G37 实心 GND 区域，面积分别为 562.422 mm² 和 520.456 mm²。这证明发布 Gerber 中有这些铜几何；它不证明实物板已制造或地阻抗已经测量。</p>
+</section>
+
+<section aria-labelledby="section-24-9">
+  <h2 id="section-24-9">24.9 案例：板外畸形边界与缺失的生成铜</h2>
+  <aside class="error-case">
+    <table>
+      <caption>R1 铺铜故障的结构化复盘</caption>
+      <thead><tr><th scope="col">阶段</th><th scope="col">事实</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">现象一</th><td>编辑器中存在原生铺铜边界，但没有生成可用的填充铜；边界的视觉存在容易被误当作地平面。</td></tr>
+        <tr><th scope="row">现象二</th><td>制造审核发现两个原生铺铜对象完全位于板外，ID 为 <code>5296498eb95b5e66</code> 与 <code>d420c7c130568fae</code>，分别涉及两层。</td></tr>
+        <tr><th scope="row">根因类别</th><td>边界坐标/包围盒畸形，加上没有把“重铺结果”和“制造铜”作为独立质量门。</td></tr>
+        <tr><th scope="row">检测</th><td>枚举所有铺铜对象并把包围盒与闭合板框比较；检查生成铜对象；在 Gerber 中查看实际铜区域。</td></tr>
+        <tr><th scope="row">R1 修复</th><td>删除两个板外原生边界；冻结发布保留 17 个已验证静态 GND FILL；重跑 DRC并重新生成制造包。</td></tr>
+        <tr><th scope="row">未来预防</th><td>优先创建正确的板内原生 GND 铺铜，任何修改后重铺；同时检查边界、生成结果和 Gerber，不再把轮廓当作铜。</td></tr>
+      </tbody>
+    </table>
+  </aside>
+  <p>最终源与工程归档均为 0 个原生 <code>POUR</code>，Gerber 中仍有 17 个有效 GND 铜区域。这两句话并不矛盾：制造铜来自静态 <code>FILL</code>，而不是原生铺铜对象。</p>
+</section>
+
+<section aria-labelledby="section-24-10">
+  <h2 id="section-24-10">24.10 地连续性、返回路径与孤立铜岛</h2>
+  <p>面积很大的地铜如果被信号通道切成狭颈，或完全不连接到 GND，也不能提供预期返回。审核时应沿关键路径观察地电流如何流动：</p>
+  <ul>
+    <li>J1/U2 到 U1 的 USB 参考铜是否连续；</li>
+    <li>信号换层处是否有附近地层转换；</li>
+    <li>U1 去耦地端是否能短路回到相应地脚；</li>
+    <li>U3 输入/输出脉冲地是否与敏感反馈路径共享狭窄阻抗；</li>
+    <li>板边和过孔阵列是否形成细颈；</li>
+    <li>每个铜岛是否通过焊盘、走线或过孔与 GND 主体连接。</li>
+  </ul>
+  <p>孤岛删除规则要配合人工复核。一个被工具保留的小岛可能只通过很细的颈连接；一个被删除的区域又可能暴露布局过于拥挤。结果本身应成为布局改进反馈。</p>
+</section>
+
+<section class="experiment" aria-labelledby="section-24-11">
+  <h2 id="section-24-11">24.11 实验：移动走线、重铺并检查间距变化</h2>
+  <p><strong>目标：</strong>在教学副本中观察原生铺铜怎样响应几何变化，并建立从编辑器到 Gerber 的证据链。不要修改冻结 R1 发布源。</p>
+  <ol>
+    <li>在闭合板框内创建顶层 GND 原生铺铜，设置网络、间距、热焊盘和删除孤岛；</li>
+    <li>执行重铺，记录边界、生成铜、热焊盘和 DRC；</li>
+    <li>在 GND 铜中穿过一条其他网络走线，重铺并测量避让；</li>
+    <li>移动该走线但暂不重铺，观察旧铜为何已经不可信；</li>
+    <li>再次重铺，比较新旧铜边缘、狭颈和孤岛；</li>
+    <li>故意把副本中的边界移到板外，使用包围盒检查发现并恢复；</li>
+    <li>导出 Gerber，在独立查看器确认最终铜与板框；</li>
+    <li>保存源对象、DRC、Gerber截图和文件哈希。</li>
+  </ol>
+  <p><strong>通过判据：</strong>学生能指出边界、生成铜和 Gerber 铜的区别，能证明移动走线后必须重铺，并能发现板外边界与孤立铜。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-24-summary">
+  <h2 id="chapter-24-summary">本章小结</h2>
+  <p>铺铜是由边界、规则和当前几何计算出的制造铜，不是一个可见轮廓。持续编辑优先使用可重铺的原生铺铜；无论使用原生铺铜还是静态 FILL，都必须检查板框、网络、连通、DRC 和最终 Gerber。R1 的板外边界与缺铜经历说明，只有完整证据链才能放行。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>R1 制造清单、检查清单、最终 Gerber/工程归档，以及 EasyEDA PCB 形状格式中的 <code>POUR</code>、<code>POURED</code> 与 <code>FILL</code> 定义。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="23-power-ground-routing.html"><small>上一页</small>23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a><a class="next" rel="next" href="25-silkscreen-human-factors.html"><small>下一页</small>25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

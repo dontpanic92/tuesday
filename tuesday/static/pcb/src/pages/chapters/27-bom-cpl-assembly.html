@@ -1,0 +1,260 @@
+<section class="notice" aria-labelledby="ch27-evidence-boundary">
+  <h2 id="ch27-evidence-boundary">本章证据边界</h2>
+  <p>USB GPIO R1 的 BOM、CPL、装配图和最终项目源已经交叉核对，但这只证明交付数据内部一致。
+    它不证明下单当天仍有库存，也不证明贴装厂已经接受旋转规则，更不代表实物已装配或上电。</p>
+</section>
+
+<section aria-labelledby="ch27-learning-goals">
+  <h2 id="ch27-learning-goals">学习目标</h2>
+  <ul>
+    <li>区分物料清单（Bill of Materials，BOM）的分组行数、采购数量和位号数量。</li>
+    <li>用制造商料号建立器件身份，并把供应商料号只当作采购路径。</li>
+    <li>解释 DNP 件为什么可以出现在 PCB、CPL 和装配图中，却不出现在采购 BOM 中。</li>
+    <li>审核元件坐标表（Component Placement List，CPL）的坐标、角度、面和方向约定。</li>
+    <li>在下单前建立 BOM—CPL—PCB—原理图—装配图的数量与方向闭环。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch27-1-bom-contents">
+  <h2 id="ch27-1-bom-contents">27.1 BOM 包含什么</h2>
+  <p>BOM 回答“要采购并装配什么”。R1 的 CSV 是 UTF-16、制表符分隔的表格，包含 10 列：
+    序号、数量、说明、位号、封装、值、制造商料号、制造商、供应商料号和供应商。审核时不能只看文件扩展名；
+    应验证编码、分隔符、列名、行数和每组位号数量。</p>
+  <table>
+    <caption>BOM 关键字段及审核问题</caption>
+    <thead>
+      <tr><th scope="col">字段</th><th scope="col">用途</th><th scope="col">常见误判</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Quantity</td><td>该分组需要装配的件数</td><td>把分组行数当成器件总数。</td></tr>
+      <tr><td>Designator</td><td>此料号覆盖的全部位号</td><td>数量与逗号分隔位号数不一致。</td></tr>
+      <tr><td>Footprint</td><td>装配封装身份</td><td>只凭“0603”替换，不核对焊盘和高度。</td></tr>
+      <tr><td>Manufacturer Part</td><td>首选器件身份</td><td>用供应商网页标题代替精确制造商料号。</td></tr>
+      <tr><td>Supplier Part</td><td>特定供应链中的采购入口</td><td>误认为它在所有供应商和所有时间都稳定。</td></tr>
+      <tr><td>Value</td><td>电气标称值</td><td>R1 导出此列为空；空值不能被解释为“元件值未知”。</td></tr>
+    </tbody>
+  </table>
+  <aside class="warning" aria-labelledby="ch27-empty-value-warning">
+    <h3 id="ch27-empty-value-warning">R1 的空 Value 列</h3>
+    <p>R1 BOM 的 <code>Value</code> 列为空，值保存在最终 EasyEDA 项目归档的器件元数据中。
+      审核者应以制造商料号和项目源恢复数值，例如 R1/R2 为 5.1 kΩ、R3/R4 为 22 Ω；
+      不得把空列直接发送给装配厂并期待对方猜测。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch27-2-grouped-quantities">
+  <h2 id="ch27-2-grouped-quantities">27.2 分组数量与单个位号</h2>
+  <p>同一制造商料号、封装和装配属性的位号可以合并为一行。R1 BOM 有 21 个分组数据行，但这些行展开后是
+    46 个拟装配位号。正确审核方法是对每行执行两项检查：<code>Quantity = 位号个数</code>，再把全部行数量求和。</p>
+  <table>
+    <caption>R1 BOM 分组示例</caption>
+    <thead>
+      <tr><th scope="col">制造商料号</th><th scope="col">数量</th><th scope="col">位号</th><th scope="col">审核结论</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>GRM21BR61H106KE43L</td><td>5</td><td>C1、C2、C4、C5、C9</td><td>5 个 C0805 电容位号，数量一致。</td></tr>
+      <tr><td>CC0603KRX7R9BB104</td><td>6</td><td>C6、C7、C8、C10、C13、C14</td><td>6 个 C0603 电容位号，数量一致。</td></tr>
+      <tr><td>0603WAF2200T5E</td><td>10</td><td>R14–R23</td><td>10 个外部接口串联电阻，数量一致。</td></tr>
+      <tr><td>SY6280AAC</td><td>2</td><td>U4、U5</td><td>两个相同负载开关，功能网络不同但采购料相同。</td></tr>
+    </tbody>
+  </table>
+  <p>“21 行”描述采购分组，“46 个位号”描述拟装配位置。两者都正确，但不能互换。若一行同时混入不同数值、
+    容差、额定值或 DNP 状态，即使封装相同也不应合并。</p>
+</section>
+
+<section aria-labelledby="ch27-3-part-numbers">
+  <h2 id="ch27-3-part-numbers">27.3 制造商料号与供应商料号</h2>
+  <p>制造商料号（Manufacturer Part Number，MPN）定义“是什么器件”；供应商料号定义“从某个渠道怎样买到”。
+    合格替代料必须重新验证电气参数、引脚、封装、极性、温度/额定值、生命周期和装配能力，不能只比较商品名称。</p>
+  <table>
+    <caption>R1 核心器件身份交叉检查</caption>
+    <thead>
+      <tr><th scope="col">位号</th><th scope="col">制造商料号</th><th scope="col">项目事实库中的 LCSC 代码</th><th scope="col">重点复核</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>U1</td><td>CH32V203K8T6</td><td>C5372188</td><td>LQFP-32 引脚映射、USB 和工作电压。</td></tr>
+      <tr><td>J1</td><td>TYPE-C-31-M-12</td><td>C165948</td><td>外壳、固定孔、USB-C 引脚编号和插入方向。</td></tr>
+      <tr><td>U2</td><td>USBLC6-2SC6</td><td>C2687116</td><td>SOT-23-6 引脚方向与低电容 USB ESD 用途。</td></tr>
+      <tr><td>U3</td><td>SY8089AAAC</td><td>C78988</td><td>SOT-23-5 引脚版本、反馈与开关节点。</td></tr>
+      <tr><td>U4、U5</td><td>SY6280AAC</td><td>C55136</td><td>EN/ISET 引脚和限流版本。</td></tr>
+      <tr><td>L1</td><td>SWPA252012S2R2MT</td><td>C23894</td><td>2.2 µH、封装尺寸、电流与饱和能力。</td></tr>
+      <tr><td>Y1</td><td>X322512MSB4SI</td><td>C9002</td><td>最终 12 MHz、20 pF、3225-4P。</td></tr>
+    </tbody>
+  </table>
+  <p>R1 导出 BOM 的供应商字段含有工具生成的条目标识；下单前仍应回到当前供应商目录核对真实商品代码、库存和数据手册。
+    本章不声称这些器件在阅读当天有库存。</p>
+</section>
+
+<section aria-labelledby="ch27-4-dnp">
+  <h2 id="ch27-4-dnp">27.4 DNP 与不装配器件</h2>
+  <p>DNP（Do Not Populate/Place）表示“PCB 保留位置，但本装配变体不安装”。R1 的 J2 和 J3 是明确 DNP：
+    它们在 PCB、CPL 和 7 页装配 PDF 中存在，在项目源中为 <code>addIntoBom=false</code>，因此不进入 46 位号采购 BOM。</p>
+  <table>
+    <caption>J2/J3 在不同交付物中的预期状态</caption>
+    <thead>
+      <tr><th scope="col">交付物</th><th scope="col">J2/J3 是否存在</th><th scope="col">原因</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>原理图与 PCB</td><td>存在</td><td>电气连接、孔位和用户自装接口属于设计。</td></tr>
+      <tr><td>CPL</td><td>存在</td><td>保留完整物理位置和方向，共 48 行。</td></tr>
+      <tr><td>装配图</td><td>存在</td><td>方便识别孔位和后装方向。</td></tr>
+      <tr><td>采购 BOM</td><td>不存在</td><td>R1 变体不购买、不贴装这两个连接器。</td></tr>
+    </tbody>
+  </table>
+  <p>仅从 CPL 中看到一行不能判断“要贴装”；仅从 BOM 中看不到一行也不能判断“PCB 上没有”。装配订单必须另有明确的
+    DNP/变体说明，避免代工厂把 CPL 的 48 行全部当成拟装配件。</p>
+</section>
+
+<section aria-labelledby="ch27-5-cpl-contents">
+  <h2 id="ch27-5-cpl-contents">27.5 CPL 包含什么</h2>
+  <p>CPL 回答“每个物理位号在哪里、朝哪边”。R1 CPL 同样是 UTF-16、制表符分隔，含 18 列和 48 个数据行。
+    主要字段包括位号、器件、封装、中心坐标、参考点坐标、焊盘参考坐标、引脚数、层、旋转、SMD 标志和说明。</p>
+  <table>
+    <caption>R1 CPL 示例行</caption>
+    <thead>
+      <tr><th scope="col">位号</th><th scope="col">中心 X/Y</th><th scope="col">层</th><th scope="col">旋转</th><th scope="col">解释</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>J1</td><td>5.093 / 11.989 mm</td><td>T</td><td>270°</td><td>与机械审核中的 -90° 等价，USB 插口朝左。</td></tr>
+      <tr><td>J2</td><td>46.990 / 11.989 mm</td><td>T</td><td>90°</td><td>物理位置保留，但本变体 DNP。</td></tr>
+      <tr><td>U1</td><td>24.892 / 11.989 mm</td><td>T</td><td>0°</td><td>仍须用 1 脚标记确认封装零度定义。</td></tr>
+      <tr><td>D1</td><td>33.528 / 3.048 mm</td><td>T</td><td>0°</td><td>零度不代表无极性，必须核对阴阳极焊盘。</td></tr>
+    </tbody>
+  </table>
+  <p>R1 全部 48 个物理位号都在顶面。字段 <code>SMD=No</code> 也不等于 DNP：J1 是拟装配的连接器，
+    J2/J3 才是 DNP；DNP 身份来自项目属性和装配变体，而不是 SMD 字段。</p>
+</section>
+
+<section aria-labelledby="ch27-6-orientation-traps">
+  <h2 id="ch27-6-orientation-traps">27.6 位置、旋转、面与封装零度陷阱</h2>
+  <p>同一个“90°”可能因坐标原点、顺/逆时针定义、顶/底面观察方向和封装零度不同而产生完全不同的机器动作。
+    因此 CPL 不能脱离一张带 1 脚/极性标记的装配图使用。</p>
+  <ol>
+    <li><strong>确认原点：</strong>把 J1、J2 等靠板边器件与 Gerber 轮廓叠加，确认坐标方向和偏移。</li>
+    <li><strong>确认角度：</strong>用至少三个不对称器件建立转换表；R1 的 J1 CPL 270°等价于机械记录 -90°。</li>
+    <li><strong>确认面：</strong>底面坐标常涉及镜像；R1 全部为顶面，不能把这个经验直接套到双面板。</li>
+    <li><strong>确认封装零度：</strong>把 U1 的 1 脚、D1 极性、U2/U3/U4/U5 的 1 脚、J1 插口方向逐一标出。</li>
+    <li><strong>确认 DNP：</strong>旋转正确也不表示该位号应装配。</li>
+  </ol>
+  <aside class="error-case" aria-labelledby="ch27-rotation-failure">
+    <h3 id="ch27-rotation-failure">失败案例：角度数值正确，器件仍转错</h3>
+    <p>若封装库的 0°方向与贴片机库方向相差 90°，CPL 的每个数字都可能“格式正确”而实物全部转错。
+      预防方法是在生产前由装配厂返回极性/方向确认图，并把确认结果作为发布记录的一部分。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch27-7-top-only">
+  <h2 id="ch27-7-top-only">27.7 单面顶层装配及其成本优势</h2>
+  <p>R1 的 48 个物理位号全部位于顶面，底面没有拟贴装器件，Gerber 包也没有底面钢网层。这通常可减少一次钢网、
+    翻板、贴片和回流相关设置，并降低方向管理复杂度；具体价格仍取决于装配厂，不能在没有报价时给出节省比例。</p>
+  <table>
+    <caption>单面装配带来的审核简化</caption>
+    <thead>
+      <tr><th scope="col">项目</th><th scope="col">R1 状态</th><th scope="col">仍不能省略的检查</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>CPL 面</td><td>48/48 为 T</td><td>确认没有误导出的底面器件。</td></tr>
+      <tr><td>钢网</td><td>只有顶面 GTP</td><td>检查顶面开口和通孔件不依赖钢网。</td></tr>
+      <tr><td>底面铜/阻焊/丝印</td><td>仍存在</td><td>“不贴装”不等于底面制造层可以删除。</td></tr>
+      <tr><td>通孔件</td><td>J1 拟装；J2/J3 DNP</td><td>确认焊接工艺、DNP 指令和后装空间。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch27-8-assembly-drawings">
+  <h2 id="ch27-8-assembly-drawings">27.8 装配图与位号定位图</h2>
+  <p>R1 板上为避免文字压住焊盘和器件，密集位号被有意从丝印隐藏；因此装配 PDF、BOM、CPL 和项目源承担位号身份。
+    最终装配 PDF 有 7 页并保留全部 48 个位号。装配图至少应表达：</p>
+  <ul>
+    <li>板名与 R1 修订号；</li>
+    <li>顶/底面和观察方向；</li>
+    <li>所有位号的可读位置；</li>
+    <li>U1、U2、U3、U4、U5、D1、J1、Y1 等方向敏感对象的 1 脚、极性或配合方向；</li>
+    <li>J2/J3 的 DNP 状态，而不是让操作者从“BOM 中缺失”自行推断；</li>
+    <li>连接器悬边和后装/手焊说明。</li>
+  </ul>
+  <p>装配图是人工可读证据，CPL 是机器可读证据。两者不一致时必须停单，不应默认其中一个“更接近正确”。</p>
+</section>
+
+<section aria-labelledby="ch27-9-cross-check-counts">
+  <h2 id="ch27-9-cross-check-counts">27.9 交叉核对 BOM、CPL、PCB 与原理图数量</h2>
+  <table>
+    <caption>USB GPIO R1 数量矩阵</caption>
+    <thead>
+      <tr><th scope="col">来源</th><th scope="col">记录</th><th scope="col">解释</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>原理图 ↔ PCB</td><td>48/48 器件；172/172 引脚/焊盘</td><td>电气和封装映射完整。</td></tr>
+      <tr><td>PCB</td><td>48 个物理位号</td><td>含拟装配和 DNP。</td></tr>
+      <tr><td>BOM</td><td>21 个分组行；46 个拟装配位号</td><td>不含 J2、J3。</td></tr>
+      <tr><td>CPL</td><td>48 个唯一位号</td><td>含 J2、J3 的位置和方向。</td></tr>
+      <tr><td>装配 PDF</td><td>48 个位号；7 页</td><td>提供人工定位与方向证据。</td></tr>
+    </tbody>
+  </table>
+  <p>核心不变量是：</p>
+  <pre><code>PCB 物理位号 = BOM 拟装配位号 + DNP 位号
+48 = 46 + 2
+CPL 位号集合 = PCB 位号集合 = 48
+BOM 位号集合 ∩ DNP 位号集合 = 空集</code></pre>
+  <p>还应检查集合，而不只检查数量：两个文件即使都写“48”，也可能一个遗漏 R1、另一个重复 R2。</p>
+</section>
+
+<section aria-labelledby="ch27-10-availability">
+  <h2 id="ch27-10-availability">27.10 下单前立即复核可获得性</h2>
+  <p>库存、价格、最小起订量和基础/扩展贴装分类会变化，所以可获得性检查必须靠近下单时间，而不是沿用设计初期截图。</p>
+  <table>
+    <caption>下单前物料复核清单</caption>
+    <thead>
+      <tr><th scope="col">检查项</th><th scope="col">通过条件</th><th scope="col">失败时动作</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>MPN 与数据手册</td><td>精确料号、封装、引脚和额定值仍匹配</td><td>禁止直接替代；发起工程变更。</td></tr>
+      <tr><td>库存与交期</td><td>数量覆盖样板、损耗和最小订单需求</td><td>选择已验证替代料或等待，不能只改商品链接。</td></tr>
+      <tr><td>供应商/装配分类</td><td>费用、换料和扩展库条件已知</td><td>重新核算，不虚构成本优势。</td></tr>
+      <tr><td>湿敏、极性与包装</td><td>卷带方向、MSL 和烘烤要求可被产线处理</td><td>补充工艺说明或换为可处理包装。</td></tr>
+      <tr><td>DNP 变体</td><td>J2/J3 的“不采购、不装配”被订单明确识别</td><td>修正装配变体并重新生成交付物。</td></tr>
+    </tbody>
+  </table>
+  <p>任何替代料都会使原 BOM 哈希和发布结论失效；即使焊盘兼容，也必须更新项目源、BOM、必要时 CPL/装配图，并重跑发布门。</p>
+</section>
+
+<section class="error-case" aria-labelledby="ch27-failure-cases">
+  <h2 id="ch27-failure-cases">典型失败模式</h2>
+  <ul>
+    <li><strong>把空 Value 当作未知：</strong>装配人员无法知道 R7 是 16.9 kΩ 而不是早期提案的约 17 kΩ。</li>
+    <li><strong>把 21 行当作 21 个器件：</strong>采购数量少了 25 件，且会漏掉分组展开关系。</li>
+    <li><strong>只删 BOM 行来表示 DNP：</strong>CPL/装配说明没有同步，J2/J3 可能仍被误装。</li>
+    <li><strong>只凭封装换料：</strong>相同 SOT-23-5 外形可能有不同引脚定义。</li>
+    <li><strong>直接采用旋转数字：</strong>未建立贴片机与 CAD 零度转换，极性件可能整批转错。</li>
+  </ul>
+</section>
+
+<section class="experiment" aria-labelledby="ch27-exercise">
+  <h2 id="ch27-exercise">审计练习：不用“看起来一致”作为答案</h2>
+  <ol>
+    <li>从 R1 BOM 中任选三行，验证数量等于位号个数。</li>
+    <li>写出 J2/J3 在原理图、PCB、BOM、CPL 和装配图中的预期状态。</li>
+    <li>以 J1、U1、D1 为例，列出确认方向需要的三种证据。</li>
+    <li>假设 U3 缺货，写出批准替代料前必须复核的项目以及会失效的发布文件。</li>
+  </ol>
+  <p><strong>通过判据：</strong>展开总数必须得到 46 个拟装配位号，且能解释为何 CPL 仍为 48 行。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="ch27-quality-gate">
+  <h2 id="ch27-quality-gate">本章质量门</h2>
+  <p>只有在 21 个 BOM 分组展开为 46 个唯一拟装配位号、CPL 含 48 个唯一顶面位号、J2/J3 DNP 在所有文件中一致、
+    方向敏感器件经装配图确认、可获得性刚刚复核后，装配数据才可放行。</p>
+</section>
+
+<section aria-labelledby="ch27-summary">
+  <h2 id="ch27-summary">本章小结</h2>
+  <p>BOM 管身份与采购，CPL 管位置与方向，装配图帮助人理解，项目源保存最终设计意图。可靠审核比较的是位号集合、
+    数量、封装、MPN、DNP、面和方向，而不是只比较文件行数。R1 的闭环是 48 个 PCB/CPL 位号、46 个拟装配位号和
+    2 个明确 DNP 位号。</p>
+</section>
+
+<section aria-labelledby="ch27-sources">
+  <h2 id="ch27-sources">事实来源</h2>
+  <p>本章使用最终 BOM CSV/XLSX、48 行 CPL、7 页装配 PDF、最终 EasyEDA 项目归档、制造 checklist 和结构化器件事实。
+    物料库存与价格未被当作固定事实；最终项目源中的值和 DNP 属性优先于早期提案。</p>
+</section>

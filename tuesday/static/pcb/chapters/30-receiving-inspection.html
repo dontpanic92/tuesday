@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="30. PCB 收货与检验（Receiving and Inspecting the PCB） — USB GPIO PCB 离线教程">
+  <title>30. PCB 收货与检验（Receiving and Inspecting the PCB） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-30">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html" aria-current="page">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</li><li aria-current="page">30. PCB 收货与检验（Receiving and Inspecting the PCB）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</p>
+          <h1>30. PCB 收货与检验（Receiving and Inspecting the PCB）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch30-learning-objectives">学习目标与事实边界</a></li><li class="toc-level-2"><a href="#sec-30-1">30.1 将交付板与 Gerber 和图纸比较</a></li><li class="toc-level-3"><a href="#sec-30-1-reference-set">建立黄金参考集</a></li><li class="toc-level-2"><a href="#sec-30-2">30.2 板尺寸、外形、表面处理、阻焊和丝印</a></li><li class="toc-level-2"><a href="#sec-30-3">30.3 孔、焊盘和连接器检查</a></li><li class="toc-level-2"><a href="#sec-30-4">30.4 裸板连通与短路检查</a></li><li class="toc-level-3"><a href="#sec-30-4-bare-board-method">未装配裸板的检查方法</a></li><li class="toc-level-3"><a href="#sec-30-4-assembled-screen">装配板的无电筛查</a></li><li class="toc-level-2"><a href="#sec-30-5">30.5 目视检查，以及何时使用 X 射线</a></li><li class="toc-level-2"><a href="#sec-30-6">30.6 记录批次、版本和检验结果</a></li><li class="toc-level-2"><a href="#ch30-summary">本章小结</a></li></ul></nav>
+        <section aria-labelledby="ch30-learning-objectives">
+  <h2 id="ch30-learning-objectives">学习目标与事实边界</h2>
+  <p>收板检验的目的不是证明电路“能工作”，而是在上电之前回答三个问题：收到的是否是正确版本、制造结果是否与发布资料一致、是否存在会让后续上电变得危险的缺陷。完成本章后，你应能建立一条从订单、Gerber、装配图到实物批次的可追溯证据链，并把“外观看起来正常”转化为可记录、可复查的判定。</p>
+  <aside class="notice" aria-label="当前验证状态">
+    <p><strong>当前没有实物测量记录。</strong>事实库中的板尺寸、焊盘、过孔和连通性来自最终设计源、CAD 或制造输出；<code>measured_fact_count = 0</code>。本章出现的尺寸均是设计值或 Gerber 计算值，记录表中的实测栏必须由收到的板填写，不能预填“合格”。</p>
+  </aside>
+  <ul>
+    <li>设计名义外形为 <strong>50 mm × 24 mm</strong>；Gerber 外形计算值为 <strong>49.9999 mm × 24.00046 mm</strong>。</li>
+    <li>R1 为双层、顶层装配设计；PCB 中有 48 个元件位号，最终装配 BOM 安装 46 个，J2、J3 为 DNP（不装）。</li>
+    <li>CAD 统计为 172 个焊盘、130 个过孔、47 个命名网络；这些数字用于核对资料，不表示交付实物已经通过开短路测试。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sec-30-1">
+  <h2 id="sec-30-1">30.1 将交付板与 Gerber 和图纸比较</h2>
+  <p>检验必须以<strong>冻结的发布包</strong>为基准，而不是以编辑器当前画面、早期提案或聊天截图为基准。R1 的提案尺寸约为 45 mm × 20 mm，但最终发布设计为 50 mm × 24 mm；如果拿错基准，正确的板也会被误判。</p>
+  <h3 id="sec-30-1-reference-set">建立黄金参考集</h3>
+  <ol>
+    <li>记录订单号、供应商批次、数量、收货日期和包装标签。</li>
+    <li>锁定同一次发布的 Gerber、钻孔、BOM、CPL、装配图和制造清单；记录文件哈希或发布包版本。</li>
+    <li>从 Gerber 查看器分别检查顶/底铜、阻焊、丝印、板框和钻孔，不用 PCB 编辑器视图替代制造数据。</li>
+    <li>把实物的连接器方向、板边缺口、安装孔、功能丝印和元件面与装配图逐项对应。</li>
+    <li>随机抽取第二片板重复方向和关键特征核对，排除“只看一片”的偶然性。</li>
+  </ol>
+  <table>
+    <caption>表 30-1　发布资料与实物的一致性记录</caption>
+    <thead><tr><th scope="col">检查对象</th><th scope="col">发布资料预期</th><th scope="col">实物观察</th><th scope="col">判定/证据</th></tr></thead>
+    <tbody>
+      <tr><td>版本</td><td><code>USB_GPIO_R1</code>、丝印 <code>REV R1</code></td><td>待填</td><td>照片编号：____</td></tr>
+      <tr><td>J1 方向</td><td>位于左侧、开口朝板外；设计旋转为 −90°</td><td>待填</td><td>通过 / 隔离</td></tr>
+      <tr><td>装配面</td><td>元件仅在顶层</td><td>待填</td><td>通过 / 隔离</td></tr>
+      <tr><td>J2、J3</td><td>PCB 有孔位，成品 BOM 默认不装排针</td><td>待填</td><td>通过 / 偏差单号</td></tr>
+      <tr><td>功能丝印</td><td>含 USB GPIO、REV R1、SWD、GND、G0–G7、TX/RX 等功能标识</td><td>待填</td><td>通过 / 隔离</td></tr>
+    </tbody>
+  </table>
+  <p><strong>通过条件：</strong>板版本、方向、层面和关键特征都能追溯到同一发布包。任何版本不明、混批、连接器方向相反或板框明显不符的板先隔离，不进入上电流程。</p>
+</section>
+
+<section aria-labelledby="sec-30-2">
+  <h2 id="sec-30-2">30.2 板尺寸、外形、表面处理、阻焊和丝印</h2>
+  <p>外形检查既包含“有没有做出来”，也包含“是否能装进目标结构”。数显卡尺适合测总长、总宽和明显间距，但不能可靠评估薄铜厚度、阻焊厚度或很小的孔径。表面处理类型应从采购订单或供应商合格证读取；事实库没有记录 R1 的实际表面处理，不能仅凭颜色猜测 ENIG、HASL 或其他工艺。</p>
+  <ol>
+    <li>让板在室温下平放，清除会影响测量的包装碎屑，不刮擦焊盘。</li>
+    <li>用分辨率 0.01 mm 的校准卡尺测量长和宽，每个方向至少测两处并记录，而不是只写一个“约 50 × 24”。</li>
+    <li>在平整基准面上检查翘曲、毛刺、V-cut/锣边残留和板角损伤；采用订单规定的翘曲判据。</li>
+    <li>在斜射光和 5×～10× 放大下检查阻焊偏移、露铜、桥连、针孔、起泡和污染。</li>
+    <li>检查丝印是否压到焊盘、缺字或误导方向。R1 板面不显示全部位号，逐件定位应使用装配图，而不是猜测。</li>
+  </ol>
+  <table>
+    <caption>表 30-2　机械与表面检查记录</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">设计/订单依据</th><th scope="col">仪器</th><th scope="col">实测或观察</th><th scope="col">结论</th></tr></thead>
+    <tbody>
+      <tr><td>长度</td><td>名义 50 mm；Gerber 49.9999 mm</td><td>0.01 mm 卡尺</td><td>____ mm</td><td>按订单公差</td></tr>
+      <tr><td>宽度</td><td>名义 24 mm；Gerber 24.00046 mm</td><td>0.01 mm 卡尺</td><td>____ mm</td><td>按订单公差</td></tr>
+      <tr><td>板厚/表面处理</td><td>读取订单，不由本教程假定</td><td>千分尺/合格证</td><td>____</td><td>一致 / 偏差</td></tr>
+      <tr><td>阻焊</td><td>开窗与 Gerber 一致，无明显桥连或露铜</td><td>5×～10× 放大</td><td>____</td><td>通过 / 返工评估</td></tr>
+      <tr><td>丝印</td><td>可读且不覆盖可焊表面</td><td>目视/照片</td><td>____</td><td>通过 / 偏差</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="sec-30-3">
+  <h2 id="sec-30-3">30.3 孔、焊盘和连接器检查</h2>
+  <p>孔和焊盘缺陷常在焊接或插装时才暴露，因此应在上电前检查。R1 的 130 个过孔在 CAD 中采用 12 mil（0.3048 mm）钻孔、24 mil 焊盘的设计值；交付后的成品孔径会受电镀和制造补偿影响，应按制造图和供应商能力判定，不能把 0.3048 mm 当作已测成品孔径。</p>
+  <ul>
+    <li><strong>通孔：</strong>观察孔壁电镀是否连续，是否堵孔、破环、偏钻或有毛刺；J2/J3 未装排针是预期状态。</li>
+    <li><strong>SMD 焊盘：</strong>检查缺口、污染、氧化、阻焊侵入和相邻焊盘桥连。对 J1 的细间距引脚和外壳固定脚重点拍照。</li>
+    <li><strong>连接器：</strong>用匹配但不带电的 USB-C 插头轻插一次，确认板边与外壳没有机械干涉；不要用插头强行“修正”歪斜连接器。</li>
+    <li><strong>装配板：</strong>检查 J1 共面性、外壳固定焊点和引脚润湿；检查 U1 LQFP 四边是否有翘脚、桥连或引脚偏移。</li>
+  </ul>
+  <aside class="warning" aria-label="连接器检查警告">
+    <p>机械试插时不连接电脑、电源或目标设备。若 J1 松动、歪斜、外壳焊脚开裂或插拔需要异常力量，立即停止；继续插拔可能撕裂焊盘。</p>
+  </aside>
+  <p><strong>抽样与升级：</strong>首件和版本变更批应提高抽样比例；发现同一位置重复缺陷时，把问题升级为批次问题，而不是只返修发现的那一片。</p>
+</section>
+
+<section aria-labelledby="sec-30-4">
+  <h2 id="sec-30-4">30.4 裸板连通与短路检查</h2>
+  <p>裸板电测用于发现开路、短路和孔壁问题；装配板上的半导体、电容和 ESD 器件会改变万用表读数，不能直接套用裸板阈值。供应商飞针或专用治具报告比手工逐点测试 47 个网络更完整，但报告仍要与正确的网络表和版本绑定。</p>
+  <h3 id="sec-30-4-bare-board-method">未装配裸板的检查方法</h3>
+  <ol>
+    <li>确认板完全无电，万用表处于低压电阻/通断档，先短接表笔记录表线电阻。</li>
+    <li>按网络表选取同一网络的两个可接触焊盘，验证应连通路径；对跨层路径至少覆盖一个过孔。</li>
+    <li>在相邻细间距焊盘、各电源轨与 GND 之间检查不应存在的低阻连接。</li>
+    <li>移动和轻弯测试线，而不是弯曲 PCB；不稳定读数可能来自探针接触而非板故障。</li>
+    <li>保存供应商电测报告，并记录使用的网络表版本、测试日期和不良板序号。</li>
+  </ol>
+  <h3 id="sec-30-4-assembled-screen">装配板的无电筛查</h3>
+  <pre aria-label="装配板电源短路筛查接线"><code>红表笔 ── VBUS_IN 或 3V3_SYS 测试点
+黑表笔 ── GND
+USB、调试器、目标负载全部断开</code></pre>
+  <p>分别测 <code>VBUS_IN</code>—GND、<code>3V3_SYS</code>—GND、<code>5V_SW</code>—GND 和 <code>3V3_SW</code>—GND，记录初始值、5 s 后值和交换表笔后的值。电容充电会使读数变化，ESD/半导体会产生方向差异；这些现象本身不是故障。</p>
+  <table>
+    <caption>表 30-3　无电电阻筛查记录</caption>
+    <thead><tr><th scope="col">测量对</th><th scope="col">初始值</th><th scope="col">5 s 后</th><th scope="col">交换表笔</th><th scope="col">判定/备注</th></tr></thead>
+    <tbody>
+      <tr><td>VBUS_IN—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+      <tr><td>3V3_SYS—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+      <tr><td>5V_SW—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+      <tr><td>3V3_SW—GND</td><td>____ Ω</td><td>____ Ω</td><td>____ Ω</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <p><strong>停止条件：</strong>通断蜂鸣持续、读数稳定接近表线电阻、同批板中某片显著偏离，或看到电源焊盘桥连时，不上电。先用显微镜、分区测阻和必要的四线低阻测量定位。由于 R1 尚无实测基线，本教程不虚构一个“正常电阻值”。</p>
+</section>
+
+<section aria-labelledby="sec-30-5">
+  <h2 id="sec-30-5">30.5 目视检查，以及何时使用 X 射线</h2>
+  <p>目视检查应按固定路线进行：连接器与板边 → 电源级 U3/L1/C2/C3 → MCU U1 与去耦 → USB 保护 U2/R3/R4 → 负载开关 U4/U5 → 其余无源器件。每次沿同一方向扫描，能减少漏检。</p>
+  <table>
+    <caption>表 30-4　缺陷、检测方式与升级措施</caption>
+    <thead><tr><th scope="col">缺陷候选</th><th scope="col">首选检查</th><th scope="col">何时升级到 X 射线/切片</th></tr></thead>
+    <tbody>
+      <tr><td>LQFP 翘脚、桥连、少锡</td><td>斜光显微镜，逐边检查 U1</td><td>焊点被器件或焊料遮挡、反复出现间歇故障时</td></tr>
+      <tr><td>J1 隐蔽引脚或外壳固定脚焊接不足</td><td>显微镜、轻微机械检查、连通测试</td><td>外观不可见而 USB/供电呈间歇性，或首件工艺验证</td></tr>
+      <tr><td>过孔孔壁空洞、内层连接异常</td><td>供应商电测、截面报告</td><td>同网开路但表面无缺陷，或批次可靠性调查</td></tr>
+      <tr><td>0603/SOT-23 偏移、立碑、反向</td><td>显微镜和装配图</td><td>通常不需要 X 射线；除非焊点被遮挡或失效分析要求</td></tr>
+    </tbody>
+  </table>
+  <p>R1 没有 BGA 或底部端子 QFN，因此 X 射线不是每片板的默认检查手段；它适合解决“关键焊点不可见”或“电气症状与外观矛盾”的问题。X 射线图像也需要工艺人员判读，不能把亮暗差异自动等同于合格或不合格。</p>
+</section>
+
+<section aria-labelledby="sec-30-6">
+  <h2 id="sec-30-6">30.6 记录批次、版本和检验结果</h2>
+  <p>没有记录的检查无法支持复现、供应商反馈或 R2 改版。每片样板至少应有唯一编号；批量板可采用批次号加样本号，并保存正反面、连接器和异常点照片。</p>
+  <table>
+    <caption>表 30-5　收板检验总表（每批一份）</caption>
+    <thead><tr><th scope="row">字段</th><th scope="col">记录</th><th scope="row">字段</th><th scope="col">记录</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">项目/版本</th><td>USB_GPIO_R1 / ____</td><th scope="row">检验员/日期</th><td>____ / ____</td></tr>
+      <tr><th scope="row">供应商/订单</th><td>____</td><th scope="row">批次/数量</th><td>____ / ____</td></tr>
+      <tr><th scope="row">发布包标识</th><td>____</td><th scope="row">抽样方案</th><td>____</td></tr>
+      <tr><th scope="row">机械结论</th><td>通过 / 隔离 / 让步</td><th scope="row">电气筛查</th><td>通过 / 隔离 / 未执行</td></tr>
+      <tr><th scope="row">异常单号</th><td>____</td><th scope="row">照片/报告位置</th><td>____</td></tr>
+      <tr><th scope="row">放行决定</th><td colspan="3">允许进入限流上电 / 返工后复检 / 整批隔离</td></tr>
+    </tbody>
+  </table>
+  <aside class="checkpoint" aria-label="收板放行门">
+    <p><strong>放行门：</strong>只有版本可追溯、机械特征一致、关键焊接可接受且电源轨无明显硬短路的板，才能进入第 31 章。此结论仍不证明 Buck、USB、时钟、固件或负载开关已经工作。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch30-summary">
+  <h2 id="ch30-summary">本章小结</h2>
+  <p>收板检验把制造资料、实物和批次记录连接起来。它能发现错版、机械缺陷、明显开短路和装配问题，却不能代替限流上电与功能测试。R1 的所有硬件表现仍待实测；下一章将用受控能量逐步建立第一条板级测量基线。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="29-r1-manufacturing-case-study.html"><small>上一页</small>29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a><a class="next" rel="next" href="31-safe-power-up.html"><small>下一页</small>31. 安全首次上电（Safe First Power-Up）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

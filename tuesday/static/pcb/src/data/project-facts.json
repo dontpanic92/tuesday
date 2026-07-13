@@ -1,0 +1,329 @@
+{
+  "schema_version": "1.0.0",
+  "project": {
+    "name": "USB GPIO",
+    "final_board_title": "USB_GPIO_R1",
+    "revision": "R1",
+    "description": "CH32V203 USB 2.0 Full-Speed CDC GPIO/PWM/UART 与双路受控电源适配板",
+    "project_uuid": "30fa5cabe0fdf3b7815a2cd8aae1efeb366c1e22505cb483b2be4e204f5a7e89",
+    "pcb_uuid": "dce0af2c48baae5a",
+    "schematic_page_uuid": "6658fda3ff83ea67",
+    "easyeda_editor_version": "3.2.166",
+    "release_generation_date": "2026-07-12",
+    "state": "design",
+    "evidence": ["final-project-archive", "fabrication-manifest"]
+  },
+  "fact_states": {
+    "design": "最终设计源或发布资料中的标称事实；不是实测。",
+    "calculated": "由设计值或 CAD/制造文件推导。",
+    "expected": "按机理或规格预测的行为。",
+    "measured": "装配实物的仪器测量；当前为 0 条。",
+    "unverified": "需要数据手册细节、生产叠层或实物测试确认。"
+  },
+  "source_policy": {
+    "authoritative_order": ["final-project-archive", "fabrication-manifest", "fabrication-checklist", "final-bom", "final-cpl", "device-datasheets", "proposal"],
+    "note": "提案只保留设计意图；任何与最终项目源冲突的数值均由最终源覆盖。"
+  },
+  "requirements": {
+    "host_interface": {"value": "USB Type-C receptacle, USB 2.0 Full-Speed device, USB CDC ACM", "state": "design"},
+    "logic_voltage": {"value": 3.3, "unit": "V", "state": "design"},
+    "gpio_channels": {"value": 8, "state": "design"},
+    "pwm_channels": {"value": 4, "timer": "TIM3 CH1-CH4", "shared_frequency": true, "state": "design"},
+    "target_uart": {"value": 1, "logic": "3.3 V CMOS/TTL", "state": "design"},
+    "switched_outputs": [
+      {"rail": "5V_SW", "target_current": 0.4, "unit": "A", "state": "design", "hardware_state": "unverified"},
+      {"rail": "3V3_SW", "target_current": 0.25, "unit": "A", "state": "design", "hardware_state": "unverified"}
+    ],
+    "isolation": {"value": false, "state": "design"},
+    "usb_power_delivery": {"value": false, "state": "design"},
+    "safe_startup_requirement": {
+      "gpio": "high impedance",
+      "pwm": "stopped",
+      "uart_tx": "high impedance until configured",
+      "switched_rails": "off during reset, boot and USB suspend",
+      "state": "expected",
+      "hardware_state": "unverified",
+      "evidence": ["proposal"]
+    }
+  },
+  "architecture": {
+    "mcu": "CH32V203K8T6",
+    "usb_esd": "USBLC6-2SC6",
+    "system_regulator": "SY8089AAAC synchronous buck",
+    "load_switches": {"5V_SW": "SY6280AAC U4", "3V3_SW": "SY6280AAC U5"},
+    "clock": {"part": "X322512MSB4SI", "frequency": 12, "unit": "MHz", "state": "design", "hardware_state": "unverified"},
+    "connectors": {"host": "J1 USB-C", "target": "J2 2x8 2.54 mm DNP", "debug": "J3 1x5 1.27 mm DNP"},
+    "external_gpio_esd_array": {"present": false, "state": "design"},
+    "load_switch_fault_outputs": {"present": false, "state": "design"},
+    "evidence": ["final-project-archive", "final-bom", "proposal"]
+  },
+  "board": {
+    "nominal_dimensions": {"width": 50, "height": 24, "unit": "mm", "state": "design"},
+    "gerber_outline_dimensions": {"width": 49.9999, "height": 24.00046, "unit": "mm", "state": "calculated"},
+    "layer_count": {"value": 2, "layers": ["Top copper", "Bottom copper"], "state": "design"},
+    "component_count": {"pcb": 48, "fitted_bom": 46, "dnp": 2, "state": "design"},
+    "assembly_side": {"value": "Top only", "state": "design"},
+    "pads": {"value": 172, "state": "calculated"},
+    "named_nets": {"value": 47, "state": "calculated"},
+    "intentionally_unconnected_pins": {"value": 9, "state": "design"},
+    "outline": {"closed": true, "locked": true, "fragments": 1, "state": "calculated"},
+    "edge_clearance_minimums": {
+      "pad_mil": 12.9,
+      "via_mil": 16.9,
+      "track_mil": 17.5,
+      "state": "calculated"
+    },
+    "mechanical_audit": {
+      "component_pairs_checked": 1128,
+      "body_overlaps": 0,
+      "courtyard_or_shape_overlaps": 0,
+      "gaps_below_0_25_mm": 0,
+      "minimum_acceptance_margin_mil": 10.748,
+      "c8_c9_body_gap_mil": 49.65,
+      "c8_c9_shape_gap_mil": 45.709,
+      "j1_orientation": "left-facing, rotation -90°",
+      "j1_intentional_overhang_min_x_mil": -5.055,
+      "state": "calculated"
+    },
+    "evidence": ["fabrication-manifest", "fabrication-checklist", "final-cpl", "final-gerbers"]
+  },
+  "routing": {
+    "track_primitives": {"total": 608, "top": 427, "bottom": 181, "state": "calculated"},
+    "vias": {"count": 130, "drill_mil": 12, "pad_mil": 24, "drill_mm": 0.3048, "state": "calculated"},
+    "gnd": {"explicit_tracks": 173, "stitching_or_tree_vias": 32, "state": "calculated"},
+    "widths_mil": {
+      "general_signals": 6,
+      "usb_dp_dm": 8,
+      "gnd": 12,
+      "buck_sw": 14,
+      "3v3_sw": 16,
+      "3v3_sys": 20,
+      "5v_sw": 16,
+      "vbus_in_trunk": 24,
+      "vbus_in_short_escape": 12,
+      "state": "design"
+    },
+    "connectivity": {"fully_connected_nets": 47, "total_named_nets": 47, "state": "calculated"},
+    "evidence": ["fabrication-manifest", "fabrication-checklist", "final-project-archive"]
+  },
+  "usb_geometry": {
+    "segments": [
+      {"id": "connector-to-esd", "dm_mil": 700.8848, "dp_mil": 700.884807, "skew_mil": 0.000007},
+      {"id": "esd-to-series-resistor", "dm_mil": 483.619088, "dp_mil": 483.619146, "skew_mil": 0.000058},
+      {"id": "series-resistor-to-mcu", "dm_mil": 361.88001, "dp_mil": 361.880026, "skew_mil": 0.000016}
+    ],
+    "maximum_usb_via_to_ground_transition_mil": 155.33,
+    "state": "calculated",
+    "limitations": ["未证明受控阻抗", "未做眼图", "未做 EMI/ESD 实物测试"],
+    "hardware_state": "unverified",
+    "evidence": ["fabrication-manifest", "fabrication-checklist"]
+  },
+  "power": {
+    "rails": [
+      {"name": "VBUS_IN", "nominal_voltage": 5, "source": "J1 USB VBUS", "state": "design"},
+      {"name": "3V3_SYS", "nominal_voltage": 3.3, "source": "U3 buck", "state": "design", "hardware_state": "unverified"},
+      {"name": "5V_SW", "nominal_voltage": 5, "source": "U4 from VBUS_IN", "state": "design", "hardware_state": "unverified"},
+      {"name": "3V3_SW", "nominal_voltage": 3.3, "source": "U5 from 3V3_SYS", "state": "design", "hardware_state": "unverified"},
+      {"name": "GND", "nominal_voltage": 0, "source": "common return/reference", "state": "design"}
+    ],
+    "buck_feedback": {
+      "r_top": "R5 453 kΩ",
+      "r_bottom": "R6 100 kΩ",
+      "v_fb_typical": 0.6,
+      "calculated_output": 3.318,
+      "unit": "V",
+      "state": "calculated",
+      "hardware_state": "unverified"
+    },
+    "load_switch_current_limits": [
+      {"rail": "5V_SW", "resistor": "R7 16.9 kΩ", "calculated": 0.40237, "unit": "A", "state": "calculated"},
+      {"rail": "3V3_SW", "resistor": "R8 27 kΩ", "calculated": 0.25185, "unit": "A", "state": "calculated"}
+    ],
+    "decoupling_path_lengths_mm": {
+      "C6_to_mcu": 6.65,
+      "C7_to_mcu": 6.71,
+      "C8_to_mcu": 8.99,
+      "C9_bulk_to_mcu": 13.82,
+      "state": "calculated"
+    },
+    "hardware_state": "unverified",
+    "unverified_items": ["buck startup/ripple/stability", "load-step response", "rail voltage drop", "current-limit tolerance", "thermal performance", "USB current budget under real host/cable conditions"],
+    "evidence": ["final-project-archive", "fabrication-checklist", "datasheet-sy8089", "datasheet-sy6280"]
+  },
+  "clock_and_reset": {
+    "crystal": {"ref": "Y1", "frequency_mhz": 12, "load_capacitance_pf": 20, "state": "design"},
+    "load_capacitors": {"refs": ["C11", "C12"], "each_pf": 12, "series_equivalent_without_stray_pf": 6, "state": "calculated"},
+    "load_match": {"state": "unverified", "reason": "MCU 引脚、封装和走线杂散电容未知；需复核频偏与起振裕量。"},
+    "reset_network": {"pull_up": "R12 10 kΩ", "capacitor": "C10 100 nF", "time_constant_ms": 1, "state": "calculated", "hardware_state": "unverified"},
+    "boot_bias": {"ref": "R11", "value": "100 kΩ", "behavior": "BOOT0 default low", "state": "design"},
+    "evidence": ["final-project-archive", "datasheet-crystal", "datasheet-ch32v203"]
+  },
+  "ground_copper": {
+    "native_pours": {"count": 0, "state": "calculated"},
+    "removed_malformed_pour_ids": ["5296498eb95b5e66", "d420c7c130568fae"],
+    "connected_static_gnd_regions": {"total": 17, "top": 11, "bottom": 6, "state": "calculated"},
+    "area_mm2": {"top": 562.422, "bottom": 520.456, "state": "calculated"},
+    "gerber_g36_g37_regions": {"top": 11, "bottom": 6, "state": "calculated"},
+    "maintenance_warning": "这些是静态 FILL 图元；任何几何修改后都必须重新生成并复核，未来优先使用可重铺的原生铺铜。",
+    "evidence": ["fabrication-manifest", "fabrication-checklist", "final-gerbers", "final-project-archive"]
+  },
+  "silkscreen": {
+    "top_functional_labels": 13,
+    "labels": ["USB GPIO", "REV R1", "3V3 LOGIC", "USB-C", "SWD", "GND", "5V/3V3", "G0-G7", "TX/RX", "RST"],
+    "board_designators_visible": false,
+    "designator_sources": ["final-bom", "final-cpl", "final-assembly-pdf", "final-project-archive"],
+    "state": "design"
+  },
+  "named_nets": {
+    "all": [
+      "3V3_SW", "NRST", "OSC_IN", "OSC_OUT", "CC1", "USB_DM_CONN", "USB_DP_CONN",
+      "GPIO0_PWM0", "GPIO1_PWM1", "GPIO2_PWM2", "GPIO3_PWM3", "GPIO4", "GPIO5", "GPIO6", "GPIO7",
+      "UART_TX", "UART_RX", "SWDIO", "SWCLK", "BUCK_SW", "USB_DM_MCU", "USB_DM_ESD", "USB_DP_MCU",
+      "USB_DP_ESD", "BUCK_FB", "ISET_5V", "EN_5V", "EN_3V3", "BOOT0", "STATUS_LED",
+      "GPIO0_MCU", "GPIO1_MCU", "GPIO2_MCU", "GPIO3_MCU", "GPIO4_MCU", "GPIO5_MCU", "GPIO6_MCU",
+      "GPIO7_MCU", "UART_TX_MCU", "UART_RX_MCU", "GND", "VBUS_IN", "3V3_SYS", "5V_SW", "LED_A",
+      "CC2", "ISET_3V3"
+    ],
+    "power": ["GND", "VBUS_IN", "3V3_SYS", "3V3_SW", "5V_SW", "BUCK_SW"],
+    "usb": ["USB_DM_CONN", "USB_DP_CONN", "USB_DM_ESD", "USB_DP_ESD", "USB_DM_MCU", "USB_DP_MCU"],
+    "external_io": ["GPIO0_PWM0", "GPIO1_PWM1", "GPIO2_PWM2", "GPIO3_PWM3", "GPIO4", "GPIO5", "GPIO6", "GPIO7", "UART_TX", "UART_RX"],
+    "state": "design",
+    "evidence": ["final-project-archive"]
+  },
+  "connector_pin_maps": {
+    "J2_target": {
+      "fitted": false,
+      "pins": {
+        "1": "GND", "2": "GND", "3": "5V_SW", "4": "3V3_SW",
+        "5": "GPIO0_PWM0", "6": "GPIO1_PWM1", "7": "GPIO2_PWM2", "8": "GPIO3_PWM3",
+        "9": "GPIO4", "10": "GPIO5", "11": "GPIO6", "12": "GPIO7",
+        "13": "UART_TX", "14": "UART_RX", "15": "NRST", "16": null
+      },
+      "state": "design"
+    },
+    "J3_debug": {
+      "fitted": false,
+      "pins": {"1": "3V3_SYS", "2": "GND", "3": "SWDIO", "4": "SWCLK", "5": "NRST"},
+      "state": "design"
+    },
+    "evidence": ["final-project-archive", "fabrication-checklist"]
+  },
+  "mcu_functional_pin_map": [
+    {"package_pin": 2, "mcu_pin": "OSC_IN/PD0", "net": "OSC_IN", "function": "12 MHz crystal input"},
+    {"package_pin": 3, "mcu_pin": "OSC_OUT/PD1", "net": "OSC_OUT", "function": "12 MHz crystal output"},
+    {"package_pin": 4, "mcu_pin": "NRST", "net": "NRST", "function": "reset"},
+    {"package_pin": 6, "mcu_pin": "PA0", "net": "GPIO4_MCU", "function": "GPIO4"},
+    {"package_pin": 7, "mcu_pin": "PA1", "net": "GPIO5_MCU", "function": "GPIO5"},
+    {"package_pin": 8, "mcu_pin": "PA2", "net": "UART_TX_MCU", "function": "USART2_TX"},
+    {"package_pin": 9, "mcu_pin": "PA3", "net": "UART_RX_MCU", "function": "USART2_RX"},
+    {"package_pin": 10, "mcu_pin": "PA4", "net": "GPIO6_MCU", "function": "GPIO6"},
+    {"package_pin": 11, "mcu_pin": "PA5", "net": "GPIO7_MCU", "function": "GPIO7"},
+    {"package_pin": 12, "mcu_pin": "PA6", "net": "GPIO0_MCU", "function": "TIM3_CH1 / GPIO0"},
+    {"package_pin": 13, "mcu_pin": "PA7", "net": "GPIO1_MCU", "function": "TIM3_CH2 / GPIO1"},
+    {"package_pin": 14, "mcu_pin": "PB0", "net": "GPIO2_MCU", "function": "TIM3_CH3 / GPIO2"},
+    {"package_pin": 15, "mcu_pin": "PB1", "net": "GPIO3_MCU", "function": "TIM3_CH4 / GPIO3"},
+    {"package_pin": 21, "mcu_pin": "PA11/USB1DM", "net": "USB_DM_MCU", "function": "USB D-"},
+    {"package_pin": 22, "mcu_pin": "PA12/USB1DP", "net": "USB_DP_MCU", "function": "USB D+"},
+    {"package_pin": 23, "mcu_pin": "PA13/SWDIO", "net": "SWDIO", "function": "debug data"},
+    {"package_pin": 24, "mcu_pin": "PA14/SWCLK", "net": "SWCLK", "function": "debug clock"},
+    {"package_pin": 26, "mcu_pin": "PB3", "net": "EN_5V", "function": "5V_SW enable"},
+    {"package_pin": 27, "mcu_pin": "PB4", "net": "EN_3V3", "function": "3V3_SW enable"},
+    {"package_pin": 28, "mcu_pin": "PB5", "net": "STATUS_LED", "function": "status LED"},
+    {"package_pin": 31, "mcu_pin": "PB8/BOOT0", "net": "BOOT0", "function": "boot selection"}
+  ],
+  "release_validation": {
+    "schematic_erc_errors": 0,
+    "schematic_erc_nonblocking_notices": 2,
+    "pcb_drc_connection_errors": 0,
+    "pcb_drc_clearance_errors": 0,
+    "pcb_drc_differential_pair_errors": 0,
+    "pcb_drc_other_errors": 0,
+    "schematic_to_pcb_netlist_differences": 0,
+    "mapped_components": "48/48",
+    "mapped_pins_to_pads": "172/172",
+    "release_decision": "PASS - ready for prototype fabrication",
+    "state": "calculated",
+    "limitations": ["原型可制造不等于已完成电气、热、USB 或固件验证"],
+    "evidence": ["fabrication-checklist", "fabrication-manifest"]
+  },
+  "resolved_proposal_conflicts": [
+    {
+      "topic": "board-size",
+      "proposal": "约 45 mm × 20 mm",
+      "final": "50 mm × 24 mm",
+      "resolution": "final wins",
+      "evidence": ["proposal", "fabrication-manifest"]
+    },
+    {
+      "topic": "crystal-frequency",
+      "proposal": "8 MHz",
+      "final": "12 MHz X322512MSB4SI",
+      "resolution": "final wins",
+      "evidence": ["proposal", "final-project-archive"]
+    },
+    {
+      "topic": "5v-current-set-resistor",
+      "proposal": "nominal 17 kΩ",
+      "final": "R7 = 16.9 kΩ",
+      "resolution": "final wins",
+      "evidence": ["proposal", "final-project-archive"]
+    },
+    {
+      "topic": "regulator",
+      "proposal": "部分旧文字仍提到 LDO 热耗散",
+      "final": "U3 SY8089 buck, L1 2.2 µH, R5/R6 feedback",
+      "resolution": "忽略旧 LDO 表述",
+      "evidence": ["proposal", "final-project-archive"]
+    },
+    {
+      "topic": "gpio-esd",
+      "proposal": "建议外部 GPIO ESD 阵列，可选 DNP",
+      "final": "最终 48 位号中没有 GPIO ESD 阵列",
+      "resolution": "不得在 R1 教材中写成已实现",
+      "evidence": ["proposal", "final-project-archive", "final-bom"]
+    },
+    {
+      "topic": "load-switch-fault-signals",
+      "proposal": "若器件提供则接 MCU",
+      "final": "U4/U5 只有 IN/OUT/EN/ISET/GND，未实现故障输出网络",
+      "resolution": "不得写成已实现",
+      "evidence": ["proposal", "final-project-archive"]
+    },
+    {
+      "topic": "ground-pours",
+      "proposal": "期望地平面/铺铜",
+      "final": "0 个原生 POUR；17 个已在 Gerber 验证的静态 GND FILL 区域",
+      "resolution": "按最终制造铜描述，并保留维护风险",
+      "evidence": ["fabrication-manifest", "fabrication-checklist", "final-project-archive"]
+    },
+    {
+      "topic": "headers",
+      "proposal": "目标头和调试接口不预装",
+      "final": "J2/J3 在 PCB/CPL 中存在，原理图 Add into BOM=no，最终 BOM 排除",
+      "resolution": "final confirms proposal",
+      "evidence": ["final-project-archive", "final-bom", "final-cpl"]
+    }
+  ],
+  "verification_register": {
+    "measured_fact_count": 0,
+    "design_and_release_verified": [
+      "位号、值、封装、焊盘网络",
+      "BOM/CPL/DNP 一致性",
+      "板框、钻孔、Gerber 文件完整性",
+      "CAD 连通性、DRC、USB 几何长度",
+      "机械包络无重叠"
+    ],
+    "unverified_hardware": [
+      "VBUS 与 3V3_SYS 上电电压/电流",
+      "Buck 起动、纹波、瞬态、稳定性和温升",
+      "5V_SW/3V3_SW 压降、限流、恢复和放电",
+      "Y1 起振、频率和负载电容匹配",
+      "USB 枚举、传输、挂起/恢复、眼图、EMI 和 ESD",
+      "GPIO/PWM/UART 电平、频率、占空比、误码和负载能力",
+      "固件复位/启动/挂起安全状态",
+      "连接器实物配合、焊接质量和多板一致性"
+    ],
+    "state": "unverified",
+    "evidence": ["fabrication-checklist"]
+  }
+}

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="附录 K：复习题与答案（Review Questions and Answer Key） — USB GPIO PCB 离线教程">
+  <title>附录 K：复习题与答案（Review Questions and Answer Key） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="appendix-k">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="../chapters/01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="../chapters/02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="../chapters/03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="../chapters/04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="../chapters/05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="../chapters/06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="../chapters/07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="../chapters/08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="../chapters/09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="../chapters/10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="../chapters/11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="../chapters/12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="../chapters/13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="../chapters/14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="../chapters/15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="../chapters/16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="../chapters/17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="../chapters/18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="../chapters/19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="../chapters/20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="../chapters/21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="../chapters/22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="../chapters/23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="../chapters/24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="../chapters/25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="../chapters/26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="../chapters/27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="../chapters/28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="../chapters/29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="../chapters/30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="../chapters/31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="../chapters/32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="../chapters/33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="../chapters/34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="../chapters/35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="../chapters/36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="../chapters/37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="k-answer-key.html" aria-current="page">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>附录（Appendices）</li><li aria-current="page">附录 K：复习题与答案（Review Questions and Answer Key）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">附录（Appendices）</p>
+          <h1>附录 K：复习题与答案（Review Questions and Answer Key）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#k-use">K.1 答案范围与评分原则</a></li><li class="toc-level-2"><a href="#k-foundations">K.2 第一、二部分练习</a></li><li class="toc-level-3"><a href="#answer-1-11">1.11 跟踪简单 LED 板的电流回路</a></li><li class="toc-level-3"><a href="#answer-1-12">1.12 常见误解</a></li><li class="toc-level-3"><a href="#answer-2-9">2.9 把 USB GPIO 原理图分成功能块</a></li><li class="toc-level-3"><a href="#answer-3-11">3.11 测量电阻、电容、二极管和 LED</a></li><li class="toc-level-3"><a href="#answer-4-9">4.9 一页板级规格</a></li><li class="toc-level-3"><a href="#answer-5-1">5-1 “USB 已识别但 J2-3 无 5 V”故障树</a></li><li class="toc-level-3"><a href="#answer-6-13">6.13 核对一个 symbol 与 footprint</a></li><li class="toc-level-2"><a href="#k-circuit">K.3 第三部分电路练习</a></li><li class="toc-level-3"><a href="#answer-7-9">7.9 USB-C 针脚与 CC 电阻</a></li><li class="toc-level-3"><a href="#answer-8-9">8.9 单端与差分波形比较</a></li><li class="toc-level-3"><a href="#answer-9-12">9.12 Buck 效率与纹波</a></li><li class="toc-level-3"><a href="#answer-10-10">10.10 受控电源安全测试</a></li><li class="toc-level-3"><a href="#answer-11-11">11.11 近端与远端去耦</a></li><li class="toc-level-3"><a href="#answer-12-10">12.10 时钟、复位与 LED</a></li><li class="toc-level-3"><a href="#answer-13-11">13.11 GPIO、PWM 与 UART 综合实验</a></li><li class="toc-level-3"><a href="#answer-14-14">14.14 不看注释解释全部位号</a></li><li class="toc-level-2"><a href="#k-eda-layout">K.4 EasyEDA 与 PCB 练习</a></li><li class="toc-level-3"><a href="#answer-15-7">15.7 建立工程骨架</a></li><li class="toc-level-3"><a href="#answer-16-11">16.11 跟踪全部电源与外部信号</a></li><li class="toc-level-3"><a href="#answer-17-review">17.9 质量门复习题</a></li><li class="toc-level-3"><a href="#answer-19-8">19.8 比较 pad、courtyard 与 3D 碰撞</a></li><li class="toc-level-3"><a href="#answer-21-9">21.9 布一条网络并找回流</a></li><li class="toc-level-3"><a href="#answer-23-8">23.8 标出高电流与高 di/dt 环路</a></li><li class="toc-level-3"><a href="#answer-24-11">24.11 移线、重铺并比较</a></li><li class="toc-level-3"><a href="#answer-26-exercise">第 26 章：48 位号 PCB 签核表</a></li><li class="toc-level-3"><a href="#answer-27-exercise">第 27 章：BOM、CPL 与方向审计</a></li><li class="toc-level-3"><a href="#answer-28-exercise">第 28 章：从归档反推制造意图</a></li><li class="toc-level-3"><a href="#answer-29-exercise">第 29 章：独立发布结论</a></li><li class="toc-level-2"><a href="#k-bringup">K.5 上电与接口实验答案要点</a></li><li class="toc-level-3"><a href="#answer-31-8">31.8 首次上电工作表</a></li><li class="toc-level-3"><a href="#answer-33-1">33.1 USB 枚举与串行通信</a></li><li class="toc-level-3"><a href="#answer-33-2">33.2 数字输出与 LED</a></li><li class="toc-level-3"><a href="#answer-33-3">33.3 数字输入与消抖</a></li><li class="toc-level-3"><a href="#answer-33-4">33.4 PWM 频率与占空比</a></li><li class="toc-level-3"><a href="#answer-33-5">33.5 UART 环回与帧错误</a></li><li class="toc-level-3"><a href="#answer-33-6">33.6 受控 5 V 与 3.3 V</a></li><li class="toc-level-3"><a href="#answer-33-7">33.7 负载阶跃与压降</a></li><li class="toc-level-3"><a href="#answer-33-8">33.8 过流保护与恢复</a></li><li class="toc-level-3"><a href="#answer-33-9">33.9 USB 挂起与安全状态</a></li><li class="toc-level-3"><a href="#answer-33-10">33.10 无损故障诊断</a></li><li class="toc-level-2"><a href="#k-factual">K.6 R1 快速事实题</a></li></ul></nav>
+        <section aria-labelledby="k-use">
+  <h2 id="k-use">K.1 答案范围与评分原则</h2>
+  <p>本附录以 <code>toc.md</code> 中当前已有的稳定章节号、练习号和实验号为键。章节若进一步拆分子题，应把本页的“必含要点”映射到对应子题，而不是另造互相矛盾的答案。</p>
+  <aside class="notice">
+    <p><strong>实验没有预制实测答案。</strong>实验题的答案是正确方法、证据和判定逻辑；电压、纹波、温度、误码率、限流点等必须由学生真实测量。把设计值抄入结果栏应判为“证据不足”。</p>
+  </aside>
+  <table>
+    <caption>表 K-1　建议评分等级</caption>
+    <thead><tr><th scope="col">等级</th><th scope="col">要求</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">完整</th><td>结论正确，解释电流/信号路径、条件、单位、事实状态和验证边界；能引用位号/网络。</td></tr>
+      <tr><th scope="row">部分</th><td>结论大体正确，但缺少原因、返回路径、条件或证据状态。</td></tr>
+      <tr><th scope="row">不足</th><td>只背名词、把典型/计算当实测、忽略安全，或用 DRC 代替机械/实物验证。</td></tr>
+    </tbody>
+  </table>
+  <p>已定稿题目可直接跳转，例如：<a href="../chapters/01-pcb-basics.html#section-1-12">1.12 复习题</a>、<a href="../chapters/17-schematic-review-erc.html#section-17-9">第 17 章质量门与复习题</a>、<a href="../chapters/26-drc-mechanical-audit.html#ch26-exercise">第 26 章审计练习</a>、<a href="../chapters/27-bom-cpl-assembly.html#ch27-exercise">第 27 章审计练习</a>、<a href="../chapters/28-fabrication-outputs.html#ch28-exercise">第 28 章审计练习</a>和<a href="../chapters/29-r1-manufacturing-case-study.html#ch29-exercise">第 29 章案例练习</a>。</p>
+</section>
+
+<section aria-labelledby="k-foundations">
+  <h2 id="k-foundations">K.2 第一、二部分练习</h2>
+
+  <h3 id="answer-1-11">1.11 跟踪简单 LED 板的电流回路</h3>
+  <p><strong>必含要点：</strong>从电源正端出发，经限流电阻、LED，再经 GND/返回导体回到电源负端，形成闭合回路。只画“电源 → LED”而没有回流不完整。还应说明 LED 极性与电阻限制电流的作用。</p>
+
+  <h3 id="answer-1-12">1.12 常见误解</h3>
+  <ol>
+    <li><strong>“某点是 3.3 V”为什么不完整：</strong>电压是两点间的电势差，必须补充参考节点，例如“3V3_SYS 相对 GND 为 3.3 V”。</li>
+    <li><strong>功率与能量：</strong>功率是能量转换速率，单位 W；能量是累计做功/储能，单位 J。恒定功率下 E=P×t。</li>
+    <li><strong>为什么检查地返回：</strong>信号电流必须闭合；返回路径决定环路面积、参考电位、串扰和辐射。只有去程走线不能说明信号完整。</li>
+    <li><strong>三种证据：</strong>原理图网络表示设计意图；PCB 铜表示制造前几何；装配板导通测量才观察特定实物的静态连接，但仍不证明高速、负载和长期功能。</li>
+    <li><strong>47/47 连通的边界：</strong>它证明最终 CAD 几何连通，不证明每块板无虚焊、裂纹、错件或污染。</li>
+    <li><strong>PTH/NPTH：</strong>PTH 孔壁有金属并可导电，NPTH 孔壁无铜、通常用于机械。误用会造成意外电气连接、焊接/装配错误或制造文件不一致。</li>
+    <li><strong>阻焊不能修复铜间距：</strong>阻焊有对位公差、缺陷和耐压边界，且底层铜仍然过近；必须先满足真实铜间距规则。</li>
+    <li><strong>DRC 常漏的机械问题：</strong>器件实体/courtyard 重叠、连接器朝向或插接空间错误、器件高度冲突、刻意伸出和外壳干涉等。</li>
+  </ol>
+  <p>延伸纠错：GND 不是电流消失处；原理图相邻不代表 PCB 相邻；铺铜边界不等于制造铜；大电容不能无条件替代近端小电容。</p>
+
+  <h3 id="answer-2-9">2.9 把 USB GPIO 原理图分成功能块</h3>
+  <p>合理答案至少包括：J1/R1/R2/C1 的 USB-C 入口与 CC；J1/U2/R3/R4/U1 的 USB 数据链；U3/L1/C2/C3/R5/R6 的 Buck；U4/R7/R9/C13/C4 的 5V_SW；U5/R8/R10/C14/C5 的 3V3_SW；U1/C6–C9 的 MCU 供电；Y1/C11/C12、R12/C10、R11、R13/D1 的时钟/复位/启动/指示；R14–R23/J2 的外部接口；J3 的 SWD。</p>
+  <p><strong>思考题：</strong>U2 可以同时归入“USB 数据路径”和“保护”。功能块是分析视角，不是要求每个器件只能拥有一个标签；应说明你的分块规则，例如按主要能量/信息流归类，同时把跨块保护接口标出来。</p>
+
+  <h3 id="answer-3-11">3.11 测量电阻、电容、二极管和 LED</h3>
+  <p><strong>方法答案：</strong>断电测电阻；电容测量前放电并说明仪表频率/模式；二极管档记录正反向差异；LED 必须串联限流。正确报告应有仪器、量程、极性、原始读数和误差，不要求与标称值完全相等。</p>
+  <p><strong>思考题：</strong>万用表离板电容档主要给出低频等效容量，不能包含 C6 安装后的走线/过孔电感、ESR/ESL、与 U1 引脚构成的高频回路面积、工作偏压和实际负载瞬态。因此它不能证明 MCU 高频去耦效果。</p>
+
+  <h3 id="answer-4-9">4.9 一页板级规格</h3>
+  <p>应包含可测的功能、接口、电压、电流、安全状态、尺寸/成本约束和验收证据。R1 的关键功能是 USB 2.0 Full-Speed CDC、8 GPIO、4 个共享 TIM3 频率的 PWM、1 个 3.3 V UART、受控 5 V/3.3 V 电源；还要明确非隔离、无 USB-PD、GPIO 非 5 V 电源输出以及实物验证尚未完成。</p>
+
+  <h3 id="answer-5-1">5-1 “USB 已识别但 J2-3 无 5 V”故障树</h3>
+  <p>建议由低风险到高风险：先核对命令是否发送、固件是否拒绝/处于挂起；读取软件状态；测 U1 PB3/<code>EN_5V</code>；无负载测 U4 输入和输出；断电检查 R9、R7、U4 焊接/料号；确认 J2 为 DNP 时是否已安装且接触正确；断电测负载是否短路；最后复核表笔 GND 和 J2 针序。控制流先于功率流，所有电阻/连续性检查必须断电。</p>
+
+  <h3 id="answer-6-13">6.13 核对一个 symbol 与 footprint</h3>
+  <p>完整答案必须逐针建立“数据手册针号/针名 → 原理图符号 → footprint 焊盘 → 项目网络”，并核对观察面、pin 1、极性、外形、孔、推荐 land pattern 和装配方向。仅说“3D 模型看起来一样”不得分。</p>
+  <p><strong>思考题：</strong>焊盘编号正确只证明电气映射可能正确；连接器仍可能被镜像、旋转 180°、放在错误板边，或壳体/插头朝板内。必须用数据手机械视图、footprint 观察面、装配/3D 和实物配合共同证明插接方向。</p>
+</section>
+
+<section aria-labelledby="k-circuit">
+  <h2 id="k-circuit">K.3 第三部分电路练习</h2>
+
+  <h3 id="answer-7-9">7.9 USB-C 针脚与 CC 电阻</h3>
+  <p>J1 的 A5→<code>CC1</code>→R1→GND，B5→<code>CC2</code>→R2→GND；R1、R2 均为 5.1 kΩ 且必须独立。断电测量时每个 CC 对地应呈现与该支路一致的阻性结果，但实际读数可受并联路径和仪表影响。A6/B6 是 D+，A7/B7 是 D−，VBUS 与 GND 需按连接器视图辨认。</p>
+
+  <h3 id="answer-8-9">8.9 单端与差分波形比较</h3>
+  <p>单端测量相对 GND；差分测量关注 D+−D−。正确解释应指出共模噪声可同时出现在两线，而差分接收关注两线差值；探测方式和探头负载会改变高速信号。不能由示波器上“看起来相反”就宣称 USB 眼图合格。</p>
+
+  <h3 id="answer-9-12">9.12 Buck 效率与纹波</h3>
+  <p>计算：V<sub>OUT</sub>=0.6×(1+453/100)=3.318 V。效率必须同步测 V<sub>IN</sub>、I<sub>IN</sub>、V<sub>OUT</sub>、I<sub>OUT</sub>，用 η=P<sub>OUT</sub>/P<sub>IN</sub>。纹波应使用短地弹簧、记录带宽和负载。没有原始波形或把 3.318 V 称为实测值都不合格。</p>
+
+  <h3 id="answer-10-10">10.10 受控电源安全测试</h3>
+  <p>先验证 EN=0 时输出关闭，再在小负载下使能，逐步增加电子负载并记录输入/输出、压降、温度和恢复。设计计算：5V_SW≈0.402 A，3V3_SW≈0.252 A；这些不是精确通过阈值。禁止直接短路，必须设置电源/负载限流和停止条件。</p>
+
+  <h3 id="answer-11-11">11.11 近端与远端去耦</h3>
+  <p>预期近端电容形成较小高频电流环，供电尖峰和地弹跳通常更小；远端电容的走线/过孔电感削弱高频效果。正确实验要保持负载、探头和电容值不变，只改变物理路径，并保存波形。不得预填“改善了多少”。</p>
+
+  <h3 id="answer-12-10">12.10 时钟、复位与 LED</h3>
+  <p>Y1 设计值为 12 MHz；C11=C12=12 pF，简单串联为 6 pF 加未知杂散，匹配待验证。R12=10 kΩ、C10=100 nF，τ=1 ms，但实际 NRST 释放取决于阈值。LED 电流应由 R13 压降计算；3.3 mA 只是令 V<sub>F</sub>=0 的上限。</p>
+
+  <h3 id="answer-13-11">13.11 GPIO、PWM 与 UART 综合实验</h3>
+  <p>外接 LED 要有独立限流；开关输入要定义上拉/下拉和消抖；PWM 同时记录频率、占空比、高低电平，四路共享 TIM3 频率；UART TX/RX 要交叉并共地，电平为 3.3 V CMOS/TTL，不是 RS-232。R14–R23 为 220 Ω 串联器件，不提供隔离。</p>
+
+  <h3 id="answer-14-14">14.14 不看注释解释全部位号</h3>
+  <p>满分要求覆盖 48 个物理位号且无遗漏：23 个 R、14 个 C、5 个 U、3 个 J、L1、D1、Y1；对每个说明类别、值/型号、关键网络、功能、布局重要性和主要失效影响。J2/J3 必须标为 PCB/CPL 存在但 BOM DNP。可用<a href="b-bom-reference-table.html">附录 B</a>逐项核对集合，而不是照抄一句功能名。</p>
+</section>
+
+<section aria-labelledby="k-eda-layout">
+  <h2 id="k-eda-layout">K.4 EasyEDA 与 PCB 练习</h2>
+
+  <h3 id="answer-15-7">15.7 建立工程骨架</h3>
+  <p>应有项目、板、原理图页和 PCB 文档；记录名称、修订、单位、网格和备份；先建立稳定网络命名与功能块。完成证据是可打开的项目归档和无歧义的文档层级，而不是空白文件截图。</p>
+
+  <h3 id="answer-16-11">16.11 跟踪全部电源与外部信号</h3>
+  <p>至少应完整复述：VBUS_IN→U3→L1→3V3_SYS；VBUS_IN→U4→5V_SW；3V3_SYS→U5→3V3_SW；USB D+/D− 的 J1→U2→R3/R4→U1；十条 U1→R14–R23→J2 信号；J3 的 SWD/NRST。每条都应指出 GND 返回。</p>
+
+  <h3 id="answer-17-review">17.9 质量门复习题</h3>
+  <ol>
+    <li><strong>ERC=0 仍可能电源塌缩：</strong>ERC 只检查符号电气类型和逻辑连接，不模拟负载、有效电容、稳压稳定性、走线压降、短路、焊接或热保护。</li>
+    <li><strong>172/172 仍不能证明连接器能插入：</strong>该数字只证明针脚—焊盘—网络映射；方向、镜像、壳体、板边伸出、配对空间和真实尺寸属于机械证据。</li>
+    <li><strong>确认板厂实际地铜：</strong>在独立 Gerber 查看器检查 GTL/GBL 中生成的铜区域、间距和连接；编辑器中的铺铜边界或源对象不足。</li>
+  </ol>
+
+  <h3 id="answer-19-8">19.8 比较 pad、courtyard 与 3D 碰撞</h3>
+  <p>pad 视图回答焊接铜与孔；courtyard 回答装配/返修预留；3D/实体回答真实外壳和高度。三者可能给出不同结论。R1 历史上的 C8/C9 和连接器周边问题说明仅看电气焊盘不足。</p>
+
+  <h3 id="answer-21-9">21.9 布一条网络并找回流</h3>
+  <p>答案应标出源、负载、正向铜路径和返回路径；说明频率越高，回流越倾向靠近信号路径以减小环路。换层时应考虑附近地过孔。只画一条信号线而没有回流分析不完整。</p>
+
+  <h3 id="answer-23-8">23.8 标出高电流与高 di/dt 环路</h3>
+  <p>应至少标出 U3/C2 的输入开关环、U3→BUCK_SW→L1 的开关节点、L1/C3/负载的输出环、U4/U5 的输入输出路径。<code>BUCK_SW</code> 应小且远离 USB、晶振和反馈；反馈应取安静输出并返回安静地。</p>
+
+  <h3 id="answer-24-11">24.11 移线、重铺并比较</h3>
+  <p>正确流程：保存基线截图/数据 → 移动走线 → 对原生铺铜执行 repour → 检查间距、热连接、孤岛和回流 → 运行 DRC → 导出 Gerber → 在铜层确认实际区域变化。只看到铺铜边界变化而未查 Gerber不得判完成。</p>
+
+  <h3 id="answer-26-exercise">第 26 章：48 位号 PCB 签核表</h3>
+  <ol>
+    <li>不重复组件对数为 n(n−1)/2=48×47/2=<strong>1,128</strong>。</li>
+    <li>独立证据示例：DRC 报告；数据手册实体与 footprint courtyard 两套碰撞结果；装配/3D 和数据手机械图验证连接器方向；GKO/板框几何验证板边；集合比较验证 BOM/CPL；独立 Gerber 查看验证制造层。</li>
+    <li>48 PCB、46 BOM、48 CPL 同时正确，因为 J2/J3 是物理存在和需定位的 DNP 位号，但不进入采购装配 BOM。</li>
+    <li>移动 J1 会使机械、板边、USB 走线/长度、回流、铜填充、DRC、CPL、装配图、Gerber、项目归档、manifest 和哈希失效；修改 U3 footprint 还会使针脚映射、焊盘、热/回路和 BOM 失效。不能只重跑 DRC。</li>
+  </ol>
+
+  <h3 id="answer-27-exercise">第 27 章：BOM、CPL 与方向审计</h3>
+  <ol>
+    <li>可验证的分组示例：R14–R23 共 10；C6/C7/C8/C10/C13/C14 共 6；U4/U5 共 2。任一 BOM 行的数量都应等于展开后的唯一位号数。</li>
+    <li>J2/J3：原理图与 PCB 存在；Add into BOM=no；采购 BOM 不含；CPL 和装配图包含；最终由用户按需焊接或使用夹具。</li>
+    <li>方向至少用三类证据：数据手册 pin 1/极性/机械图；PCB footprint 焊盘号与装配/3D；CPL 旋转和实物丝印/封装标记。J1 还需真实插接方向。</li>
+    <li>U3 替代料必须复核电气范围、针脚、封装/land pattern、反馈基准、L/C 与稳定性、开关频率、限流、热和布局。项目源、BOM、CPL、装配资料、DRC/机械审核、Gerber、manifest 和哈希均需重新发布。</li>
+  </ol>
+
+  <h3 id="answer-28-exercise">第 28 章：从归档反推制造意图</h3>
+  <ol>
+    <li>14 个条目分类：GTL/GBL 为铜；GTS/GBS 为阻焊；GTP 为顶层钢网；GTO/GBO 为丝印；GKO 为板框、GDL 为文档/机械辅助；三个 DRL 为 PTH、NPTH、via 钻孔；FlyingProbeTesting.json 与下单说明为辅助数据。</li>
+    <li>via-only 的 130 个落点是完整 PTH 数据中相应过孔的子集/单独工艺视图，不是额外 130 个物理孔；相加会重复计数。</li>
+    <li>检查 GKO 路径首尾坐标相同且连续，再以 maxX−minX、maxY−minY 计算 49.999900 mm × 24.000460 mm。</li>
+    <li>最少步骤：在项目源确认 17 个 GND FILL 及层/网络；在 GTL/GBL 查 11/6 个 G36/G37 区域；用 Gerber 查看器确认形状、板内边界、间距和连接，而非只数对象。</li>
+    <li>哈希相同证明文件字节完全相同、传输未变；不证明文件设计正确、制造可行或实物性能合格。</li>
+  </ol>
+
+  <h3 id="answer-29-exercise">第 29 章：独立发布结论</h3>
+  <ol>
+    <li>基线：50×24 mm、2 层、48 个 PCB/CPL 位号、46 个拟装配、J2/J3 两个 DNP、172 焊盘、47 网络、608 track、130 via。</li>
+    <li>可选纠错：开板框需 GKO 闭合证据；J1 错方向需机械/插接证据；C8/C9 或 R1/J1 碰撞需实体/courtyard；旧布线需独立连通；越板铺铜/无实体铜需边界、重铺和 Gerber。DRC 不覆盖或不能单独证明这些事项。</li>
+    <li>17 个地铜区域：源项目中 17 个 GND FILL（Top 11/Bottom 6），Gerber 中对应 11/6 个实体区域；任何板框、布线、规则或填充变化都使结论失效并要求重建/重审。</li>
+    <li>几何偏斜只比较路径长度；阻抗还需要生产叠层、介电参数、线宽/间距、参考面和制造公差，最终还可能需要眼图。</li>
+    <li>送样后至少完成：外观/焊接；断电电阻和限流上电；Buck 电压/纹波/瞬态/热；受控电源压降/限流/恢复；晶振；USB；GPIO/PWM/UART；安全状态。结论只能写“可送原型制造”。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="k-bringup">
+  <h2 id="k-bringup">K.5 上电与接口实验答案要点</h2>
+
+  <h3 id="answer-31-8">31.8 首次上电工作表</h3>
+  <p>先做外观和断电电阻；使用限流源，零电压接线，逐步上电；记录输入电流、VBUS、3V3_SYS、温度和时间线。异常电流、错误电压、热或气味立即断电。3V3_SYS 的 3.318 V 是计算参考，不是预填实测值。</p>
+
+  <h3 id="answer-33-1">33.1 USB 枚举与串行通信</h3>
+  <p>证据应包括主机/OS、线缆、设备日志、固件版本、枚举结果、收发数据和复现步骤。至少测试重连；若测试挂起/恢复，应同时观察受控电源安全状态。枚举成功不等于 USB 信号完整性认证。</p>
+
+  <h3 id="answer-33-2">33.2 数字输出与 LED</h3>
+  <p>选择一个 J2 GPIO，经外部限流电阻驱动 LED；记录引脚高低电平和电阻压降。不能把板载 D1 的 R13 当成外部 LED 的限流，也不能直接驱动大电流负载。</p>
+
+  <h3 id="answer-33-3">33.3 数字输入与消抖</h3>
+  <p>输入必须有定义的上拉/下拉，开关与 GND/3.3 V 接法清楚。记录原始边沿和消抖后事件；比较时间消抖或状态机策略。浮空输入随机变化不算功能测试通过。</p>
+
+  <h3 id="answer-33-4">33.4 PWM 频率与占空比</h3>
+  <p>同时记录命令值、固件返回的实际设置、示波器频率、占空比和高低电平。四路共享 TIM3 频率；改变一通道频率可能影响全部通道。平均值关系 D×V<sub>HIGH</sub> 只在充分平均条件下适用。</p>
+
+  <h3 id="answer-33-5">33.5 UART 环回与帧错误</h3>
+  <p>TX 接 RX、共地，确认 3.3 V 电平；按多个波特率和帧格式发送已知字节序列，记录总数、错误数和位时间。故意改变波特率/校验应出现可解释错误。不得连接 RS-232 电压。</p>
+
+  <h3 id="answer-33-6">33.6 受控 5 V 与 3.3 V</h3>
+  <p>验证默认关闭、命令使能、输出电压、关断和重新使能；记录输入/输出和负载。两路输出不能被误认为独立无限电源：5V_SW 共享 USB 输入，3V3_SW 还经过 U3。</p>
+
+  <h3 id="answer-33-7">33.7 负载阶跃与压降</h3>
+  <p>使用电子负载定义低/高电流、边沿和重复率；在源端与负载端同步测电压，记录下冲、过冲和恢复。V<sub>DROP</sub>=I×R<sub>PATH</sub> 可用于解释，但实际路径电阻应由测量得到。</p>
+
+  <h3 id="answer-33-8">33.8 过流保护与恢复</h3>
+  <p>缓慢提升电子负载，设置硬限流/温度/时间停止条件；记录进入限流前后输出、输入电流、温度和恢复方式。0.402/0.252 A 是典型计算目标，不是唯一合格点。禁止用导线短路。</p>
+
+  <h3 id="answer-33-9">33.9 USB 挂起与安全状态</h3>
+  <p>记录进入挂起的主机证据和时间；同步观察 5V_SW、3V3_SW、GPIO、PWM、UART TX。设计要求两路受控电源关闭、外部输出进入安全状态；只有波形/日志能证明当前固件实现。</p>
+
+  <h3 id="answer-33-10">33.10 无损故障诊断</h3>
+  <p>允许的教学故障应是可逆且限能的，例如断开信号、改软件配置、增加安全串联电阻或降低电源限流；每次只改变一个变量。禁止短接电源、反接 USB、超压 I/O、直接 ESD 放电或让学生触摸发热器件。</p>
+</section>
+
+<section aria-labelledby="k-factual">
+  <h2 id="k-factual">K.6 R1 快速事实题</h2>
+  <table>
+    <caption>表 K-2　可用于章节短答题的核对答案</caption>
+    <thead><tr><th scope="col">问题</th><th scope="col">答案</th><th scope="col">状态</th></tr></thead>
+    <tbody>
+      <tr><td>最终板尺寸与层数？</td><td>名义 50 mm × 24 mm，2 层；Gerber 外形 49.999900 mm × 24.000460 mm。</td><td>设计 / 计算</td></tr>
+      <tr><td>物理组件、拟装配、DNP？</td><td>PCB/CPL 48；BOM 拟装配 46；J2/J3 两个 DNP。</td><td>设计</td></tr>
+      <tr><td>焊盘、命名网络、刻意未连接？</td><td>172、47、9。</td><td>计算 / 设计</td></tr>
+      <tr><td>晶振最终频率？</td><td>Y1 12 MHz；早期提案 8 MHz 已被最终项目覆盖。</td><td>设计</td></tr>
+      <tr><td>Buck 反馈结果？</td><td>R5=453 kΩ、R6=100 kΩ、典型 0.6 V → 3.318 V。</td><td>计算，未实测</td></tr>
+      <tr><td>负载开关限流？</td><td>R7=16.9 kΩ → 0.40237 A；R8=27 kΩ → 0.25185 A。</td><td>计算，实际阈值未验证</td></tr>
+      <tr><td>原生铺铜与实际地铜？</td><td>0 个原生 POUR；17 个静态 GND FILL，Top 11、Bottom 6，已在 Gerber 确认。</td><td>计算 / 制造验证</td></tr>
+      <tr><td>最终 DRC 能证明什么？</td><td>配置规则下 connection/clearance/differential/其他错误为 0；不证明热、机械、阻抗、USB、固件或实物功能。</td><td>发布审核</td></tr>
+      <tr><td>当前有多少实测事实？</td><td>0；所有板上性能仍待样机测试。</td><td>事实库状态</td></tr>
+    </tbody>
+  </table>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="j-glossary.html"><small>上一页</small>附录 J：术语表（Glossary）</a><a class="next" rel="next" href="l-references.html"><small>下一页</small>附录 L：参考资料与延伸阅读（References and Further Reading）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

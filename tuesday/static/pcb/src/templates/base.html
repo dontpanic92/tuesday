@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN" data-root="$root_prefix">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="$description">
+  <title>$document_title</title>
+  <link rel="stylesheet" href="${root_prefix}assets/css/book.css">
+  <link rel="stylesheet" href="${root_prefix}assets/css/print.css" media="print">
+  <script src="${root_prefix}assets/js/search-index.js" defer></script>
+  <script src="${root_prefix}assets/js/navigation.js" defer></script>
+  <script src="${root_prefix}assets/js/search.js" defer></script>
+</head>
+<body data-page-id="$page_id">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="${root_prefix}index.html">$site_title</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      $search_form
+      $site_navigation
+    </aside>
+    <main id="main-content" tabindex="-1">
+      $breadcrumbs
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">$part</p>
+          <h1>$page_title</h1>
+        </header>
+        $page_toc
+        $content
+      </article>
+      $page_navigation
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

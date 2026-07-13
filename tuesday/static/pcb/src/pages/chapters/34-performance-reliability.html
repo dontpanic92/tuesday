@@ -1,0 +1,358 @@
+<section aria-labelledby="ch34-learning-objectives">
+  <h2 id="ch34-learning-objectives">学习目标与证据等级</h2>
+  <p>功能实验回答“能不能工作”，性能与可靠性测量回答“在什么条件下、以多大裕量、能否重复地工作”。本章要求同时记录激励、负载、环境、仪器设置和原始波形；没有这些上下文，一个“3.3 V”或“USB 正常”几乎没有工程价值。</p>
+  <aside class="notice" aria-label="当前实测状态">
+    <p>R1 事实库的实测条目仍为 <strong>0</strong>。Buck 纹波/瞬态/温升、开关压降、PWM 抖动、UART 误码、USB 传输/挂起/线缆、EMI 和 ESD 全部待实物验证。本章只给方法、记录格式和判定逻辑，所有结果栏不得预填。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="sec-34-1">
+  <h2 id="sec-34-1">34.1 万用表、示波器、逻辑分析仪与电子负载的角色</h2>
+  <table>
+    <caption>表 34-1　仪器回答的问题</caption>
+    <thead><tr><th scope="col">仪器</th><th scope="col">最适合</th><th scope="col">不能单独证明</th><th scope="col">R1 典型用途</th></tr></thead>
+    <tbody>
+      <tr><td>数字万用表（DMM）</td><td>平均/稳态电压、电阻、低速电流</td><td>快速纹波、启动过冲、窄毛刺</td><td>VBUS、3V3_SYS、5V_SW/3V3_SW 稳态压降</td></tr>
+      <tr><td>示波器</td><td>电压随时间变化、纹波、瞬态、抖动</td><td>长时间统计、逻辑协议语义</td><td>C3 端纹波、负载阶跃、NRST、PWM</td></tr>
+      <tr><td>逻辑分析仪</td><td>多路数字时序、协议解码、长记录</td><td>模拟幅度、过冲、慢边沿阈值裕量</td><td>PWM 同步、UART 帧、GPIO 安全状态</td></tr>
+      <tr><td>电子负载</td><td>可控直流/动态电流、重复负载阶跃</td><td>板端真实电压，除非使用远端感测</td><td>U4/U5 压降、限流、C4/C5 瞬态</td></tr>
+    </tbody>
+  </table>
+  <p>仪器量程应使信号占满有效动态范围而不超量程。例如测 3.3 V 轨用 6 V 或相近档，不用 600 V 档；测 20 mV 纹波时，用示波器小垂直档、短地和合适带宽，而不是把 DMM 末位跳动当纹波。</p>
+</section>
+
+<section aria-labelledby="sec-34-2">
+  <h2 id="sec-34-2">34.2 探头接地与避免测量引入的错误</h2>
+  <p>测量系统也是电路的一部分。普通 10× 探头约有数 pF 电容，长地线形成电感环路；二者会制造或放大振铃。台式示波器 BNC 外壳通常接保护地，把地夹接到 <code>BUCK_SW</code> 等非地节点会直接短路该节点。</p>
+  <ol>
+    <li>先确认被测点与仪器地的参考关系。所有单端探头地只接 R1 的 GND。</li>
+    <li>纹波测量优先在 C3、C4 或 C5 的正负焊端直接使用地弹簧，环路尽可能小。</li>
+    <li>记录探头倍率、耦合方式、带宽限制、采样率、记录长度和示波器输入阻抗。</li>
+    <li>同一波形至少保存“全带宽”和“20 MHz 带宽限制”两份；后者有利于比较电源规格，前者用于发现高频尖峰。</li>
+    <li>先用被动探头测一个低风险数字节点确认极性和尺度，再接关键电源节点。</li>
+    <li>直接测晶体脚会改变负载电容。Y1 起振/频偏优先用低电容有源探头或间接时钟输出验证。</li>
+  </ol>
+  <aside class="warning" aria-label="差分测量警告">
+    <p>不要用两根普通探头的地夹分别接在两个“浮动”节点上。高侧或浮动差分测量必须使用额定值合适的差分探头，或采用经审查的双通道相减方法且两个地夹都接 GND。</p>
+  </aside>
+</section>
+
+<section class="experiment" aria-labelledby="sec-34-3">
+  <h2 id="sec-34-3">34.3 Buck 纹波与瞬态响应</h2>
+  <h4 id="meas-34-3-purpose">目的</h4>
+  <p>测量 U3/L1/C3 生成的 3V3_SYS 在不同负载下的稳态纹波、启动过冲、负载阶跃跌落/过冲和恢复时间。</p>
+  <h4 id="meas-34-3-theory">原理</h4>
+  <p>Buck 电感纹波近似受 <var>V</var><sub>IN</sub>、<var>V</var><sub>OUT</sub>、占空比、L1 = 2.2 µH 与开关频率影响；C3 = 22 µF 的有效电容、ESR/ESL 和高频回路决定输出纹波。公式只能预测趋势，不能替代板上测量。</p>
+  <h4 id="meas-34-3-equipment">器材与量程</h4>
+  <ul>
+    <li>≥50 MHz 示波器，采样率 ≥500 MS/s；10× 地弹簧探头，另备低噪声同轴探测头更佳。</li>
+    <li>5.0 V 限流电源、动态电子负载、DMM；负载上限由第 33 章验证包络决定。</li>
+  </ul>
+  <h4 id="meas-34-3-safety">安全与停止条件</h4>
+  <p>不探测 BUCK_SW，除非使用额定差分探头和专门计划。出现 3V3_SYS 超出预定窗、持续振荡、U3/L1 快速升温、限流或 USB/MCU 复位时停止。</p>
+  <h4 id="meas-34-3-wiring">接线指导</h4>
+  <pre aria-label="Buck 纹波探测"><code>CH1 探头尖端 → C3 的 3V3_SYS 端
+CH1 地弹簧   → C3 的 GND 端
+电子负载     → 经验证的 3V3 输出负载路径
+CH2（可选）  → 负载触发或 3V3_SW，地接 GND</code></pre>
+  <h4 id="meas-34-3-precheck">上电前检查</h4>
+  <ol>
+    <li>校准探头，设置 10×；确认地弹簧不碰邻近焊盘。</li>
+    <li>填写 3V3_SYS 允许纹波、过冲、跌落和恢复时间；若尚无要求，标为“表征”。</li>
+    <li>负载从 0 A 开始，记录环境温度和台式电源端/板端 VBUS。</li>
+  </ol>
+  <h4 id="meas-34-3-procedure">编号步骤</h4>
+  <ol>
+    <li>在板空闲、USB 活动和经批准的 25%、50%、80% 负载点分别保存全带宽与 20 MHz 限带波形。</li>
+    <li>每个点测量平均值、峰峰值、主频和是否有低频包络；不要只读取自动测量一个数字。</li>
+    <li>从 0 V 捕获受控上电，记录 3V3_SYS 上升、过冲和建立时间。</li>
+    <li>做 10%↔50%、10%↔80% 负载阶跃，至少捕获 20 次并保存最差波形。</li>
+    <li>改变探头地线长度做一次对照；若尖峰随探法大幅变化，将其标为测量伪影候选。</li>
+  </ol>
+  <h4 id="meas-34-3-expected">预期结果（非实测）</h4>
+  <p>预期 3V3_SYS 围绕约 3.3 V 稳定，负载阶跃出现有限跌落/过冲后恢复。R1 的真实纹波、主频、过冲和恢复时间均未知。</p>
+  <h4 id="meas-34-3-record">记录表</h4>
+  <table>
+    <caption>表 34-2　3V3_SYS 纹波与瞬态</caption>
+    <thead><tr><th scope="col">工况</th><th scope="col">Iout</th><th scope="col">平均 V</th><th scope="col">纹波 p-p</th><th scope="col">Vmin/Vmax</th><th scope="col">恢复时间</th><th scope="col">带宽/探法</th><th scope="col">文件</th></tr></thead>
+    <tbody>
+      <tr><td>空闲</td><td>____ A</td><td>____ V</td><td>____ mV</td><td>____ / ____ V</td><td>—</td><td>____</td><td>____</td></tr>
+      <tr><td>50% 稳态</td><td>____ A</td><td>____ V</td><td>____ mV</td><td>____ / ____ V</td><td>—</td><td>____</td><td>____</td></tr>
+      <tr><td>10→50%</td><td>____→____ A</td><td>____ V</td><td>—</td><td>____ / ____ V</td><td>____ µs</td><td>____</td><td>____</td></tr>
+      <tr><td>10→80%</td><td>____→____ A</td><td>____ V</td><td>—</td><td>____ / ____ V</td><td>____ µs</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="meas-34-3-criteria">通过/失败判据</h4>
+  <p>所有已定义工况满足事先批准的轨电压、纹波、过冲和恢复时间，且无复位、保护动作或持续振荡。若接受值未定义，只能形成基线和 R2 需求，不能写“Buck 性能合格”。</p>
+  <h4 id="meas-34-3-analysis">分析</h4>
+  <p>把稳态纹波与负载阶跃分开；比较不同带宽和地线长度，识别伪影。按 <var>η</var> = <var>P</var><sub>OUT</sub>/<var>P</var><sub>IN</sub> 同时计算效率时，输入输出必须同时测量。</p>
+  <h4 id="meas-34-3-troubleshooting">故障排查</h4>
+  <p>低频周期包络：查保护打嗝或环路稳定。高频尖峰仅在长地线出现：改探法。跌落伴随 VBUS 下跌：查源和夹具。3V3_SYS 持续振荡：停止，核对 U3/L1/C2/C3、布局和数据手册稳定条件。</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-34-4">
+  <h2 id="sec-34-4">34.4 额定负载下的热测量</h2>
+  <h4 id="meas-34-4-purpose">目的</h4>
+  <p>在已经电气验证的负载包络内，测量 U3、L1、U4、U5、U1 和连接器的温升及达到热稳态的时间。</p>
+  <h4 id="meas-34-4-theory">原理</h4>
+  <p>器件温升由损耗、铜扩散、气流和环境温度共同决定。红外相机读数受表面发射率影响，反光金属会低报；热电偶会引入局部热沉。表面温度也不等于芯片结温，需要数据手册热模型。</p>
+  <h4 id="meas-34-4-equipment">器材与量程</h4>
+  <ul>
+    <li>红外相机或细线热电偶，范围至少 20～100 °C；哑光高发射率胶带用于可安全贴附的测点。</li>
+    <li>电子负载、限流电源、DMM、环境温度计；无强制风冷，除非测试计划要求。</li>
+  </ul>
+  <h4 id="meas-34-4-safety">安全与停止条件</h4>
+  <p>“额定负载”必须来自已批准需求，不可直接把计算限流当连续额定电流。任何器件表面超过风险评估门限、温度 5 min 内仍持续快速上升、轨电压失控或材料变色时停止。</p>
+  <h4 id="meas-34-4-wiring">接线指导</h4>
+  <p>使用与第 33.7 节相同的短粗负载线；热电偶线固定后不得跨接 J1、U3 或 L1 引脚。相机垂直角度、距离、发射率和环境反射条件保持一致。</p>
+  <h4 id="meas-34-4-precheck">上电前检查</h4>
+  <ol>
+    <li>填写每个器件的表面停止温度和由数据手册推导的结温评估方法。</li>
+    <li>在断电板上比较红外与接触温度，校正发射率。</li>
+    <li>确认该板已通过目标负载的短时电气测试。</li>
+  </ol>
+  <h4 id="meas-34-4-procedure">编号步骤</h4>
+  <ol>
+    <li>记录环境温度，空载运行 10 min，每分钟记录六个测点。</li>
+    <li>施加 25%、50%、80% 连续负载；每档保持到 5 min 内温升小于预定稳定判据或达到最长时间。</li>
+    <li>对 5V_SW 与 3V3_SW 分开测，再按真实使用场景评估同时负载。</li>
+    <li>在最热工况保存热像和轨电压；卸载后记录冷却曲线。</li>
+    <li>完全冷却后复测功能，检查热应力是否留下漂移。</li>
+  </ol>
+  <h4 id="meas-34-4-expected">预期结果（非实测）</h4>
+  <p>预期温度随负载上升并趋于稳态；最热点取决于哪一路消耗功率。R1 没有任何实际温度或连续额定负载结论。</p>
+  <h4 id="meas-34-4-record">记录表</h4>
+  <table>
+    <caption>表 34-3　热测量</caption>
+    <thead><tr><th scope="col">工况/时间</th><th scope="col">环境</th><th scope="col">U3</th><th scope="col">L1</th><th scope="col">U4</th><th scope="col">U5</th><th scope="col">U1</th><th scope="col">J1</th><th scope="col">轨电压</th></tr></thead>
+    <tbody>
+      <tr><td>空载 / ____ min</td><td>____ °C</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>50% / ____ min</td><td>____ °C</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>80% / ____ min</td><td>____ °C</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="meas-34-4-criteria">通过/失败判据</h4>
+  <p>所有测点低于批准的表面/结温限制并保有裕量，温度达到稳定，无热保护、轨漂移或功能退化。只测一张瞬时热像、未记录环境与发射率，不能判定通过。</p>
+  <h4 id="meas-34-4-analysis">分析</h4>
+  <p>使用温升 Δ<var>T</var> = <var>T</var><sub>device</sub> − <var>T</var><sub>ambient</sub> 比较工况；绘制 ΔT–功率。若 U4/U5 温升近似随 <var>I</var>² 增长，导通损耗可能主导；若 U3 温升与输入输出功率差一致，可用于估计效率。</p>
+  <h4 id="meas-34-4-troubleshooting">故障排查</h4>
+  <p>读数跳变：查发射率和反射。单个焊点异常热：查接触电阻。L1 异常热：查饱和、错误电感或纹波。U3 热而输出功率低：查开关节点、稳定性和器件方向。</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-34-5">
+  <h2 id="sec-34-5">34.5 PWM 时序准确度与抖动</h2>
+  <h4 id="meas-34-5-purpose">目的</h4>
+  <p>在长记录中量化 PWM 频率准确度、占空比分辨率、周期到周期抖动和多通道相对时序。</p>
+  <h4 id="meas-34-5-theory">原理</h4>
+  <p>平均频率偏差主要来自时钟源与定时器分频，短期抖动来自时钟噪声、中断或更新方式。12 MHz Y1 是设计值，其负载匹配与实际频率未验证；CAD 无法证明时序准确度。</p>
+  <h4 id="meas-34-5-equipment">器材与量程</h4>
+  <ul>
+    <li>频率计或带统计功能的示波器，参考时基精度优于待验证要求至少 4 倍。</li>
+    <li>四通道逻辑分析仪，采样率至少最高 PWM 的 50 倍；短线、共同地。</li>
+  </ul>
+  <h4 id="meas-34-5-safety">安全与停止条件</h4>
+  <p>无负载测量，输入限于 0～3.6 V。若探头引入复位、USB 断开或异常过冲，停止并改善探测。</p>
+  <h4 id="meas-34-5-wiring">接线指导</h4>
+  <p>J2 pins 5～8 分别接四通道，所有地接 J2 GND。若测晶体贡献，不直接给 Y1 加普通探头，而用 PWM/时钟输出的长时平均反推。</p>
+  <h4 id="meas-34-5-precheck">上电前检查</h4>
+  <ol>
+    <li>记录仪器时基校准日期和不确定度。</li>
+    <li>记录固件定时器时钟、计数值、更新机制和预期量化误差。</li>
+    <li>预先定义频率误差、占空比误差和峰峰抖动限值。</li>
+  </ol>
+  <h4 id="meas-34-5-procedure">编号步骤</h4>
+  <ol>
+    <li>选择低、中、高三个频率，各测 10%、50%、90% 占空比。</li>
+    <li>每个点记录至少 10,000 周期的平均、最小、最大和标准差。</li>
+    <li>同时开启四路相同占空比，测频率一致性与边沿相对偏移。</li>
+    <li>在 USB 空闲、持续传输和负载阶跃三种系统活动下重复，观察干扰。</li>
+    <li>执行频率/占空比在线更新，捕获是否出现一次性异常周期。</li>
+  </ol>
+  <h4 id="meas-34-5-expected">预期结果（非实测）</h4>
+  <p>四路应共享频率，平均误差受时钟与计数器量化限制；系统活动不应产生丢周期或危险毛刺。实际数值待测。</p>
+  <h4 id="meas-34-5-record">记录表</h4>
+  <table>
+    <caption>表 34-4　PWM 长时统计</caption>
+    <thead><tr><th scope="col">工况</th><th scope="col">命令 f/D</th><th scope="col">平均 f</th><th scope="col">相对误差</th><th scope="col">周期 min/max/σ</th><th scope="col">占空比误差</th><th scope="col">异常周期</th></tr></thead>
+    <tbody>
+      <tr><td>USB 空闲</td><td>____</td><td>____ Hz</td><td>____ %</td><td>____ / ____ / ____</td><td>____</td><td>____</td></tr>
+      <tr><td>USB 传输</td><td>____</td><td>____ Hz</td><td>____ %</td><td>____ / ____ / ____</td><td>____</td><td>____</td></tr>
+      <tr><td>负载阶跃</td><td>____</td><td>____ Hz</td><td>____ %</td><td>____ / ____ / ____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="meas-34-5-criteria">通过/失败判据</h4>
+  <p>各工况均满足预先声明的准确度/抖动要求，无丢周期、端点窄脉冲或跨通道频率分裂。测量仪器不确定度必须小于判定裕量。</p>
+  <h4 id="meas-34-5-analysis">分析</h4>
+  <p>把平均偏差、随机抖动和一次性更新毛刺分开。所有通道有相同比例固定误差时先查时钟；只有系统活动时出现长周期则查中断优先级与寄存器更新。</p>
+  <h4 id="meas-34-5-troubleshooting">故障排查</h4>
+  <p>仪器间结果不一致：比较参考时基。抖动随阈值变化：检查慢边沿/噪声。某一路独有毛刺：查对应通道更新。四路同错：查 TIM3 时钟树或 Y1。</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-34-6">
+  <h2 id="sec-34-6">34.6 UART 误码率测试</h2>
+  <h4 id="meas-34-6-purpose">目的</h4>
+  <p>在不同波特率、线长和系统负载下统计 UART 数据错误，建立适用条件，而不把一次短回环的零错误推广为“永不误码”。</p>
+  <h4 id="meas-34-6-theory">原理</h4>
+  <p>观测误码率可写为 BER = 错误位数/总传输位数；若只按字节校验，应明确报告“错字节率”。观察到零错误并不表示真实 BER 为零，只给出与样本量相关的上界。</p>
+  <h4 id="meas-34-6-equipment">器材与量程</h4>
+  <ul>
+    <li>3.3 V USB-UART 或第二块已校准设备、伪随机序列发生/校验软件。</li>
+    <li>0.1 m、1 m 及目标应用线缆；逻辑分析仪采样率 ≥16×baud。</li>
+  </ul>
+  <h4 id="meas-34-6-safety">安全与停止条件</h4>
+  <p>共同地先接，不接适配器 5 V；不使用 RS-232 电平。出现地电位异常、输入超出 0～3.6 V、板复位或线缆发热时停止。</p>
+  <h4 id="meas-34-6-wiring">接线指导</h4>
+  <p>板 TX→对端 RX、板 RX←对端 TX、GND↔GND；使用外部回环或双向测试，但避免两个 TX 相连。长线测试保持远离开关电源磁性器件并记录布线方式。</p>
+  <h4 id="meas-34-6-precheck">上电前检查</h4>
+  <ol>
+    <li>选择每个工况的总字节数、校验算法和超时；记录种子以便重放。</li>
+    <li>在短线最低波特率下验证测试工具本身。</li>
+    <li>定义允许 BER/错字节率；没有要求则只表征。</li>
+  </ol>
+  <h4 id="meas-34-6-procedure">编号步骤</h4>
+  <ol>
+    <li>短线下在低、中、高三个支持波特率各发送预定数据量。</li>
+    <li>分别在 USB 空闲、USB 持续传输、PWM 全开和受控电源负载阶跃时重复。</li>
+    <li>更换 1 m 和目标线缆，保持波特率不变；记录错误与波形。</li>
+    <li>对每个错误保存前后至少一帧和 UART 状态计数器。</li>
+    <li>恢复短线基线，确认测试后没有永久变化。</li>
+  </ol>
+  <h4 id="meas-34-6-expected">预期结果（非实测）</h4>
+  <p>在批准线长和波特率内应满足预先定义的错误率；更长线或更高波特率可能降低裕量。R1 没有 UART BER 实测数据。</p>
+  <h4 id="meas-34-6-record">记录表</h4>
+  <table>
+    <caption>表 34-5　UART 错误统计</caption>
+    <thead><tr><th scope="col">baud/格式</th><th scope="col">线长/工况</th><th scope="col">总字节/位</th><th scope="col">错字节/位</th><th scope="col">帧/溢出</th><th scope="col">观测错误率</th><th scope="col">日志</th></tr></thead>
+    <tbody>
+      <tr><td>____</td><td>____</td><td>____ / ____</td><td>____ / ____</td><td>____ / ____</td><td>____</td><td>____</td></tr>
+      <tr><td>____</td><td>____</td><td>____ / ____</td><td>____ / ____</td><td>____ / ____</td><td>____</td><td>____</td></tr>
+      <tr><td>____</td><td>____</td><td>____ / ____</td><td>____ / ____</td><td>____ / ____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="meas-34-6-criteria">通过/失败判据</h4>
+  <p>每个批准工况的观测错误率低于要求，且无缓冲溢出、复位或静默执行损坏命令。若零错误样本量不足以支持目标上界，应增加传输量，而不是直接通过。</p>
+  <h4 id="meas-34-6-analysis">分析</h4>
+  <p>按波特率、线长和系统活动分层，寻找阈值而不是只求总平均。错误集中在负载阶跃时提示地/电源耦合；随线长单调增加提示边沿和回流；固定周期错误可能来自软件调度。</p>
+  <h4 id="meas-34-6-troubleshooting">故障排查</h4>
+  <p>先用逻辑分析仪确认位时间和帧格式，再查 R22/R23、共同地和线缆。USB 负载下才溢出时查缓冲与中断；不要把所有错误都归因于“信号完整性”。</p>
+</section>
+
+<section class="experiment" aria-labelledby="sec-34-7">
+  <h2 id="sec-34-7">34.7 USB 传输、线缆、挂起/恢复与重连测试</h2>
+  <h4 id="meas-34-7-purpose">目的</h4>
+  <p>建立跨主机、端口、线缆和电源状态的 USB 回归矩阵，测量传输错误、持续速率、挂起/恢复和反复重连可靠性。</p>
+  <h4 id="meas-34-7-theory">原理</h4>
+  <p>USB Full-Speed 链路的可用性由物理层、主机调度、端点大小、固件缓冲和操作系统驱动共同决定。应用吞吐量不是 12 Mbit/s 线速；也不能用单一线缆结果证明兼容性。</p>
+  <h4 id="meas-34-7-equipment">器材与量程</h4>
+  <ul>
+    <li>至少两类主机/操作系统、直接端口和已知良好集线器。</li>
+    <li>三条已编号数据线：短标准线、较长合格线、已知良好对照线。</li>
+    <li>带校验的双向传输工具、主机 USB 日志；可选协议分析仪和电流记录仪。</li>
+  </ul>
+  <h4 id="meas-34-7-safety">安全与停止条件</h4>
+  <p>每次只有一个 VBUS 源。主机报告过流、J1/U2/U3 发热、端口保护动作或板持续复位时停止并回到限流电源。</p>
+  <h4 id="meas-34-7-wiring">接线指导</h4>
+  <p>主机→被测线缆/集线器→J1；J2 只接经验证的小负载，J3 不供电。保持线缆不受拉扯，记录 USB-C 插头方向。</p>
+  <h4 id="meas-34-7-precheck">上电前检查</h4>
+  <ol>
+    <li>定义每个矩阵单元的枚举时限、传输字节数、允许错误、重连次数和挂起时间。</li>
+    <li>清空并开始记录主机日志，核对固件版本。</li>
+    <li>先用对照线和直接端口验证测试软件。</li>
+  </ol>
+  <h4 id="meas-34-7-procedure">编号步骤</h4>
+  <ol>
+    <li>对每个主机×线缆×拓扑组合执行冷插拔并记录枚举。</li>
+    <li>进行固定时长双向传输，记录有效字节、耗时、校验错误和超时。</li>
+    <li>活动传输中发起 suspend，保持计划时长后 resume，验证安全状态与数据恢复。</li>
+    <li>每个组合执行 50 次软件关闭/打开端口和 20 次物理重连，统计失败。</li>
+    <li>翻转 USB-C 插头方向重复关键组合，检查可翻转路径。</li>
+    <li>保存失败单元的系统日志、供电电流和第一个异常时间。</li>
+  </ol>
+  <h4 id="meas-34-7-expected">预期结果（非实测）</h4>
+  <p>预期所有批准组合稳定枚举、正确传输并从挂起/重连恢复；实际吞吐、错误和恢复时间未知。R1 的 CAD 长度不证明这些结果。</p>
+  <h4 id="meas-34-7-record">记录表</h4>
+  <table>
+    <caption>表 34-6　USB 回归矩阵</caption>
+    <thead><tr><th scope="col">主机/OS</th><th scope="col">线缆/方向/拓扑</th><th scope="col">枚举</th><th scope="col">有效速率</th><th scope="col">错误/超时</th><th scope="col">挂起恢复</th><th scope="col">重连失败</th><th scope="col">日志</th></tr></thead>
+    <tbody>
+      <tr><td>____</td><td>____</td><td>____ s</td><td>____ B/s</td><td>____ / ____</td><td>____ ms</td><td>____ / 20</td><td>____</td></tr>
+      <tr><td>____</td><td>____</td><td>____ s</td><td>____ B/s</td><td>____ / ____</td><td>____ ms</td><td>____ / 20</td><td>____</td></tr>
+      <tr><td>____</td><td>____</td><td>____ s</td><td>____ B/s</td><td>____ / ____</td><td>____ ms</td><td>____ / 20</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <h4 id="meas-34-7-criteria">通过/失败判据</h4>
+  <p>所有“必须支持”的矩阵单元满足预定枚举、错误、传输和恢复要求；插头两方向一致；无端口过流或安全状态违规。可选组合失败必须明确标为限制，而不是从报告中删除。</p>
+  <h4 id="meas-34-7-analysis">分析</h4>
+  <p>按主机、线缆、方向和集线器分层。仅某条线失败可能是线缆；仅某插头方向失败优先查 J1 两组触点/CC；所有组合在高负载失败则联查电源完整性。</p>
+  <h4 id="meas-34-7-troubleshooting">故障排查</h4>
+  <p>保留主机第一个错误，不反复插拔覆盖日志。先确认 VBUS/复位/时钟，再查 U2、R3/R4、焊点和固件。协议分析仪显示重试不等于一定是 PCB，也可能是固件未及时服务端点。</p>
+</section>
+
+<section aria-labelledby="sec-34-8">
+  <h2 id="sec-34-8">34.8 ESD 与 EMI 预兼容概念</h2>
+  <p>预兼容（pre-compliance）是在正式认证前寻找明显风险，不等于认证。R1 的 U2 USBLC6-2SC6 保护 USB D+/D−，但外部 GPIO 没有专用 ESD 阵列；两层板使用 17 个已在 Gerber 中确认的静态 GND FILL，而非可重铺原生铜区。USB 受控阻抗、眼图、EMI 与 ESD 均未验证。</p>
+  <table>
+    <caption>表 34-7　预兼容活动与安全边界</caption>
+    <thead><tr><th scope="col">活动</th><th scope="col">可学到</th><th scope="col">限制/要求</th></tr></thead>
+    <tbody>
+      <tr><td>近场磁/电探头扫描</td><td>定位 U3/L1、USB、时钟附近相对热点</td><td>结果是相对值；探头位置、带宽必须固定</td></tr>
+      <tr><td>电源线传导噪声预扫</td><td>发现负载工况与频谱峰值关系</td><td>需合适 LISN/接收机和接地环境；普通示波器不是认证接收机</td></tr>
+      <tr><td>ESD 枪接触/空气放电</td><td>观察抗扰与恢复</td><td>仅在具备防护、接地、标准计划和受训人员的实验室执行</td></tr>
+      <tr><td>故障后功能回归</td><td>发现复位、锁死、数据损坏</td><td>必须先断电检查，保存首次失败证据</td></tr>
+    </tbody>
+  </table>
+  <aside class="warning" aria-label="ESD 测试警告">
+    <p>不要用打火器、压电点火器、衣物静电或裸线火花代替 ESD 设备。未经监督不得对 USB、GPIO 或人体附近施加放电。正式等级、耦合平面、极性和次数应来自适用标准与测试计划，本教程不虚构合规等级。</p>
+  </aside>
+  <p><strong>预兼容判定：</strong>先定义可接受的暂态性能、自动恢复和数据完整性。任何硬损伤、危险输出、需要人工断电才能恢复或重复可复现的失效，都应转化为 R2 保护/布局/固件要求。</p>
+</section>
+
+<section aria-labelledby="sec-34-9">
+  <h2 id="sec-34-9">34.9 生产容差与多板测试</h2>
+  <p>一片样板只能说明“这片在这些条件下的结果”。电阻、电容、晶体、开关阈值、焊接和板材会产生散布。初步工程样本可选择至少 5 片观察趋势，但它不能替代为量产良率设计的统计样本；样本量应由风险、预期变异和置信目标决定。</p>
+  <ol>
+    <li>从不同拼板位置/包装位置随机取样，不只挑外观最好的一片。</li>
+    <li>所有板使用同一治具、固件、仪器设置、环境和步骤；随机化测试顺序，减少温度漂移偏差。</li>
+    <li>每片记录个体结果，不能只保留平均值。规格判定通常要求每片都通过。</li>
+    <li>计算平均、最小、最大、极差和标准差；样本少时明确说明统计不稳定。</li>
+    <li>对离群点先复测治具，再隔离板做失效分析；不得直接删除数据。</li>
+  </ol>
+  <table>
+    <caption>表 34-8　多板散布摘要</caption>
+    <thead><tr><th scope="col">指标</th><th scope="col">要求</th><th scope="col">n</th><th scope="col">平均</th><th scope="col">最小</th><th scope="col">最大</th><th scope="col">标准差</th><th scope="col">失败板号</th></tr></thead>
+    <tbody>
+      <tr><td>3V3_SYS</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>Buck 纹波</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>5V_SW 限流</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>PWM 频率误差</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+      <tr><td>USB 重连失败</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <p><strong>通过原则：</strong>平均值在规格内但个别板失败，批次仍不能按该指标放行；若测试系统重复性与板间差异同量级，先改进量测系统。</p>
+</section>
+
+<section aria-labelledby="sec-34-10">
+  <h2 id="sec-34-10">34.10 将测量转化为 R2 要求</h2>
+  <p>测量不是报告终点。R2 要求应包含参数、条件、统计边界、限制值和验证方法，而不是“改善电源”“USB 更稳定”这样的愿望。</p>
+  <table>
+    <caption>表 34-9　从证据到需求的转换模板</caption>
+    <thead><tr><th scope="col">R1 证据</th><th scope="col">风险解释</th><th scope="col">R2 可验证要求</th><th scope="col">验证方法</th><th scope="col">裕量/样本</th></tr></thead>
+    <tbody>
+      <tr><td>3V3_SYS 最差跌落 ____</td><td>可能触发 MCU 复位</td><td>在 ____ A/____ µs 阶跃下 Vmin ≥ ____ V</td><td>C3 地弹簧示波，规定带宽</td><td>____ / n=____</td></tr>
+      <tr><td>U3 温升 ____</td><td>高环境温度裕量不足</td><td>环境 ____ °C、负载 ____ W 时结温估算 ≤ ____</td><td>热电偶+损耗模型</td><td>____</td></tr>
+      <tr><td>USB 某线缆失败</td><td>阻抗/边沿或供电裕量</td><td>通过规定主机×线缆矩阵，错误 ≤ ____</td><td>回归矩阵+眼图/阻抗资料</td><td>____</td></tr>
+      <tr><td>挂起残压 ____</td><td>目标设备仍被供能</td><td>挂起后 ____ ms 内输出 ≤ ____ V</td><td>示波+规定负载</td><td>____</td></tr>
+    </tbody>
+  </table>
+  <ol>
+    <li>引用原始波形/日志与板号，区分单板异常和系统性趋势。</li>
+    <li>从目标设备真正需要的边界反推限制，而不是把 R1 的最好结果当规格。</li>
+    <li>给制造容差、温度、老化和仪器不确定度留出裕量。</li>
+    <li>为每条要求指定设计责任人、验证方法、样本量和关闭条件。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="ch34-summary">
+  <h2 id="ch34-summary">本章小结</h2>
+  <p>可靠测量要求正确仪器、低扰动探测、预先声明的判据和完整原始数据。R1 的性能数字仍全部待测；只有把单板波形扩展为工况矩阵、多板散布和可验证的 R2 要求，测量才真正进入工程闭环。</p>
+</section>

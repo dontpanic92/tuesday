@@ -1,0 +1,162 @@
+<section aria-labelledby="ch36-learning-objectives">
+  <h2 id="ch36-learning-objectives">学习目标：不存在免费的“更好”</h2>
+  <p>工程取舍不是替错误辩护，而是在明确约束下比较收益、代价和残余风险。R1 已完成设计、连通、机械和制造输出检查，但没有板级电气、热、USB 或固件实测；因此本章评价的是<strong>设计选择及其待验证假设</strong>，不是对成品性能的背书。</p>
+  <p>分析每个取舍时使用同一框架：</p>
+  <ol>
+    <li>要优化的目标是什么，谁受益？</li>
+    <li>增加了哪些成本、面积、功耗、复杂度或失效模式？</li>
+    <li>R1 为什么选择当前方案？</li>
+    <li>什么证据会支持保留，什么结果会触发 R2 改变？</li>
+  </ol>
+</section>
+
+<section aria-labelledby="sec-36-1">
+  <h2 id="sec-36-1">36.1 成本与保护</h2>
+  <p>R1 不是“无保护”也不是“全保护”。USB D+/D−使用 U2 USBLC6-2SC6，外部 5 V/3.3 V 由 U4/U5 受控并限流；但八路 GPIO/PWM 和 UART 没有专用外部 ESD 阵列，U4/U5 也没有故障输出网络。</p>
+  <table>
+    <caption>表 36-1　保护器件的收益与代价</caption>
+    <thead><tr><th scope="col">选择</th><th scope="col">收益</th><th scope="col">代价/新风险</th><th scope="col">R1 证据缺口</th></tr></thead>
+    <tbody>
+      <tr><td>USB ESD U2</td><td>把接口瞬态导向 VBUS/GND，降低 MCU 直接承受风险</td><td>BOM/面积、结电容、器件短路可令 USB 失效</td><td>未做 ESD、眼图或传输实测</td></tr>
+      <tr><td>U4/U5 限流开关</td><td>软件控制、默认关闭、过载限制</td><td>压降、热、限流容差、无故障状态输出</td><td>阈值、恢复和温升未测</td></tr>
+      <tr><td>GPIO 仅 220 Ω 串联</td><td>成本和面积低，限制部分瞬态电流/边沿</td><td>不能钳位过压或代替 ESD 保护</td><td>外部环境与 ESD 等级未定义</td></tr>
+    </tbody>
+  </table>
+  <p><strong>决策规则：</strong>保护成本应与暴露接口、误接后果、维修成本和合规目标比较。若 R1 外部 I/O 预兼容或现场数据出现损坏，R2 增加保护的价值可能远高于元件单价。</p>
+</section>
+
+<section aria-labelledby="sec-36-2">
+  <h2 id="sec-36-2">36.2 尺寸与布局/探测空间</h2>
+  <p>最终 R1 为 50 mm × 24 mm，而早期提案约 45 mm × 20 mm。增加面积使 J1、Buck、MCU、J2/J3 和电源开关能按功能分区，并在 1128 对元件包络检查中实现零实体/形状重叠；代价是板材、外壳和便携性。</p>
+  <table>
+    <caption>表 36-2　尺寸压缩时最容易丢失的工程空间</caption>
+    <thead><tr><th scope="col">空间</th><th scope="col">太小的后果</th><th scope="col">R1/R2 评价</th></tr></thead>
+    <tbody>
+      <tr><td>J1 板边与固定焊脚</td><td>插拔干涉、外壳受力、焊盘撕裂</td><td>R1 左向并有意伸出板边；需实物配合验证</td></tr>
+      <tr><td>U3/L1/C2/C3 功率回路</td><td>环路增大、EMI/纹波；太挤又难返修</td><td>用纹波和热像决定是否需重排</td></tr>
+      <tr><td>U1 去耦与探点</td><td>高频回路变长或无法可靠探测</td><td>C6～C9 路径为 CAD 计算，效果未测</td></tr>
+      <tr><td>J2/J3 访问</td><td>开发/量产治具昂贵、误接风险高</td><td>默认 DNP，R2 可转成标准化测试焊盘</td></tr>
+    </tbody>
+  </table>
+  <p>“最小板”不是把元件尽量挤紧；应在连接器力学、爬电/间距、回流、返修、探针直径和外壳公差约束下最小化。</p>
+</section>
+
+<section aria-labelledby="sec-36-3">
+  <h2 id="sec-36-3">36.3 两层板与四层板</h2>
+  <p>R1 使用顶/底两层，成本和教学可见性较好，但电源、信号和回流共享有限铜面。最终制造数据含 17 个已验证连接的静态 GND FILL 区域，却没有原生可重铺 POUR；任何几何变化都可能让静态铜失去连通或安全间距。</p>
+  <table>
+    <caption>表 36-3　层数取舍</caption>
+    <thead><tr><th scope="col">维度</th><th scope="col">两层 R1</th><th scope="col">四层候选</th></tr></thead>
+    <tbody>
+      <tr><td>单板成本</td><td>通常较低，供应普遍</td><td>通常较高，叠层需明确</td></tr>
+      <tr><td>回流路径</td><td>容易被走线/分割打断，依赖仔细铺铜与过孔</td><td>可提供连续内层参考面，但仍需避免跨分割</td></tr>
+      <tr><td>USB 阻抗</td><td>受板厚/线宽影响大，R1 未证明受控阻抗</td><td>内层距离可更小，较易实现可制造阻抗</td></tr>
+      <tr><td>Buck EMI</td><td>高 di/dt 回路与信号更难隔离</td><td>完整地面可改善回流，但布局仍是第一因素</td></tr>
+      <tr><td>调试/可视性</td><td>铜路径较直观，便于教学</td><td>内层不可见，需更严格文档与制造复核</td></tr>
+    </tbody>
+  </table>
+  <p>是否升四层应由 USB/EMI、回流和尺寸证据驱动，而不是“专业板都用四层”。若两层已满足明确性能和成本目标，增加层数未必有价值；若要求受控阻抗、低 EMI 和更小面积，四层可能降低总风险。</p>
+</section>
+
+<section aria-labelledby="sec-36-4">
+  <h2 id="sec-36-4">36.4 Buck 转换器与 LDO</h2>
+  <p>R1 的 U3 是 SY8089 同步 Buck，L1 = 2.2 µH，R5/R6 计算输出 3.318 V。早期文字中提到 LDO 的内容不代表最终设计。</p>
+  <table>
+    <caption>表 36-4　从 5 V 生成 3.3 V 的选择</caption>
+    <thead><tr><th scope="col">指标</th><th scope="col">Buck（R1）</th><th scope="col">LDO 候选</th></tr></thead>
+    <tbody>
+      <tr><td>效率/热</td><td>理想上效率较高；实测需用 η=Pout/Pin</td><td>损耗近似 (5−3.3)×I，负载增加时热显著</td></tr>
+      <tr><td>噪声/EMI</td><td>有开关节点、纹波、环路稳定与布局要求</td><td>电路简单、无开关频率，但仍有 PSRR/稳定条件</td></tr>
+      <tr><td>BOM/面积</td><td>U3、L1、反馈与输入/输出电容</td><td>器件更少，可能更小</td></tr>
+      <tr><td>低压差</td><td>在当前 5→3.3 V 条件下不是主要限制</td><td>必须满足 dropout，且 USB VBUS/线缆下降会压缩裕量</td></tr>
+    </tbody>
+  </table>
+  <p>如果实测系统 3.3 V 电流很低、EMI 成为主要风险，R2 可重新比较 LDO；如果负载较高，Buck 的热优势通常更重要。没有输入/输出功率和温升数据前，不能声称 R1 效率“高”。</p>
+</section>
+
+<section aria-labelledby="sec-36-5">
+  <h2 id="sec-36-5">36.5 LQFP 可维护性与更小封装</h2>
+  <p>U1 采用 32 引脚 LQFP，0.8 mm 引脚节距。它比 QFN/BGA 占面积更大，却提供可见焊点、探针访问和手工返修能力，适合原型、教学和低批量调试。</p>
+  <dl>
+    <dt>LQFP 的收益</dt>
+    <dd>逐脚目视检查；SWD、USB、GPIO 引脚可直接探测；返修设备要求较低；装配失效分析直观。</dd>
+    <dt>LQFP 的代价</dt>
+    <dd>占板面积、扇出走线较长、引脚更易受机械接触、I/O 数量受封装限制。</dd>
+    <dt>更小 QFN/BGA 的收益</dt>
+    <dd>面积和寄生可能更低，可提供更多引脚或裸露焊盘散热。</dd>
+    <dt>更小封装的代价</dt>
+    <dd>需要更严格钢网/回流/X 射线、底部焊点不可见、返修与探测成本提高。</dd>
+  </dl>
+  <p>若 R2 的目标是量产小型化，可以重新评估封装；但必须把测试点、可制造性、X 射线和返修成本纳入总成本，而不是只比较封装面积。</p>
+</section>
+
+<section aria-labelledby="sec-36-6">
+  <h2 id="sec-36-6">36.6 原生 USB 与独立 USB-UART 桥</h2>
+  <p>R1 让 CH32V203 直接实现 USB Full-Speed CDC，省去独立桥接芯片，并允许同一协议控制 GPIO/PWM/电源。代价是 MCU 固件、12 MHz 时钟、描述符和 USB 栈都进入关键启动路径。</p>
+  <table>
+    <caption>表 36-5　主机接口架构</caption>
+    <thead><tr><th scope="col">维度</th><th scope="col">原生 USB（R1）</th><th scope="col">独立 USB-UART 桥</th></tr></thead>
+    <tbody>
+      <tr><td>BOM/面积</td><td>少一个桥芯片及其外围</td><td>增加芯片、去耦和 UART 连接</td></tr>
+      <tr><td>固件灵活性</td><td>可实现自定义端点、版本和安全状态</td><td>主机侧常见驱动，MCU 只处理 UART</td></tr>
+      <tr><td>恢复路径</td><td>USB 固件坏时需 SWD/启动恢复</td><td>桥仍可能提供串口引导/日志，但 MCU 仍需恢复设计</td></tr>
+      <tr><td>性能/诊断</td><td>直接访问 USB 外设，吞吐与缓冲可优化</td><td>受 UART 波特率和桥缓冲限制，分层更易诊断</td></tr>
+      <tr><td>时钟/信号风险</td><td>MCU 时钟和 USB 布线直接决定枚举</td><td>桥有独立 USB 实现，但增加器件与接口</td></tr>
+    </tbody>
+  </table>
+  <p>如果 R1 的 USB 回归矩阵稳定，原生方案有明显集成优势；若现场升级/恢复是首要目标，R2 可考虑独立桥、双接口或更强的 ROM 引导策略。</p>
+</section>
+
+<section aria-labelledby="sec-36-7">
+  <h2 id="sec-36-7">36.7 受保护负载开关与分立 MOSFET</h2>
+  <p>U4/U5 把使能、限流和高侧开关集成在 SOT-23-5 中。R7/R8 计算限流约 0.402 A/0.252 A，R9/R10 提供默认关闭。R1 没有故障输出网络，主机只能通过电压、电流或行为推断过载。</p>
+  <table>
+    <caption>表 36-6　电源开关实现方式</caption>
+    <thead><tr><th scope="col">维度</th><th scope="col">集成负载开关（R1）</th><th scope="col">分立 MOSFET</th></tr></thead>
+    <tbody>
+      <tr><td>保护</td><td>有设定限流，可能含热保护；真实行为待测</td><td>需额外电流检测、限流和栅极保护</td></tr>
+      <tr><td>压降</td><td>由开关 RON、温度和电流决定</td><td>可选更低 RDS(on)，但栅极驱动必须正确</td></tr>
+      <tr><td>反向电流/放电</td><td>取决于具体器件结构；R1 未验证</td><td>可用背靠背 MOSFET/放电电阻定制，但器件更多</td></tr>
+      <tr><td>诊断</td><td>R1 无 fault pin，软件可观测性有限</td><td>可自定义电流采样/故障锁存，复杂度高</td></tr>
+    </tbody>
+  </table>
+  <p>若 R1 的压降和热结果满足目标，集成方案降低设计风险；若需要反向阻断、精确遥测或更大电流，R2 可能选择带 fault/current monitor 的开关，而不一定退回最简单的单 MOSFET。</p>
+</section>
+
+<section aria-labelledby="sec-36-8">
+  <h2 id="sec-36-8">36.8 晶振准确度与降本</h2>
+  <p>Y1 为 12 MHz、标称负载 20 pF，C11/C12 各 12 pF；忽略杂散时等效为 6 pF。未知的引脚/封装/走线杂散以及 MCU 振荡器模型使负载匹配、频偏和起振裕量仍未验证。</p>
+  <table>
+    <caption>表 36-7　时钟方案取舍</caption>
+    <thead><tr><th scope="col">方案</th><th scope="col">收益</th><th scope="col">风险/证据需求</th></tr></thead>
+    <tbody>
+      <tr><td>保留外部晶体</td><td>通常提供较好长期准确度和可预测 USB 时钟</td><td>增加 BOM/面积；需验证 CL、频偏、起振和 EMI</td></tr>
+      <tr><td>调整 C11/C12</td><td>可校正负载与频偏</td><td>必须基于测量和振荡器模型，盲目加电容可能不起振</td></tr>
+      <tr><td>使用内部振荡器</td><td>降 BOM、释放面积、减少敏感节点</td><td>温度/电压准确度与 USB 校准能力必须满足要求</td></tr>
+      <tr><td>有源振荡器</td><td>启动和频率规格清晰</td><td>功耗、成本、EMI 与封装面积可能增加</td></tr>
+    </tbody>
+  </table>
+  <p>降本必须以 USB、PWM、UART 在温度/电压范围内的测量为依据。只因“样板能枚举”就移除晶体，会把短时偶然成功误当量产裕量。</p>
+</section>
+
+<section aria-labelledby="sec-36-9">
+  <h2 id="sec-36-9">36.9 原型证据与量产信心</h2>
+  <p>R1 当前拥有强的发布证据：48/48 元件映射、172/172 引脚到焊盘映射、47/47 命名网络连通、DRC 0 错误、机械零重叠、Gerber/钻孔完整。它们证明“设计包内部一致且可制造”，不证明“实物在全部工况可靠”。</p>
+  <table>
+    <caption>表 36-8　从原型到量产仍需跨越的证据门</caption>
+    <thead><tr><th scope="col">阶段</th><th scope="col">主要证据</th><th scope="col">不能替代</th></tr></thead>
+    <tbody>
+      <tr><td>CAD/发布</td><td>ERC/DRC、连通、机械、BOM/CPL/Gerber</td><td>上电、热、信号、固件功能</td></tr>
+      <tr><td>单板 bring-up</td><td>限流电流、轨电压、SWD、USB、接口</td><td>多板散布和长期可靠性</td></tr>
+      <tr><td>工程验证</td><td>工况矩阵、热、瞬态、线缆、错误率</td><td>生产过程能力和合规认证</td></tr>
+      <tr><td>设计验证/小批</td><td>多板统计、环境、预兼容、治具覆盖率</td><td>大批量持续监控</td></tr>
+      <tr><td>量产</td><td>过程能力、追溯、抽检/全检、现场反馈</td><td>后续变更的重新验证</td></tr>
+    </tbody>
+  </table>
+  <p>工程信心来自相互独立的证据：设计分析、仪器测量、多样本统计、极限/环境测试和生产反馈。若 R1 尚未完成某一层，就应明确写“未验证”，而不是用更强的措辞填补空白。</p>
+</section>
+
+<section aria-labelledby="ch36-summary">
+  <h2 id="ch36-summary">本章小结</h2>
+  <p>R1 的每个选择都交换了不同资源：保护与成本、面积与可测性、层数与回流、效率与 EMI、封装尺寸与可维护性、集成与恢复路径。最好的 R2 不是把所有选项都升级，而是用 R1 测量和目标使用场景，把预算投入到风险最高、验证收益最大的地方。</p>
+</section>

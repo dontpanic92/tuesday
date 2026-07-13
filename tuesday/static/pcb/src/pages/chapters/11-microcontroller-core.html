@@ -1,0 +1,207 @@
+<section class="notice" aria-labelledby="ch11-learning-objectives">
+  <h2 id="ch11-learning-objectives">学习目标与事实状态</h2>
+  <p>本章把 U1 看成“受电、取时钟、执行固件、驱动外设”的系统核心，并说明 C6–C9、J3 和固定引脚映射为何与 MCU 本体同样重要。</p>
+  <p><strong>状态约定：</strong>器件、网络和引脚分配为【设计】；去耦路径长度为【计算】；启动安全状态与失效影响为【预期】；电源瞬态、USB 枚举、固件行为和调试可靠性均为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch11-11-1">
+  <h2 id="ch11-11-1">11.1 微控制器内部有什么</h2>
+  <p>微控制器（Microcontroller Unit，MCU）把处理器、程序存储器、数据存储器、时钟与复位逻辑以及多种外设放在同一芯片中。R1 的 U1 是 CH32V203K8T6、LQFP-32【设计】，承担：</p>
+  <ul>
+    <li>USB 2.0 Full-Speed 设备与 CDC 通信；</li>
+    <li>8 路外部 GPIO，其中前 4 路可复用为 TIM3 CH1–CH4 PWM；</li>
+    <li>目标侧 USART2 TX/RX；</li>
+    <li>5V_SW、3V3_SW 使能控制；</li>
+    <li>状态 LED、BOOT0、NRST 及 SWD 调试。</li>
+  </ul>
+  <p>芯片型号提供能力，最终功能却由供电、引脚复用、时钟、复位和固件共同决定。只把 U1 焊上板并不等于上述功能已经实测成立。</p>
+</section>
+
+<section aria-labelledby="ch11-11-2">
+  <h2 id="ch11-11-2">11.2 CPU、Flash、RAM、外设与 GPIO 如何协作</h2>
+  <p>CPU 执行 Flash 中的指令，并在 RAM 中保存栈、缓冲区和运行状态；USB、定时器、USART 和 GPIO 等外设在寄存器控制下完成专门任务。一个典型控制流程是：</p>
+  <ol>
+    <li>USB 外设接收主机命令；</li>
+    <li>CPU 校验命令并更新状态；</li>
+    <li>GPIO 写寄存器改变数字输出，或 TIM3 更新 PWM 比较值；</li>
+    <li>USART2 把数据发送到目标；</li>
+    <li>状态与错误再经 USB 返回。</li>
+  </ol>
+  <p>外设可以并行运行，但会竞争引脚、时钟和中断资源。R1 因此在设计阶段冻结了 USB、SWD、晶振、UART、PWM 与普通 GPIO 的引脚映射，避免固件后期才发现复用冲突。</p>
+</section>
+
+<section aria-labelledby="ch11-11-3">
+  <h2 id="ch11-11-3">11.3 U1 的电源、地与未连接引脚</h2>
+  <table>
+    <caption>U1 电源相关焊盘【设计】</caption>
+    <thead><tr><th scope="col">封装引脚</th><th scope="col">网络</th><th scope="col">说明</th></tr></thead>
+    <tbody>
+      <tr><td>1、5、17</td><td><code>3V3_SYS</code></td><td>多个电源入口必须都获得低阻抗 3.3 V，并由附近去耦服务。</td></tr>
+      <tr><td>16、32</td><td><code>GND</code></td><td>电源与信号回流；应直接进入连续地网络。</td></tr>
+      <tr><td>18、19、20、25、29、30</td><td>未连接</td><td>最终 R1 明确保留，不应因“空着可惜”而随意接线。</td></tr>
+      <tr><td>31</td><td><code>BOOT0</code></td><td>由 R11 下拉，决定默认启动路径。</td></tr>
+    </tbody>
+  </table>
+  <p>每个电源脚都可能承载不同内部模块的瞬态电流。原理图上把多个脚画到同一 <code>3V3_SYS</code>，不代表一只远处电容就能以低电感同时服务所有脚。U1 缺失、方向错误、焊桥或过压会使整板不运行，局部虚焊则可能只破坏某一外设【预期】。</p>
+</section>
+
+<section aria-labelledby="ch11-11-4">
+  <h2 id="ch11-11-4">11.4 C6、C7、C8：100 nF 高频去耦</h2>
+  <p>C6、C7、C8 都是 100 nF、C0603、X7R，连接 <code>3V3_SYS</code>—<code>GND</code>【设计】。它们在 U1 开关瞬间就地提供电荷，使高频电流不必沿较长电源路径往返 U3/C3。</p>
+  <table>
+    <caption>三只去耦电容的最终 CAD 路径【计算】</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">到 MCU 的最短记录路径</th><th scope="col">布局说明</th><th scope="col">失效影响【预期】</th></tr></thead>
+    <tbody>
+      <tr><td>C6</td><td>约 6.65 mm</td><td>应服务最近电源脚并以短地回路闭合。</td><td>开路使局部高频去耦减少；短路使 3V3_SYS 对地短路。</td></tr>
+      <tr><td>C7</td><td>约 6.71 mm</td><td>与 C6 分担不同电源入口的瞬态。</td><td>同上。</td></tr>
+      <tr><td>C8</td><td>约 8.99 mm</td><td>最终已消除与 C9 的机械重叠，但回路仍需噪声实测。</td><td>开路降低去耦裕量；短路使 3V3_SYS 对地短路。</td></tr>
+    </tbody>
+  </table>
+  <p>这些长度是 CAD 几何结果，不是等效电感或噪声测量。对高频去耦来说，路径的总环路面积、过孔位置、地铜连续性和焊盘连接方式往往比“电容在原理图上离芯片很近”更重要。</p>
+</section>
+
+<section aria-labelledby="ch11-11-5">
+  <h2 id="ch11-11-5">11.5 C9：10 µF 储能与低频去耦</h2>
+  <p>C9 是 10 µF、C0805、X5R，连接 <code>3V3_SYS</code>—<code>GND</code>【设计】。它主要服务比 C6–C8 更低频、能量更大的负载变化，例如 CPU/USB 活动变化或外设同时切换。记录到 U1 的路径约 13.82 mm【计算】。</p>
+  <p>大容量不等于在所有频率都更好：C9 的封装和路径寄生使它不能替代近端 100 nF；C6–C8 的容量又不足以单独承担较长负载阶跃。两类电容组成宽频带电源网络。</p>
+  <p>C9 开路时，U1 区域的负载阶跃电压跌落预计增大；短路会使 3V3_SYS 对地短路【预期】。10 µF 是标称值，直流偏压后的有效电容仍为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch11-11-6">
+  <h2 id="ch11-11-6">11.6 为什么电容位置比原理图外观更重要</h2>
+  <figure class="definition" id="ch11-capacitor-reactance">
+    <figcaption>理想电容容抗</figcaption>
+    <p><var>X</var><sub>C</sub> = 1 / (2&pi;<var>fC</var>)</p>
+    <p><var>X</var><sub>C</sub> 为 Ω，<var>f</var> 为 Hz，<var>C</var> 为 F。该式只描述理想电容；真实回路还串联 ESR、封装/走线 ESL 和过孔阻抗。</p>
+  </figure>
+  <p>当频率升高，理想 <var>X</var><sub>C</sub> 下降，但寄生电感的阻抗会上升。若电容离电源脚很远，走线电感会使“100 nF”在关键瞬间无法快速供电。因此布局优先级是：</p>
+  <ol>
+    <li>电容电源焊盘靠近它服务的 U1 电源脚；</li>
+    <li>电容地焊盘就近接连续 GND，避免绕行；</li>
+    <li>电源先经过电容节点再到芯片，或至少形成最小环路；</li>
+    <li>不要让 BUCK_SW、USB 或晶振回流穿过去耦回路。</li>
+  </ol>
+  <div class="error-case">
+    <strong>错误判断：</strong>“C6、C7、C8 都连在 3V3_SYS 上，所以摆在哪里都一样。”<br>
+    <strong>正确判断：</strong>低频网络名相同，高频回路却由毫米级几何决定。
+  </div>
+</section>
+
+<section aria-labelledby="ch11-11-7">
+  <h2 id="ch11-11-7">11.7 复位、启动与安全初始状态</h2>
+  <p>上电时，U1 必须先获得稳定 3V3_SYS 和时钟，再由 NRST 释放并选择正常启动路径。R12/C10 形成复位网络，R11 把 BOOT0 默认拉低；这些元件在第 12 章详解。</p>
+  <p>硬件能保证的只是偏置条件。最终系统还依赖固件尽早建立：</p>
+  <ul>
+    <li>外部 GPIO 为高阻；</li>
+    <li>PWM 停止；</li>
+    <li>UART_TX 在配置前为高阻；</li>
+    <li>EN_5V、EN_3V3 保持低，两路受控电源关闭；</li>
+    <li>USB 挂起时关闭受控电源。</li>
+  </ul>
+  <p>以上是【预期安全要求】，当前硬件/固件尚未形成实测证据。若固件过早切换引脚，可能在目标板未准备好时输出电平或上电。</p>
+</section>
+
+<section aria-labelledby="ch11-11-8">
+  <h2 id="ch11-11-8">11.8 J3：SWDIO、SWCLK、NRST、电源和地</h2>
+  <p>J3 是 1×5、1.27 mm 调试接口，PCB 与 CPL 中存在，但最终 BOM 不装配【设计-DNP】。可焊接排针，也可使用经过验证的测试夹具。</p>
+  <table>
+    <caption>J3 最终引脚映射【设计】</caption>
+    <thead><tr><th scope="col">引脚</th><th scope="col">网络</th><th scope="col">用途</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>3V3_SYS</code></td><td>给调试器提供目标参考电压；接线前确认供电方向。</td></tr>
+      <tr><td>2</td><td><code>GND</code></td><td>调试信号参考和回流。</td></tr>
+      <tr><td>3</td><td><code>SWDIO</code></td><td>双向调试数据，U1 PA13/封装脚 23。</td></tr>
+      <tr><td>4</td><td><code>SWCLK</code></td><td>调试时钟，U1 PA14/封装脚 24。</td></tr>
+      <tr><td>5</td><td><code>NRST</code></td><td>外部复位和恢复。</td></tr>
+    </tbody>
+  </table>
+  <p>J3 不装配是预期状态，不是漏件。方向接错可能把电源接到信号脚或造成调试失败【预期】；Pin 1 标识、线缆方向和探针空间必须在实际夹具上验证。</p>
+</section>
+
+<section aria-labelledby="ch11-11-9">
+  <h2 id="ch11-11-9">11.9 引脚复用与替代功能</h2>
+  <p>同一物理引脚可在 GPIO 与外设功能之间切换。例如 PA6 既可作为普通 GPIO，也可作为 TIM3_CH1。复用带来灵活性，也带来资源冲突：</p>
+  <ul>
+    <li>配置为 PWM 后，普通 GPIO 写寄存器不再直接控制引脚；</li>
+    <li>保留给 USB、SWD 或晶振的引脚不能再任意当作目标 GPIO；</li>
+    <li>切换模式前必须先把输出置于安全电平或高阻，避免毛刺；</li>
+    <li>四路 PWM 属于同一 TIM3，频率共享而占空比可分别设置【设计】。</li>
+  </ul>
+  <p>软件接口应显式管理“资源所有权”，而不是悄悄把正在使用的 UART 或 PWM 改成普通 GPIO。</p>
+</section>
+
+<section aria-labelledby="ch11-11-10">
+  <h2 id="ch11-11-10">11.10 冻结 USB、GPIO、PWM、UART 与调试引脚表</h2>
+  <table>
+    <caption>U1 最终功能引脚映射【设计】</caption>
+    <thead><tr><th scope="col">封装脚</th><th scope="col">MCU 引脚</th><th scope="col">网络</th><th scope="col">功能</th></tr></thead>
+    <tbody>
+      <tr><td>2</td><td>OSC_IN/PD0</td><td><code>OSC_IN</code></td><td>12 MHz 晶振输入</td></tr>
+      <tr><td>3</td><td>OSC_OUT/PD1</td><td><code>OSC_OUT</code></td><td>12 MHz 晶振输出</td></tr>
+      <tr><td>4</td><td>NRST</td><td><code>NRST</code></td><td>复位</td></tr>
+      <tr><td>6</td><td>PA0</td><td><code>GPIO4_MCU</code></td><td>GPIO4</td></tr>
+      <tr><td>7</td><td>PA1</td><td><code>GPIO5_MCU</code></td><td>GPIO5</td></tr>
+      <tr><td>8</td><td>PA2</td><td><code>UART_TX_MCU</code></td><td>USART2_TX</td></tr>
+      <tr><td>9</td><td>PA3</td><td><code>UART_RX_MCU</code></td><td>USART2_RX</td></tr>
+      <tr><td>10</td><td>PA4</td><td><code>GPIO6_MCU</code></td><td>GPIO6</td></tr>
+      <tr><td>11</td><td>PA5</td><td><code>GPIO7_MCU</code></td><td>GPIO7</td></tr>
+      <tr><td>12</td><td>PA6</td><td><code>GPIO0_MCU</code></td><td>TIM3_CH1 / GPIO0</td></tr>
+      <tr><td>13</td><td>PA7</td><td><code>GPIO1_MCU</code></td><td>TIM3_CH2 / GPIO1</td></tr>
+      <tr><td>14</td><td>PB0</td><td><code>GPIO2_MCU</code></td><td>TIM3_CH3 / GPIO2</td></tr>
+      <tr><td>15</td><td>PB1</td><td><code>GPIO3_MCU</code></td><td>TIM3_CH4 / GPIO3</td></tr>
+      <tr><td>21</td><td>PA11/USB1DM</td><td><code>USB_DM_MCU</code></td><td>USB D−</td></tr>
+      <tr><td>22</td><td>PA12/USB1DP</td><td><code>USB_DP_MCU</code></td><td>USB D+</td></tr>
+      <tr><td>23</td><td>PA13/SWDIO</td><td><code>SWDIO</code></td><td>调试数据</td></tr>
+      <tr><td>24</td><td>PA14/SWCLK</td><td><code>SWCLK</code></td><td>调试时钟</td></tr>
+      <tr><td>26</td><td>PB3</td><td><code>EN_5V</code></td><td>5V_SW 使能</td></tr>
+      <tr><td>27</td><td>PB4</td><td><code>EN_3V3</code></td><td>3V3_SW 使能</td></tr>
+      <tr><td>28</td><td>PB5</td><td><code>STATUS_LED</code></td><td>状态 LED</td></tr>
+      <tr><td>31</td><td>PB8/BOOT0</td><td><code>BOOT0</code></td><td>启动选择</td></tr>
+    </tbody>
+  </table>
+  <p>这张表是原理图、PCB 和固件之间的接口合同。改动任一行都必须同时审核符号、封装焊盘、网络名、定时器通道、连接器标注和固件配置。</p>
+</section>
+
+<section class="experiment" aria-labelledby="ch11-11-11">
+  <h2 id="ch11-11-11">11.11 实验：比较近端与远端去耦观察点</h2>
+  <h3 id="ch11-experiment-purpose">目的</h3>
+  <p>观察 U1 活动变化时 3V3_SYS 的瞬态，并比较靠近 U1 电源脚与较远电源节点的波形差异。该实验验证测量方法和布局影响，不要求拆除 C6–C9。</p>
+  <h3 id="ch11-experiment-safety">安全与仪器要求</h3>
+  <ul>
+    <li>先完成限流上电和调试连接验证；不要在未知短路板上接昂贵示波器。</li>
+    <li>使用短接地弹簧或同轴探测，避免长地夹制造假振铃。</li>
+    <li>探头不得跨接相邻 LQFP 引脚；若没有合适探具，停止而不是冒险。</li>
+    <li>不要通过拆掉去耦电容制造故障；若要比较“有/无去耦”，应使用专门教学板并由教师监督。</li>
+  </ul>
+  <h3 id="ch11-experiment-procedure">步骤</h3>
+  <ol>
+    <li>让固件周期性切换一组安全的内部/外部活动，例如状态 LED 或无负载 GPIO。</li>
+    <li>在 U1 最近可安全接触的 3V3/GND 点测量，记录探头、带宽和触发条件。</li>
+    <li>在 C9 或更远的 3V3_SYS 节点重复测量，不改变固件和负载。</li>
+    <li>比较峰值、振铃和基线；若差异与探头移动同量级，应先验证测量重复性。</li>
+  </ol>
+  <table>
+    <caption>实验 11-1 记录表</caption>
+    <thead><tr><th scope="col">测点</th><th scope="col">探测方式</th><th scope="col">活动条件</th><th scope="col">瞬态记录</th><th scope="col">判读</th></tr></thead>
+    <tbody>
+      <tr><td>U1 近端 3V3/GND</td><td>待填</td><td>待填</td><td>待填</td><td>待填</td></tr>
+      <tr><td>C9/远端 3V3_SYS</td><td>待填</td><td>同上</td><td>待填</td><td>待填</td></tr>
+    </tbody>
+  </table>
+  <p>当前教材不提供预设纹波数值；只有真实测量并记录方法后，结果才能标为【实测】。</p>
+</section>
+
+<section aria-labelledby="ch11-summary">
+  <h2 id="ch11-summary">本章小结</h2>
+  <ul>
+    <li>U1 集成处理器、存储器和外设，但必须由正确供电、时钟、复位和固件共同支撑。</li>
+    <li>C6–C8 是 100 nF 高频去耦，C9 是 10 µF 储能；相同网络名不代表高频路径等效。</li>
+    <li>J3 是 DNP 的 1×5 SWD 接口，方向和供电关系必须明确。</li>
+    <li>冻结引脚表是原理图、PCB 与固件之间的接口合同；安全启动行为仍待验证。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch11-sources">
+  <h2 id="ch11-sources">事实来源</h2>
+  <p>最终 EasyEDA 工程中的 U1、C6–C9、J3 网络和器件元数据；<code>project-facts.json</code> 的 MCU 功能引脚表与去耦路径；R1 fabrication checklist；CH32V203 资料仅用于确认器件类别与外设能力，不填入事实库未记录的性能数值。</p>
+</section>

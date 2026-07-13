@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" role="img" aria-labelledby="title desc">
+  <title id="title">两层 PCB 的概念叠层剖面</title>
+  <desc id="desc">从上到下展示顶层丝印、顶层阻焊、顶层铜、绝缘基材、底层铜、底层阻焊和底层丝印，并注明图示不按比例。</desc>
+  <defs>
+    <style>
+      text{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans CJK SC",sans-serif;fill:#17202a}
+      .layer{stroke:#34495e;stroke-width:1.5}
+      .name{font-size:17px;font-weight:700}
+      .detail{font-size:13px;fill:#586474}
+      .guide{stroke:#7b8794;stroke-width:1.5}
+    </style>
+  </defs>
+  <rect width="900" height="560" rx="18" fill="#f7fafc"/>
+  <text x="450" y="42" font-size="24" font-weight="700" text-anchor="middle">两层 PCB：材料层次与功能</text>
+  <g transform="translate(210 90)">
+    <rect class="layer" x="0" y="0" width="480" height="28" rx="4" fill="#f3f4f6"/>
+    <rect class="layer" x="0" y="34" width="480" height="52" rx="4" fill="#2f9e61"/>
+    <rect class="layer" x="0" y="92" width="480" height="34" rx="4" fill="#d98c2b"/>
+    <rect class="layer" x="0" y="132" width="480" height="180" rx="4" fill="#e8d9a8"/>
+    <path d="M30 160h420M30 190h420M30 220h420M30 250h420M30 280h420" stroke="#c9b878" stroke-width="2" stroke-dasharray="8 7"/>
+    <rect class="layer" x="0" y="318" width="480" height="34" rx="4" fill="#d98c2b"/>
+    <rect class="layer" x="0" y="358" width="480" height="52" rx="4" fill="#2f9e61"/>
+    <rect class="layer" x="0" y="416" width="480" height="28" rx="4" fill="#f3f4f6"/>
+  </g>
+  <g>
+    <line class="guide" x1="210" y1="104" x2="150" y2="104"/>
+    <text class="name" x="138" y="110" text-anchor="end">顶层丝印</text>
+    <line class="guide" x1="210" y1="150" x2="150" y2="150"/>
+    <text class="name" x="138" y="156" text-anchor="end">顶层阻焊</text>
+    <line class="guide" x1="210" y1="199" x2="150" y2="199"/>
+    <text class="name" x="138" y="205" text-anchor="end">顶层铜</text>
+    <line class="guide" x1="690" y1="312" x2="750" y2="312"/>
+    <text class="name" x="762" y="318">绝缘基材</text>
+    <text class="detail" x="762" y="340">玻纤树脂介质</text>
+    <line class="guide" x1="690" y1="425" x2="750" y2="425"/>
+    <text class="name" x="762" y="431">底层铜</text>
+    <line class="guide" x1="690" y1="474" x2="750" y2="474"/>
+    <text class="name" x="762" y="480">底层阻焊</text>
+    <line class="guide" x1="690" y1="520" x2="750" y2="520"/>
+    <text class="name" x="762" y="526">底层丝印</text>
+  </g>
+  <g transform="translate(60 250)">
+    <path d="M90 0H20v170h70" fill="none" stroke="#0b5cab" stroke-width="2"/>
+    <text x="0" y="76" font-size="15" font-weight="700" fill="#0b5cab">铜层之间由</text>
+    <text x="0" y="99" font-size="15" font-weight="700" fill="#0b5cab">介质隔离</text>
+  </g>
+  <text x="450" y="545" font-size="14" fill="#586474" text-anchor="middle">概念图，不按厚度比例；真实铜厚、介质厚度与材料以生产叠层为准</text>
+</svg>

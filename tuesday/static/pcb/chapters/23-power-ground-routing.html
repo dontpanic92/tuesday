@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter） — USB GPIO PCB 离线教程">
+  <title>23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-23">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html" aria-current="page">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</li><li aria-current="page">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</p>
+          <h1>23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#chapter-23-goals">学习目标</a></li><li class="toc-level-2"><a href="#section-23-1">23.1 从电流与温升估算线宽</a></li><li class="toc-level-2"><a href="#section-23-2">23.2 VBUS 与受控输出的电流路径</a></li><li class="toc-level-2"><a href="#section-23-3">23.3 Buck 输入环、开关节点、输出环与反馈路径</a></li><li class="toc-level-2"><a href="#section-23-4">23.4 让开关噪声远离 USB、晶振与反馈</a></li><li class="toc-level-2"><a href="#section-23-5">23.5 地缝合与层转换</a></li><li class="toc-level-2"><a href="#section-23-6">23.6 热铜与压降</a></li><li class="toc-level-2"><a href="#section-23-7">23.7 逐个检查去耦电容的物理回路</a></li><li class="toc-level-2"><a href="#section-23-8">23.8 练习：在 PCB 上标出高电流与高 di/dt 回路</a></li><li class="toc-level-2"><a href="#chapter-23-summary">本章小结</a></li></ul></nav>
+        <section class="notice" aria-labelledby="chapter-23-goals">
+  <h2 id="chapter-23-goals">学习目标</h2>
+  <p>电源布线的目标不是“用最宽的线连起来”，而是在电流、压降、温升、瞬态回路、开关噪声和返回路径之间取得受控结果。完成本章后，你应能划分 VBUS、受控输出、Buck 关键回路和地缝合，并逐个审核去耦电容的物理回路。</p>
+  <ul>
+    <li>从电流、允许压降、温升和制造铜厚估算线宽；</li>
+    <li>追踪 VBUS_IN、3V3_SYS、5V_SW、3V3_SW 的完整路径；</li>
+    <li>区分 Buck 输入环、开关节点、输出环与反馈路径；</li>
+    <li>使用地铜和缝合过孔缩短返回，而不制造孤岛；</li>
+    <li>把热、纹波和瞬态明确标记为待实物验证。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="section-23-1">
+  <h2 id="section-23-1">23.1 从电流与温升估算线宽</h2>
+  <p>线宽估算需要输入铜厚、外层/内层、环境、允许温升、长度、最大连续电流和可接受压降。在线计算器或经验表只在这些假设明确时有意义。</p>
+  <ol>
+    <li>为网络写出正常、峰值和故障/限流电流；</li>
+    <li>取得计划生产的铜厚，不默认所有板都是 1 oz；</li>
+    <li>按允许温升估算最小截面，再用 <code>V = I × R</code> 检查压降；</li>
+    <li>把过孔、连接器、开关和焊点电阻纳入完整路径；</li>
+    <li>增加制造和温度裕量，避免长期工作在计算极限；</li>
+    <li>样板上电后以实际电流、压降和热像/温度测量修正假设。</li>
+  </ol>
+  <p>R1 采用 24 mil VBUS 主干、20 mil 3V3_SYS、16 mil 两条受控输出、12 mil GND 显式线和 14 mil BUCK_SW。这些是最终设计选择，不是对任何铜厚与环境都成立的额定电流声明。</p>
+</section>
+
+<section aria-labelledby="section-23-2">
+  <h2 id="section-23-2">23.2 VBUS 与受控输出的电流路径</h2>
+  <p>把每条电源画成“源 → 保护/开关 → 负载 → GND 返回 → 源”的闭合路径：</p>
+  <ul>
+    <li><code>VBUS_IN</code>：J1 VBUS 进入，供 U3 Buck 与 U4；</li>
+    <li><code>3V3_SYS</code>：U3/L1/C3 输出，供 U1、逻辑电路与 U5；</li>
+    <li><code>5V_SW</code>：VBUS_IN 经 U4 到 J2-3，典型设计限流约 0.402 A；</li>
+    <li><code>3V3_SW</code>：3V3_SYS 经 U5 到 J2-4，典型设计限流约 0.252 A；</li>
+    <li>所有负载电流经 J2 GND、地铜/地线返回 J1 和相关电源器件。</li>
+  </ul>
+  <p>两路限流目标不能绕过 USB 总输入预算。即使 U4 的限流约 0.4 A，MCU、Buck 损耗和 3V3_SW 也共享主机供电；真实主机、线缆、连接器和温升必须测量。</p>
+  <aside class="warning">
+    <p>5V_SW 是电源输出，不是 5 V 逻辑。不要用加宽电源走线来暗示 GPIO 可以承受或输出 5 V。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-23-3">
+  <h2 id="section-23-3">23.3 Buck 输入环、开关节点、输出环与反馈路径</h2>
+  <p>四条路径的优化目标不同：</p>
+  <table>
+    <caption>U3 Buck 的关键物理路径</caption>
+    <thead><tr><th scope="col">路径</th><th scope="col">主要元件</th><th scope="col">布局/布线目标</th></tr></thead>
+    <tbody>
+      <tr><td>输入脉冲环</td><td>C2、U3 VIN/开关、U3 GND</td><td>极短、宽、低电感；C2 紧靠引脚</td></tr>
+      <tr><td>开关节点</td><td>U3 SW → <code>BUCK_SW</code> → L1</td><td>短、无支路、铜面积受控，远离敏感网络</td></tr>
+      <tr><td>输出环</td><td>L1、C3、负载、GND 返回</td><td>低阻抗、短回路，3V3_SYS 主干清楚</td></tr>
+      <tr><td>反馈路径</td><td>输出取样、R5/R6、U3 FB</td><td>从安静输出点取样，远离 SW 与大电流铜</td></tr>
+    </tbody>
+  </table>
+  <p><code>BUCK_SW</code> 使用 14 mil 并不意味着应铺成大面积铜。对高 dv/dt 节点，较大面积会增加对周围网络和空间的电容耦合。</p>
+</section>
+
+<section aria-labelledby="section-23-4">
+  <h2 id="section-23-4">23.4 让开关噪声远离 USB、晶振与反馈</h2>
+  <p>U3/L1 周围的快速电压和电流变化可能通过电场、磁场、公共阻抗和地回路耦合到敏感网络。</p>
+  <ul>
+    <li>不要让 USB D+/D− 与 BUCK_SW 长距离平行；</li>
+    <li>不要把 Y1、C11/C12 或 OSC_IN/OUT 放在电感和开关铜旁；</li>
+    <li>NRST、BOOT0 和 FB 走线避免经过开关节点边缘；</li>
+    <li>输入/输出电容地端就近闭合，不把脉冲电流送入 MCU 地路径；</li>
+    <li>地铜要连续，但不要让开关节点下方的寄生耦合未经评估扩散到大面积；</li>
+    <li>布局完成后联合显示关键网络、地铜和器件本体进行区域审核。</li>
+  </ul>
+  <p>DRC 只能检查设定的几何规则，不会告诉你某段反馈线是否拾取了足以引起纹波或不稳定的噪声。</p>
+</section>
+
+<section aria-labelledby="section-23-5">
+  <h2 id="section-23-5">23.5 地缝合与层转换</h2>
+  <p>地缝合过孔连接顶、底层地铜，为信号换层和局部高频回流提供较短路径。它们应服务明确的返回需求，而不是均匀撒满板面后假设问题自动解决。</p>
+  <ol>
+    <li>在 USB 对换层、连接器入口和地铜狭颈附近检查是否需要地过孔；</li>
+    <li>在去耦电容和 IC 地脚附近提供低电感层间连接；</li>
+    <li>围绕板边或噪声区域的缝合密度应由频率、结构和 EMI 目标决定；</li>
+    <li>确认每个地过孔真正连接到两层已生成的 GND 铜；</li>
+    <li>避免地过孔切断其他关键布线通道或侵入庭院；</li>
+    <li>铺铜更新后重新检查孤立铜和过孔连通。</li>
+  </ol>
+  <p>R1 最终有 32 个地缝合/树状过孔，并记录 USB 过孔到最近地转换的最大距离为 155.33 mil，供样板验证复核。这个距离不是通用合格阈值。</p>
+</section>
+
+<section aria-labelledby="section-23-6">
+  <h2 id="section-23-6">23.6 热铜与压降</h2>
+  <p>电源器件的热会通过封装引脚、焊盘、铜和空气散出。增加连接到散热引脚的铜通常能降低热阻，但不同网络和节点不能为了“散热”任意扩大。</p>
+  <ul>
+    <li>U3、U4、U5 的 IN/OUT/GND 铜按数据手册建议和电流路径规划；</li>
+    <li>L1 的电流额定值、直流电阻和温升与铜布局共同审核；</li>
+    <li>连接器、过孔和收颈处可能成为压降热点；</li>
+    <li>BUCK_SW 扩铜受 EMI 约束，不能照搬普通散热焊盘策略；</li>
+    <li>热仿真或经验只能生成预期，原型仍需在额定负载下测温；</li>
+    <li>同时记录环境温度、输入电压、负载、持续时间和测量方法。</li>
+  </ul>
+  <aside class="notice">
+    <p>R1 已证明制造几何和规则通过，尚未证明 Buck 温升、负载开关压降、限流容差或满载热性能。不要把宽线和大铜面写成“热验证完成”。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="section-23-7">
+  <h2 id="section-23-7">23.7 逐个检查去耦电容的物理回路</h2>
+  <p>为 C6、C7、C8 和 C9 分别填写回路审计，而不是把它们合并成“MCU 附近有四个电容”。</p>
+  <table>
+    <caption>去耦/储能回路审核表</caption>
+    <thead><tr><th scope="col">器件</th><th scope="col">角色</th><th scope="col">CAD 最短 3V3 路径</th><th scope="col">还需检查</th></tr></thead>
+    <tbody>
+      <tr><td>C6</td><td>100 nF 高频去耦</td><td>6.65 mm</td><td>对应电源脚、地回路、过孔电感</td></tr>
+      <tr><td>C7</td><td>100 nF 高频去耦</td><td>6.71 mm</td><td>对应电源脚、地回路、共享铜阻抗</td></tr>
+      <tr><td>C8</td><td>100 nF 高频去耦</td><td>8.99 mm</td><td>移动后回路、C9 间距与噪声表现</td></tr>
+      <tr><td>C9</td><td>较低频储能</td><td>13.82 mm</td><td>主干压降、负载瞬态与本体空间</td></tr>
+    </tbody>
+  </table>
+  <ol>
+    <li>从 U1 电源脚沿铜到电容电源端；</li>
+    <li>从电容地端沿地铜/过孔到 U1 地脚；</li>
+    <li>标出回路中的狭颈、过孔、共享路径和地缝；</li>
+    <li>确认没有被其他信号切断的返回区域；</li>
+    <li>把较差路径列为示波器测量与 R2 改进候选。</li>
+  </ol>
+</section>
+
+<section class="experiment" aria-labelledby="section-23-8">
+  <h2 id="section-23-8">23.8 练习：在 PCB 上标出高电流与高 di/dt 回路</h2>
+  <p><strong>目标：</strong>在不修改冻结设计的 PCB 截图或副本上，把功能网络转换为物理电流环。</p>
+  <ol>
+    <li>用一种颜色标出 J1 → U4 → J2 的 5V_SW 去程和 GND 返回；</li>
+    <li>用第二种颜色标出 U3 输入脉冲环；</li>
+    <li>圈出 <code>BUCK_SW</code> 铜和 L1；</li>
+    <li>标出 L1 → C3 → 负载 → GND 的输出环；</li>
+    <li>画出 R5/R6 到 FB 的取样路径，并标注应远离的噪声源；</li>
+    <li>任选 C6–C8，画出完整去耦回路；</li>
+    <li>指出至少一个地缝合过孔服务的返回路径。</li>
+  </ol>
+  <p><strong>通过判据：</strong>每个环同时包含去程和返回，能指出高电流与高 di/dt 的差别，并且没有把“GND 符号”当作电流到此消失。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="chapter-23-summary">
+  <h2 id="chapter-23-summary">本章小结</h2>
+  <p>电源与地布线必须按闭合回路设计。VBUS 和受控输出关注电流、压降与热，Buck 还要控制输入环、开关节点、输出环和反馈路径，去耦则关注芯片引脚附近的高频回路。CAD 可以验证几何，真实纹波、温升和瞬态仍需实验。</p>
+</section>
+
+<footer class="notice">
+  <p><strong>事实依据：</strong>最终工程、制造清单、检查清单和项目电源事实。所有路径长度、线宽、铜和过孔数量为设计/CAD 事实；性能指标未实测。</p>
+</footer>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="22-usb-differential-routing.html"><small>上一页</small>22. USB 差分对布线（Routing USB Differential Pairs）</a><a class="next" rel="next" href="24-copper-pours.html"><small>下一页</small>24. 铺铜与地平面（Copper Pours and Ground Planes）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

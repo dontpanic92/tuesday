@@ -1,0 +1,210 @@
+<section class="notice" aria-labelledby="ch09-learning-objectives">
+  <h2 id="ch09-learning-objectives">学习目标与位号校正</h2>
+  <p>本章解释 U3、L1、C2、C3、R5 和 R6 如何把 <code>VBUS_IN</code> 变成始终开启的 <code>3V3_SYS</code>，并把开关电源的电流环、反馈、纹波、效率和布局联系起来。</p>
+  <p><strong>位号校正：</strong><code>toc.md</code> 的 9.7 写成“R5 和 R7”。最终 R1 中反馈分压是 <strong>R5/R6</strong>；R7 是 U4 的 5V_SW 限流设定电阻，应在第 10 章讨论。以下内容按最终工程源修正。</p>
+  <p><strong>事实状态：</strong>值与网络为【设计】；3.318 V 为【计算】；纹波、效率、温升、稳定性和输出电压均为【待验证】，没有实测结果。</p>
+</section>
+
+<section aria-labelledby="ch09-9-1">
+  <h2 id="ch09-9-1">9.1 为什么 U1 不能直接使用 5 V</h2>
+  <p>R1 的逻辑域被固定为 3.3 V：U1 的电源脚、GPIO、PWM、UART 和调试接口都以 <code>3V3_SYS</code> 为参考【设计】。J1 引入的 <code>VBUS_IN</code> 是约 5 V 的 USB 电源域，不是 MCU 供电轨。把 VBUS 直接接到 U1 或 3.3 V 外设会绕过稳压和逻辑电平边界，可能造成永久损坏【预期】。</p>
+  <p>因此电源路径必须明确分层：</p>
+  <p><code>J1 VBUS → VBUS_IN → U3/L1/C3 → 3V3_SYS → U1 与 U5</code>。</p>
+</section>
+
+<section aria-labelledby="ch09-9-2">
+  <h2 id="ch09-9-2">9.2 线性稳压与开关降压的取舍</h2>
+  <p>线性稳压器把多余电压主要转成热，其近似损耗为 <var>P</var><sub>loss</sub> ≈ (<var>V</var><sub>in</sub> − <var>V</var><sub>out</sub>) × <var>I</var><sub>out</sub>。开关降压器则通过高速开关、电感和电容分时传能，通常能降低连续负载下的热损耗，但增加纹波、EMI、反馈稳定性和布局要求。</p>
+  <p>早期提案曾留下 LDO 表述；最终 R1 明确采用 U3 SY8089AAAC 同步 Buck、L1 2.2 µH 和 R5/R6 反馈【设计】。选择 Buck 的原因是 U1 之外还要为 3V3_SW 提供目标 0.25 A 的外部负载，不能把旧 LDO 假设当成最终电路。</p>
+  <aside class="warning">
+    <strong>边界：</strong>“Buck 通常更高效”不是 R1 已测效率。没有同时测量输入和输出功率前，不得给出效率百分比。
+  </aside>
+</section>
+
+<section aria-labelledby="ch09-9-3">
+  <h2 id="ch09-9-3">9.3 U3：SY8089 的同步降压开关周期</h2>
+  <p>U3 是 SY8089AAAC、SOT-23-5【设计】。最终网络为：焊盘 1 与 4 接 <code>VBUS_IN</code>，焊盘 2 接 <code>GND</code>，焊盘 3 为 <code>BUCK_SW</code>，焊盘 5 为 <code>BUCK_FB</code>。它通过内部高侧和低侧开关反复改变 BUCK_SW 状态：</p>
+  <table>
+    <caption>同步 Buck 的两个基本能量阶段</caption>
+    <thead><tr><th scope="col">阶段</th><th scope="col">主要电流路径</th><th scope="col">L1 与 C3 的作用</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>高侧导通</td>
+        <td><code>VBUS_IN → U3 → BUCK_SW → L1 → 3V3_SYS → 负载/GND</code></td>
+        <td>L1 电流上升并储存磁能；C3 同时接受能量并稳定输出。</td>
+      </tr>
+      <tr>
+        <td>低侧续流</td>
+        <td><code>GND/低侧开关 → BUCK_SW → L1 → 3V3_SYS → 负载</code></td>
+        <td>L1 维持电流并释放磁能；C3 填补开关周期内的电流差。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>“同步”表示续流由内部受控开关完成，而不是依赖外接整流二极管。反馈环比较 <code>BUCK_FB</code> 与内部参考，并调节开关占空行为，使输出趋向设定值。U3 开路或缺失时无 <code>3V3_SYS</code>；装反、内部短路或布局失稳可能损坏 3.3 V 域或产生过热、纹波和振荡【预期】。</p>
+</section>
+
+<section aria-labelledby="ch09-9-4">
+  <h2 id="ch09-9-4">9.4 L1：储存并释放磁能</h2>
+  <p>L1 是 SWPA252012S2R2MT、2.2 µH、2.5 mm × 2.0 mm 级贴片电感，连接 <code>BUCK_SW</code>—<code>3V3_SYS</code>【设计】。项目元数据记录 1.25 A 额定、2.07 A 饱和电流，但 R1 的热与饱和裕量尚未实测【待验证】。</p>
+  <figure class="example" id="ch09-inductor-ripple">
+    <figcaption>Buck 电感纹波的一阶近似</figcaption>
+    <p>&Delta;<var>I</var><sub>L</sub> ≈ (<var>V</var><sub>IN</sub> − <var>V</var><sub>OUT</sub>) × <var>D</var> / (<var>L</var> × <var>f</var><sub>SW</sub>)</p>
+    <dl>
+      <dt>&Delta;<var>I</var><sub>L</sub></dt><dd>电感峰峰纹波电流，单位 A。</dd>
+      <dt><var>V</var><sub>IN</sub>、<var>V</var><sub>OUT</sub></dt><dd>输入和输出电压，单位 V。</dd>
+      <dt><var>D</var></dt><dd>高侧导通占空比，无量纲，0–1。</dd>
+      <dt><var>L</var></dt><dd>L1 = 2.2 µH，即 2.2 × 10<sup>−6</sup> H。</dd>
+      <dt><var>f</var><sub>SW</sub></dt><dd>实际开关频率，单位 Hz。</dd>
+    </dl>
+    <p><strong>适用条件：</strong>连续导通、稳态、理想化波形。结构化事实库没有给出经本板验证的 <var>f</var><sub>SW</sub> 与工作点，所以不填一个伪精确的纹波数值。</p>
+  </figure>
+  <p>L1 开路会使 3V3_SYS 消失；短路、错感值或饱和会增加峰值电流、输出纹波和 U3 压力【预期】。L1 必须紧邻 U3，使高 dv/dt 的 BUCK_SW 铜尽量小，并让输出电流尽快进入 C3。</p>
+</section>
+
+<section aria-labelledby="ch09-9-5">
+  <h2 id="ch09-9-5">9.5 C2：在 U3 输入端就地供应脉冲电流</h2>
+  <p>C2 是 10 µF、C0805 的陶瓷电容，连接 <code>VBUS_IN</code>—<code>GND</code>【设计】。高侧开关导通时，U3 从输入端吸取脉冲电流；若这些脉冲必须沿长走线和 USB 线缆取得，环路电感和输入纹波都会增大。C2 的任务是让高频电流在 U3 附近闭合。</p>
+  <p>C2 开路或有效电容过低时，输入纹波、EMI 和稳定性风险预计增加；C2 短路会直接使 VBUS 对地短路【预期】。陶瓷电容的有效电容会受直流偏压、温度、容差和封装寄生影响，10 µF 是标称设计值而不是运行时实测值。</p>
+</section>
+
+<section aria-labelledby="ch09-9-6">
+  <h2 id="ch09-9-6">9.6 C3：降低输出纹波并承担负载阶跃</h2>
+  <p>C3 是 22 µF、C0805 的输出电容，连接 <code>3V3_SYS</code>—<code>GND</code>【设计】。它接在 L1 后方，承担两个时间尺度的任务：</p>
+  <ul>
+    <li>在每个开关周期内吸收电感电流与负载电流的差，降低输出纹波；</li>
+    <li>当 U1 或 3V3_SW 负载突然变化时，在控制环来得及调整前暂时提供或吸收电流。</li>
+  </ul>
+  <figure class="definition" id="ch09-capacitor-reactance">
+    <figcaption>理想电容容抗</figcaption>
+    <p><var>X</var><sub>C</sub> = 1 / (2&pi;<var>fC</var>)</p>
+    <p><var>X</var><sub>C</sub> 的单位为 Ω，<var>f</var> 为 Hz，<var>C</var> 为 F。该式忽略 ESR、ESL、直流偏压和谐振，只用于理解“频率越高，理想电容阻抗越低”。</p>
+  </figure>
+  <p>C3 开路、错小或有效电容不足时，纹波、瞬态跌落或稳定性风险增加；短路时 U3 将面对 3V3_SYS 对地故障【预期】。C3 应靠近 L1/U3 输出回路，地回流短而宽。</p>
+</section>
+
+<section aria-labelledby="ch09-9-7">
+  <h2 id="ch09-9-7">9.7 R5 与 R6：输出反馈分压器</h2>
+  <table>
+    <caption>最终反馈网络【设计】</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">值与网络</th><th scope="col">布局原因</th><th scope="col">失效影响【预期】</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>R5</td>
+        <td>453 kΩ，<code>3V3_SYS</code>—<code>BUCK_FB</code>；反馈上臂。</td>
+        <td>采样输出，FB 端应短并远离 BUCK_SW。</td>
+        <td>开路时 FB 可能经 R6 偏低，U3 可能试图抬高输出；错值会改变设定电压。</td>
+      </tr>
+      <tr>
+        <td>R6</td>
+        <td>100 kΩ，<code>BUCK_FB</code>—<code>GND</code>；反馈下臂。</td>
+        <td>地端应回到安静参考，避免开关电流造成地弹。</td>
+        <td>开路时 FB 可能被 R5 拉高而压低输出；短路或错小可能使 U3 抬高输出。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>反馈节点电流很小，因此容易受 BUCK_SW 电场、漏电、助焊剂残留和地压降影响。R5/R6 的“连接正确”只是必要条件；采样点与回流位置同样重要。</p>
+</section>
+
+<section aria-labelledby="ch09-9-8">
+  <h2 id="ch09-9-8">9.8 反馈公式与 R1 的 3.3 V 算例</h2>
+  <figure class="example" id="ch09-feedback-calculation">
+    <figcaption>SY8089 输出设定【计算】</figcaption>
+    <p><var>V</var><sub>OUT</sub> = <var>V</var><sub>FB</sub> × (1 + <var>R</var><sub>TOP</sub> / <var>R</var><sub>BOTTOM</sub>)</p>
+    <dl>
+      <dt><var>V</var><sub>OUT</sub></dt><dd>目标输出电压，单位 V。</dd>
+      <dt><var>V</var><sub>FB</sub></dt><dd>事实库采用的典型反馈基准 0.6 V。</dd>
+      <dt><var>R</var><sub>TOP</sub></dt><dd>R5 = 453 kΩ。</dd>
+      <dt><var>R</var><sub>BOTTOM</sub></dt><dd>R6 = 100 kΩ。</dd>
+    </dl>
+    <p>代入：<var>V</var><sub>OUT</sub> = 0.6 × (1 + 453/100) = <strong>3.318 V</strong>【计算】。</p>
+    <p><strong>假设：</strong>使用典型 0.6 V 基准、理想阻值、忽略偏置电流、纹波、负载压降和温度。3.318 V 不是板上实测电压；电阻误差、基准误差和布局都会改变结果。</p>
+  </figure>
+</section>
+
+<section aria-labelledby="ch09-9-9">
+  <h2 id="ch09-9-9">9.9 BUCK_SW 为什么必须紧凑</h2>
+  <p><code>BUCK_SW</code> 是 U3 焊盘 3 到 L1 焊盘 1 的高速开关节点【设计】，R1 用 14 mil 走线。它具有高 dv/dt，铜面积越大，越容易通过电容耦合把噪声送入 USB、Y1、NRST 或 BUCK_FB；环路越大，磁场辐射也越强。</p>
+  <p>正确布局不是“把所有电源线都铺得尽可能大”，而是区分节点：</p>
+  <ul>
+    <li>VBUS 输入高 di/dt 环：U3—C2—GND，应短、宽、闭合；</li>
+    <li>BUCK_SW：只够连接 U3 与 L1，避免大面积铜和无关过孔；</li>
+    <li>输出环：L1—C3—负载/GND，应低阻抗；</li>
+    <li>反馈采样：从安静的 3V3_SYS 取样，远离 BUCK_SW。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch09-9-10">
+  <h2 id="ch09-9-10">9.10 效率、热、纹波与电流能力</h2>
+  <figure class="definition" id="ch09-efficiency-equation">
+    <figcaption>转换效率</figcaption>
+    <p>&eta; = <var>P</var><sub>OUT</sub> / <var>P</var><sub>IN</sub> × 100%</p>
+    <p><var>P</var><sub>IN</sub> = <var>V</var><sub>IN</sub><var>I</var><sub>IN</sub>，<var>P</var><sub>OUT</sub> = <var>V</var><sub>OUT</sub><var>I</var><sub>OUT</sub>，功率单位 W。输入与输出必须在同一稳态时刻测量。</p>
+  </figure>
+  <p>效率损失最终变成热，来源包括 U3 开关导通与切换损耗、L1 铜损与磁芯损耗、走线和连接器电阻以及控制电路消耗。输出“能否带某电流”还受峰值电感电流、饱和、温升、USB 输入预算和瞬态影响，不能只看一个器件的目录额定值。</p>
+  <p>R1 的 Buck 启动、纹波、负载阶跃、稳定性和温升全部列为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch09-9-11">
+  <h2 id="ch09-9-11">9.11 布局如何引起不稳定与噪声耦合</h2>
+  <table>
+    <caption>常见布局错误及后果</caption>
+    <thead><tr><th scope="col">错误</th><th scope="col">原因</th><th scope="col">可能现象【预期】</th></tr></thead>
+    <tbody>
+      <tr><td>C2 离 U3 太远</td><td>输入脉冲环路电感和面积增大</td><td>输入尖峰、EMI、异常复位。</td></tr>
+      <tr><td>BUCK_SW 铜过大或靠近 USB/Y1</td><td>电场与磁场耦合增强</td><td>USB 错误、时钟抖动、辐射增加。</td></tr>
+      <tr><td>R6 地端接到大电流回流</td><td>地压降被误当成反馈电压</td><td>输出偏移、纹波或控制环异常。</td></tr>
+      <tr><td>C3 回地绕行</td><td>输出电流环阻抗增大</td><td>负载阶跃跌落和纹波增加。</td></tr>
+      <tr><td>L1 错值或饱和</td><td>纹波和峰值电流偏离设计</td><td>过热、限流、输出跌落。</td></tr>
+    </tbody>
+  </table>
+  <p>DRC 只能证明连通和间距规则，不会证明控制环稳定、纹波合格或器件不过热。</p>
+</section>
+
+<section class="experiment" aria-labelledby="ch09-9-12">
+  <h2 id="ch09-9-12">9.12 实验：计算并随后测量效率与纹波</h2>
+  <h3 id="ch09-experiment-precalculation">上电前计算</h3>
+  <ol>
+    <li>用 R5/R6 计算目标输出 3.318 V，并明确它是【计算】。</li>
+    <li>选择若干不超过已批准实验计划的负载点；先计算 <var>P</var><sub>OUT</sub>。</li>
+    <li>设置停止条件：输出超出经数据手册确定的安全范围、输入电流异常、器件温升过快、波形持续振荡或任何气味/变色。</li>
+  </ol>
+  <h3 id="ch09-experiment-equipment">器材与安全</h3>
+  <ul>
+    <li>隔离或已确认接地关系的 5 V 限流电源、USB-C 无源供电夹具、两只万用表、电子负载、示波器和短接地弹簧。</li>
+    <li>首次上电不接电脑 USB 口；先用较低电流限制验证无短路和 3V3_SYS 极性。</li>
+    <li>不要用普通探头地夹接触 BUCK_SW；不要让探头滑落短接 U3/L1。</li>
+  </ul>
+  <h3 id="ch09-experiment-procedure">步骤与记录</h3>
+  <ol>
+    <li>断电测量 VBUS—GND、3V3_SYS—GND 是否有明显短路。</li>
+    <li>限流上电，记录 <var>V</var><sub>IN</sub>、<var>I</var><sub>IN</sub>、<var>V</var><sub>OUT</sub>、<var>I</var><sub>OUT</sub> 和环境条件。</li>
+    <li>同步计算输入/输出功率与效率；不要用不同时间点的数据拼接。</li>
+    <li>在 C3 两端用短回路探测纹波，记录带宽限制、探头方式和峰峰值。</li>
+    <li>逐级改变负载；每一级先观察电流、输出和温升，再决定是否继续。</li>
+  </ol>
+  <table>
+    <caption>实验 9-1 原始数据表</caption>
+    <thead><tr><th scope="col">负载条件</th><th scope="col">V<sub>IN</sub>/I<sub>IN</sub></th><th scope="col">V<sub>OUT</sub>/I<sub>OUT</sub></th><th scope="col">效率</th><th scope="col">纹波/温度/备注</th></tr></thead>
+    <tbody>
+      <tr><td>空载或最小安全负载</td><td>待填</td><td>待填</td><td>待算</td><td>待填</td></tr>
+      <tr><td>中间负载</td><td>待填</td><td>待填</td><td>待算</td><td>待填</td></tr>
+      <tr><td>经批准的最大测试负载</td><td>待填</td><td>待填</td><td>待算</td><td>待填</td></tr>
+    </tbody>
+  </table>
+  <p>只有填入真实仪器数据后才能把结果标为【实测】。本教材当前不预填通过判据数值；应从 U3、L1、电容和系统要求的数据手册复核后制定。</p>
+</section>
+
+<section aria-labelledby="ch09-summary">
+  <h2 id="ch09-summary">本章小结</h2>
+  <ul>
+    <li>U3 以同步开关方式把 VBUS_IN 降为 3V3_SYS；L1 和 C3把脉冲能量变成较平稳的输出。</li>
+    <li>C2 缩小输入高 di/dt 回路，R5/R6 以 453 kΩ/100 kΩ 设定约 3.318 V【计算】。</li>
+    <li>BUCK_SW 必须紧凑，反馈必须安静；“DRC 为零”不证明稳定或低噪声。</li>
+    <li>效率、纹波、温升和负载能力仍需限流、同步测量和明确停止条件。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch09-sources">
+  <h2 id="ch09-sources">事实来源</h2>
+  <p>最终 EasyEDA 工程中的 U3、L1、C2、C3、R5、R6 网络与器件元数据；SY8089 已复核反馈方程；<code>formula-facts.json</code> 的反馈、纹波和效率公式；R1 fabrication checklist 的走线与待验证项目。</p>
+</section>

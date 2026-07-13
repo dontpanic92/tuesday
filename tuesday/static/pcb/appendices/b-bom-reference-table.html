@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table） — USB GPIO PCB 离线教程">
+  <title>附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="appendix-b">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="../chapters/01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="../chapters/02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="../chapters/03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="../chapters/04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="../chapters/05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="../chapters/06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="../chapters/07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="../chapters/08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="../chapters/09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="../chapters/10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="../chapters/11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="../chapters/12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="../chapters/13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="../chapters/14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="../chapters/15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="../chapters/16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="../chapters/17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="../chapters/18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="../chapters/19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="../chapters/20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="../chapters/21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="../chapters/22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="../chapters/23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="../chapters/24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="../chapters/25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="../chapters/26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="../chapters/27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="../chapters/28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="../chapters/29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="../chapters/30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="../chapters/31-safe-power-up.html">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="../chapters/32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="../chapters/33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="../chapters/34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="../chapters/35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="../chapters/36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="../chapters/37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="b-bom-reference-table.html" aria-current="page">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>附录（Appendices）</li><li aria-current="page">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">附录（Appendices）</p>
+          <h1>附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#b-use">B.1 如何使用本表</a></li><li class="toc-level-2"><a href="#b-resistors">B.2 电阻 R1–R23</a></li><li class="toc-level-2"><a href="#b-capacitors">B.3 电容 C1–C14</a></li><li class="toc-level-2"><a href="#b-active-connectors">B.4 集成电路、连接器、磁性与指示器件</a></li><li class="toc-level-2"><a href="#b-audit">B.5 采购、装配与检验时的使用规则</a></li></ul></nav>
+        <section aria-labelledby="b-use">
+  <h2 id="b-use">B.1 如何使用本表</h2>
+  <p>本附录覆盖最终 PCB 上全部 48 个物理位号：R1–R23、C1–C14、U1–U5、J1–J3、L1、D1、Y1。最终采购 BOM 有 21 个分组行、46 个拟装配位号；CPL 和 PCB 有 48 行/位号，因为 J2、J3 是有焊盘但不随标准装配采购的 DNP 器件。</p>
+  <aside class="notice" aria-label="BOM 数据说明">
+    <p>最终 BOM 文件的 <q>Value</q> 列为空；下表的阻值、容值、频率和接口规格来自最终 EasyEDA 项目归档的器件元数据，而不是把空列猜成某个值。料号、封装和装配状态已与项目归档、BOM、CPL 交叉核对。</p>
+  </aside>
+  <table>
+    <caption>表 B-1　发布文件数量关系</caption>
+    <thead><tr><th scope="col">资料</th><th scope="col">数量</th><th scope="col">包含内容</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">PCB / CPL</th><td>48 个位号</td><td>全部物理位置，包括 J2、J3。</td></tr>
+      <tr><th scope="row">采购 BOM</th><td>46 个位号，21 个分组行</td><td>排除 Add into BOM=no 的 J2、J3。</td></tr>
+      <tr><th scope="row">装配面</th><td>Top only</td><td>全部 48 个物理位号都位于顶层。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="b-resistors">
+  <h2 id="b-resistors">B.2 电阻 R1–R23</h2>
+  <table>
+    <caption>表 B-2　全部电阻位号、值、料号、网络与功能</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">装配</th><th scope="col">值 / 制造商料号</th><th scope="col">封装</th><th scope="col">网络</th><th scope="col">在 R1 中的功能</th></tr></thead>
+    <tbody>
+      <tr id="ref-r1"><th scope="row"><code>R1</code></th><td>装配</td><td>5.1 kΩ<br><small>0603WAF5101T5E</small></td><td><code>R0603</code></td><td><code>CC1</code>—<code>GND</code></td><td>USB-C CC1 的独立 Rd 下拉；声明受电设备。</td></tr>
+      <tr id="ref-r2"><th scope="row"><code>R2</code></th><td>装配</td><td>5.1 kΩ<br><small>0603WAF5101T5E</small></td><td><code>R0603</code></td><td><code>CC2</code>—<code>GND</code></td><td>USB-C CC2 的独立 Rd 下拉；与 R1 分开服务另一插头方向。</td></tr>
+      <tr id="ref-r3"><th scope="row"><code>R3</code></th><td>装配</td><td>22 Ω<br><small>0603WAF220JT5E</small></td><td><code>R0603</code></td><td><code>USB_DM_ESD</code>—<code>USB_DM_MCU</code></td><td>USB D− 串联阻尼/源端调节。</td></tr>
+      <tr id="ref-r4"><th scope="row"><code>R4</code></th><td>装配</td><td>22 Ω<br><small>0603WAF220JT5E</small></td><td><code>R0603</code></td><td><code>USB_DP_ESD</code>—<code>USB_DP_MCU</code></td><td>USB D+ 串联阻尼/源端调节；应与 R3 保持对称。</td></tr>
+      <tr id="ref-r5"><th scope="row"><code>R5</code></th><td>装配</td><td>453 kΩ<br><small>0603WAF4533T5E</small></td><td><code>R0603</code></td><td><code>3V3_SYS</code>—<code>BUCK_FB</code></td><td>U3 反馈分压上臂。</td></tr>
+      <tr id="ref-r6"><th scope="row"><code>R6</code></th><td>装配</td><td>100 kΩ<br><small>0603WAF1003T5E</small></td><td><code>R0603</code></td><td><code>BUCK_FB</code>—<code>GND</code></td><td>U3 反馈分压下臂；与 R5 计算约 3.318 V 标称输出。</td></tr>
+      <tr id="ref-r7"><th scope="row"><code>R7</code></th><td>装配</td><td>16.9 kΩ<br><small>0603WAF1692T5E</small></td><td><code>R0603</code></td><td><code>ISET_5V</code>—<code>GND</code></td><td>设置 U4/5V_SW 的典型设计限流，计算约 0.402 A。</td></tr>
+      <tr id="ref-r8"><th scope="row"><code>R8</code></th><td>装配</td><td>27 kΩ<br><small>0603WAF2702T5E</small></td><td><code>R0603</code></td><td><code>ISET_3V3</code>—<code>GND</code></td><td>设置 U5/3V3_SW 的典型设计限流，计算约 0.252 A。</td></tr>
+      <tr id="ref-r9"><th scope="row"><code>R9</code></th><td>装配</td><td>100 kΩ<br><small>0603WAF1003T5E</small></td><td><code>R0603</code></td><td><code>EN_5V</code>—<code>GND</code></td><td>U4 使能下拉，使 5V_SW 在 MCU 高阻时默认关闭。</td></tr>
+      <tr id="ref-r10"><th scope="row"><code>R10</code></th><td>装配</td><td>100 kΩ<br><small>0603WAF1003T5E</small></td><td><code>R0603</code></td><td><code>EN_3V3</code>—<code>GND</code></td><td>U5 使能下拉，使 3V3_SW 默认关闭。</td></tr>
+      <tr id="ref-r11"><th scope="row"><code>R11</code></th><td>装配</td><td>100 kΩ<br><small>0603WAF1003T5E</small></td><td><code>R0603</code></td><td><code>BOOT0</code>—<code>GND</code></td><td>BOOT0 默认下拉，建立正常启动偏置。</td></tr>
+      <tr id="ref-r12"><th scope="row"><code>R12</code></th><td>装配</td><td>10 kΩ<br><small>0603WAF1002T5E</small></td><td><code>R0603</code></td><td><code>3V3_SYS</code>—<code>NRST</code></td><td>复位上拉；与 C10 形成 1 ms 名义 RC 时间常数。</td></tr>
+      <tr id="ref-r13"><th scope="row"><code>R13</code></th><td>装配</td><td>1 kΩ<br><small>0603WAF1001T5E</small></td><td><code>R0603</code></td><td><code>STATUS_LED</code>—<code>LED_A</code></td><td>D1 状态灯限流；实际电流取决于 GPIO 高电平和 LED 正向压降。</td></tr>
+      <tr id="ref-r14"><th scope="row"><code>R14</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO0_MCU</code>—<code>GPIO0_PWM0</code></td><td>GPIO0/PWM0 外部接口串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r15"><th scope="row"><code>R15</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO1_MCU</code>—<code>GPIO1_PWM1</code></td><td>GPIO1/PWM1 串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r16"><th scope="row"><code>R16</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO2_MCU</code>—<code>GPIO2_PWM2</code></td><td>GPIO2/PWM2 串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r17"><th scope="row"><code>R17</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO3_MCU</code>—<code>GPIO3_PWM3</code></td><td>GPIO3/PWM3 串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r18"><th scope="row"><code>R18</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO4_MCU</code>—<code>GPIO4</code></td><td>GPIO4 外部接口串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r19"><th scope="row"><code>R19</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO5_MCU</code>—<code>GPIO5</code></td><td>GPIO5 外部接口串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r20"><th scope="row"><code>R20</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO6_MCU</code>—<code>GPIO6</code></td><td>GPIO6 外部接口串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r21"><th scope="row"><code>R21</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>GPIO7_MCU</code>—<code>GPIO7</code></td><td>GPIO7 外部接口串联保护与边沿阻尼。</td></tr>
+      <tr id="ref-r22"><th scope="row"><code>R22</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>UART_TX_MCU</code>—<code>UART_TX</code></td><td>目标 UART TX 串联保护/阻尼；最高可靠波特率仍须实测。</td></tr>
+      <tr id="ref-r23"><th scope="row"><code>R23</code></th><td>装配</td><td>220 Ω<br><small>0603WAF2200T5E</small></td><td><code>R0603</code></td><td><code>UART_RX_MCU</code>—<code>UART_RX</code></td><td>目标 UART RX 串联保护/阻尼；输入裕量仍须实测。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="b-capacitors">
+  <h2 id="b-capacitors">B.3 电容 C1–C14</h2>
+  <table>
+    <caption>表 B-3　全部电容位号、值、料号、网络与功能</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">值 / 制造商料号</th><th scope="col">封装</th><th scope="col">网络</th><th scope="col">在 R1 中的功能</th></tr></thead>
+    <tbody>
+      <tr id="ref-c1"><th scope="row"><code>C1</code></th><td>10 µF<br><small>GRM21BR61H106KE43L</small></td><td><code>C0805</code></td><td><code>VBUS_IN</code>—<code>GND</code></td><td>USB 输入区域的本地储能/旁路；与 C2、C13 电气并联但物理服务对象不同。</td></tr>
+      <tr id="ref-c2"><th scope="row"><code>C2</code></th><td>10 µF<br><small>GRM21BR61H106KE43L</small></td><td><code>C0805</code></td><td><code>VBUS_IN</code>—<code>GND</code></td><td>U3 输入侧储能和去耦，缩小 Buck 输入脉冲电流环。</td></tr>
+      <tr id="ref-c3"><th scope="row"><code>C3</code></th><td>22 µF<br><small>CL21A226MAQNNNE</small></td><td><code>C0805</code></td><td><code>3V3_SYS</code>—<code>GND</code></td><td>U3/L1 输出储能与纹波滤波；有效电容和稳定性待实物验证。</td></tr>
+      <tr id="ref-c4"><th scope="row"><code>C4</code></th><td>10 µF<br><small>GRM21BR61H106KE43L</small></td><td><code>C0805</code></td><td><code>5V_SW</code>—<code>GND</code></td><td>5V_SW 输出端储能和负载瞬态电容。</td></tr>
+      <tr id="ref-c5"><th scope="row"><code>C5</code></th><td>10 µF<br><small>GRM21BR61H106KE43L</small></td><td><code>C0805</code></td><td><code>3V3_SW</code>—<code>GND</code></td><td>3V3_SW 输出端储能和负载瞬态电容。</td></tr>
+      <tr id="ref-c6"><th scope="row"><code>C6</code></th><td>100 nF<br><small>CC0603KRX7R9BB104</small></td><td><code>C0603</code></td><td><code>3V3_SYS</code>—<code>GND</code></td><td>U1 高频本地去耦之一；CAD 到 MCU 路径约 6.65 mm。</td></tr>
+      <tr id="ref-c7"><th scope="row"><code>C7</code></th><td>100 nF<br><small>CC0603KRX7R9BB104</small></td><td><code>C0603</code></td><td><code>3V3_SYS</code>—<code>GND</code></td><td>U1 高频本地去耦之一；CAD 到 MCU 路径约 6.71 mm。</td></tr>
+      <tr id="ref-c8"><th scope="row"><code>C8</code></th><td>100 nF<br><small>CC0603KRX7R9BB104</small></td><td><code>C0603</code></td><td><code>3V3_SYS</code>—<code>GND</code></td><td>U1 高频本地去耦之一；曾与 C9 发生机械重叠，最终已纠正。</td></tr>
+      <tr id="ref-c9"><th scope="row"><code>C9</code></th><td>10 µF<br><small>GRM21BR61H106KE43L</small></td><td><code>C0805</code></td><td><code>3V3_SYS</code>—<code>GND</code></td><td>U1 区域低频/负载瞬态储能；CAD 到 MCU 路径约 13.82 mm。</td></tr>
+      <tr id="ref-c10"><th scope="row"><code>C10</code></th><td>100 nF<br><small>CC0603KRX7R9BB104</small></td><td><code>C0603</code></td><td><code>NRST</code>—<code>GND</code></td><td>复位滤波/延时；与 R12 形成 1 ms 名义时间常数。</td></tr>
+      <tr id="ref-c11"><th scope="row"><code>C11</code></th><td>12 pF<br><small>CL10C120JB8NNNC</small></td><td><code>C0603</code></td><td><code>OSC_IN</code>—<code>GND</code></td><td>Y1 的 OSC_IN 侧负载电容；C0G。</td></tr>
+      <tr id="ref-c12"><th scope="row"><code>C12</code></th><td>12 pF<br><small>CL10C120JB8NNNC</small></td><td><code>C0603</code></td><td><code>OSC_OUT</code>—<code>GND</code></td><td>Y1 的 OSC_OUT 侧负载电容；与 C11 的匹配及起振裕量待验证。</td></tr>
+      <tr id="ref-c13"><th scope="row"><code>C13</code></th><td>100 nF<br><small>CC0603KRX7R9BB104</small></td><td><code>C0603</code></td><td><code>VBUS_IN</code>—<code>GND</code></td><td>U4 输入高频本地旁路。</td></tr>
+      <tr id="ref-c14"><th scope="row"><code>C14</code></th><td>100 nF<br><small>CC0603KRX7R9BB104</small></td><td><code>C0603</code></td><td><code>3V3_SYS</code>—<code>GND</code></td><td>U5 输入高频本地旁路。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="b-active-connectors">
+  <h2 id="b-active-connectors">B.4 集成电路、连接器、磁性与指示器件</h2>
+  <table>
+    <caption>表 B-4　U、J、L、D、Y 位号</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">装配</th><th scope="col">型号 / 值</th><th scope="col">最终封装标识</th><th scope="col">关键网络</th><th scope="col">在 R1 中的功能</th></tr></thead>
+    <tbody>
+      <tr id="ref-u1"><th scope="row"><code>U1</code></th><td>装配</td><td>CH32V203K8T6</td><td><code>LQFP-32_L7.0-W7.0-P0.80-LS9.0-BL</code></td><td><code>3V3_SYS</code>、USB、GPIO/PWM、UART、SWD、时钟、复位、使能、LED</td><td>主 MCU；承担 USB Full-Speed 设备、8 GPIO、4 TIM3 PWM、目标 UART、双路电源控制、状态指示和调试。</td></tr>
+      <tr id="ref-u2"><th scope="row"><code>U2</code></th><td>装配</td><td>USBLC6-2SC6</td><td><code>SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL</code></td><td>USB 连接器侧/MCU 侧 D+/D−、<code>VBUS_IN</code>、<code>GND</code></td><td>USB 双线低电容 ESD 导流器件；实物防护等级尚未验证。</td></tr>
+      <tr id="ref-u3"><th scope="row"><code>U3</code></th><td>装配</td><td>SY8089AAAC</td><td><code>SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR</code></td><td><code>VBUS_IN</code>、<code>BUCK_SW</code>、<code>BUCK_FB</code>、<code>GND</code></td><td>把 VBUS 降压成始终开启的 3V3_SYS 同步 Buck。</td></tr>
+      <tr id="ref-u4"><th scope="row"><code>U4</code></th><td>装配</td><td>SY6280AAC</td><td><code>SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BL</code></td><td><code>VBUS_IN</code>、<code>5V_SW</code>、<code>EN_5V</code>、<code>ISET_5V</code></td><td>5V_SW 高侧受控、可限流负载开关。</td></tr>
+      <tr id="ref-u5"><th scope="row"><code>U5</code></th><td>装配</td><td>SY6280AAC</td><td><code>SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BL</code></td><td><code>3V3_SYS</code>、<code>3V3_SW</code>、<code>EN_3V3</code>、<code>ISET_3V3</code></td><td>3V3_SW 高侧受控、可限流负载开关。</td></tr>
+      <tr id="ref-j1"><th scope="row"><code>J1</code></th><td>装配</td><td>TYPE-C-31-M-12</td><td><code>USB-C_SMD-TYPE-C-31-M-12_1</code></td><td><code>VBUS_IN</code>、<code>GND</code>、<code>CC1</code>、<code>CC2</code>、USB D+/D−</td><td>USB 2.0-only Type-C 主机连接器；不含 SuperSpeed 或 USB-PD。</td></tr>
+      <tr id="ref-j2"><th scope="row"><code>J2</code></th><td><strong>DNP</strong></td><td>2×8，2.54 mm<br><small>2.54mm2*8Pinheader</small></td><td><code>HDR-TH_16P-P2.54-V-M-R2-C8-S2.54-1</code></td><td>GND、5V_SW、3V3_SW、8 GPIO/PWM、UART、NRST、NC</td><td>目标侧接口；PCB/CPL/装配图保留，采购 BOM 不装排针。</td></tr>
+      <tr id="ref-j3"><th scope="row"><code>J3</code></th><td><strong>DNP</strong></td><td>1×5，1.27 mm<br><small>HDR-1X5</small></td><td><code>HDR-TH_5P-P1.27_C9900008152</code></td><td><code>3V3_SYS</code>、<code>GND</code>、<code>SWDIO</code>、<code>SWCLK</code>、<code>NRST</code></td><td>WCH-Link/SWD 调试与恢复接口；可焊排针或使用夹具。</td></tr>
+      <tr id="ref-l1"><th scope="row"><code>L1</code></th><td>装配</td><td>2.2 µH<br><small>SWPA252012S2R2MT</small></td><td><code>IND-SMD_L2.5-W2.0_SWPA2520</code></td><td><code>BUCK_SW</code>—<code>3V3_SYS</code></td><td>U3 Buck 储能电感；最终项目元数据给出额定/饱和信息，但板级温升和裕量未实测。</td></tr>
+      <tr id="ref-d1"><th scope="row"><code>D1</code></th><td>装配</td><td>黄绿色 LED<br><small>19-217/G7C-BK2L2VY/3T</small></td><td><code>LED0603-R-RD_GREEN</code></td><td><code>LED_A</code>—<code>GND</code></td><td>由 U1 控制的状态指示灯；极性错误时通常不亮。</td></tr>
+      <tr id="ref-y1"><th scope="row"><code>Y1</code></th><td>装配</td><td>12 MHz，标称负载 20 pF<br><small>X322512MSB4SI</small></td><td><code>CRYSTAL-SMD_4P-L3.2-W2.5-BL</code></td><td><code>OSC_IN</code>、<code>OSC_OUT</code>、两地脚</td><td>U1 外部高速时钟谐振器；最终频率覆盖提案中的 8 MHz。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="b-audit">
+  <h2 id="b-audit">B.5 采购、装配与检验时的使用规则</h2>
+  <ol>
+    <li><strong>按位号核对，而不是只按数量：</strong>同一料号分组采购，但失效分析和返修必须回到单个位号。</li>
+    <li><strong>值、料号、封装三者都要匹配：</strong>“0603”相同不代表电气值相同；SOT-23-5 的引脚排列和方向也不能仅凭外形判断。</li>
+    <li><strong>DNP 不是删除：</strong>J2/J3 的焊盘、孔、方向、机械空间和网络仍属于设计，不能因 BOM 没有它们而从审核中忽略。</li>
+    <li><strong>方向敏感器件单独检查：</strong>U1 pin 1、U2/U3/U4/U5 的封装方向、J1 插接方向、D1 极性、Y1 脚位和 J2/J3 pin 1 都必须与装配资料一致。</li>
+    <li><strong>库存分类会变化：</strong>供应商代码和基础/扩展料分类只代表发布时记录；下单前应重新确认可用性、生命周期和替代料的完整参数。</li>
+  </ol>
+  <div class="checkpoint">
+    <p><strong>覆盖检查：</strong>本页共有 23 个 R、14 个 C、5 个 U、3 个 J，以及 L1、D1、Y1，共 48 个唯一位号。若制造或返修清单的集合不同，应先解释差异，再继续。</p>
+  </div>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="a-schematic-walkthrough.html"><small>上一页</small>附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a><a class="next" rel="next" href="c-pin-mapping.html"><small>下一页</small>附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

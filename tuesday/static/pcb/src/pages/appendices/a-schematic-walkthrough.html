@@ -1,0 +1,166 @@
+<section aria-labelledby="a-scope">
+  <h2 id="a-scope">A.1 导读范围与证据边界</h2>
+  <p>本附录按“电源从哪里来、信号经过什么、控制由谁发出、故障从哪里返回”的顺序，完整导读 USB GPIO R1 原理图。最终设计包含 48 个 PCB 位号、172 个焊盘和 47 个命名网络；其中 J2、J3 保留在 PCB、CPL 和装配图中，但采购 BOM 明确不装配。</p>
+  <aside class="notice" aria-label="事实状态说明">
+    <p><strong>事实状态：</strong>位号、标称值、封装、引脚网络和 DNP 属性来自最终 EasyEDA 项目归档；连通性、数量和制造几何来自发布清单与制造审核。当前没有装配板实测数据，因此电压、纹波、温升、USB 枚举、时钟起振和限流动作均不能写成“已测得”。</p>
+  </aside>
+  <p>阅读时应同时打开四种资料：原理图回答“逻辑上怎么连”，<a href="b-bom-reference-table.html">附录 B</a>回答“每个实物是什么”，<a href="c-pin-mapping.html">附录 C</a>回答“连接器和 MCU 的针脚对应什么”，装配图与 PCB 回答“它实际放在哪里”。任何单一视图都不足以完成审核。</p>
+</section>
+
+<section aria-labelledby="a-reading-method">
+  <h2 id="a-reading-method">A.2 一张原理图的六步阅读法</h2>
+  <ol>
+    <li><strong>先找边界：</strong>J1 是主机侧入口，J2 是目标侧接口，J3 是调试接口。</li>
+    <li><strong>再分电源域：</strong><code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>5V_SW</code> 和 <code>3V3_SW</code> 是四条不同电源网络，不能因电压相近而合并。</li>
+    <li><strong>沿单向功能链追踪：</strong>例如 USB 数据依次经过 J1、U2、R3/R4，再到 U1；不要跨过中间保护器件只看两端。</li>
+    <li><strong>为每个有源器件寻找供电、地、输入、输出和配置脚：</strong>缺少其中任意一类，都应视为待解释问题。</li>
+    <li><strong>检查默认状态：</strong>R9、R10、R11、R12 与 C10 决定复位、启动和受控电源在固件接管前的倾向。</li>
+    <li><strong>最后核对物理实现：</strong>原理图上相邻不代表 PCB 上相邻；去耦、ESD、晶振和 Buck 回路必须在布局中再次验证。</li>
+  </ol>
+  <div class="checkpoint">
+    <p><strong>快速自检：</strong>如果无法用一句话说明某条网络的源端、负载端和返回路径，就还没有真正读懂该网络。</p>
+  </div>
+</section>
+
+<section aria-labelledby="a-usbc-power">
+  <h2 id="a-usbc-power">A.3 USB-C 入口、CC 检测与 VBUS</h2>
+  <h3 id="a-j1">A.3.1 J1：主机连接边界</h3>
+  <p>J1 是 USB 2.0-only Type-C 母座。重复的 A/B 侧 VBUS 焊盘汇入 <code>VBUS_IN</code>，重复的地焊盘和四个外壳/固定焊盘接入 <code>GND</code>；A6/B6 合并为 <code>USB_DP_CONN</code>，A7/B7 合并为 <code>USB_DM_CONN</code>。A8、B8 在本设计中刻意不连接。J1 左向伸出板边是最终机械意图，不是位置错误。</p>
+  <h3 id="a-cc">A.3.2 R1、R2：两个独立的受电端声明</h3>
+  <p>R1 将 <code>CC1</code> 以 5.1 kΩ 下拉到地，R2 对 <code>CC2</code> 做同样处理。两只电阻不能合并成一只，也不能把 CC1 与 CC2 短接；可翻转插头只会使其中一条 CC 通道成为有效检测通道。开路或错值可能导致某一插入方向不能被主机识别。</p>
+  <h3 id="a-vbus-entry">A.3.3 C1 与 VBUS 分配</h3>
+  <p>C1 是 <code>VBUS_IN</code> 的 10 µF 本地储能/旁路电容。VBUS 随后分成三条功能路径：给 U2 提供钳位参考、给 U3 产生始终开启的 <code>3V3_SYS</code>、给 U4 产生受控的 <code>5V_SW</code>。这些支路共享同一来源，但其局部电流回路和旁路电容不同。</p>
+  <aside class="warning" aria-label="USB 供电边界">
+    <p>R1 不是 USB Power Delivery 设备，也没有隔离。<code>5V_SW</code> 是受控电源输出，不是 5 V 逻辑电平；可用电流还受主机、线缆、板上负载、开关压降和热条件限制。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="a-usb-data">
+  <h2 id="a-usb-data">A.4 USB 数据保护链</h2>
+  <p>USB 数据路径应成对阅读，并保持 D+、D− 的拓扑对称：</p>
+  <table>
+    <caption>USB 数据从连接器到 MCU 的完整路径</caption>
+    <thead><tr><th scope="col">通道</th><th scope="col">连接器侧</th><th scope="col">ESD 器件</th><th scope="col">串联电阻</th><th scope="col">MCU 侧</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">D−</th><td>J1 → <code>USB_DM_CONN</code></td><td>U2 pin 1 → pin 6，网络变为 <code>USB_DM_ESD</code></td><td>R3，22 Ω</td><td><code>USB_DM_MCU</code> → U1 pin 21</td></tr>
+      <tr><th scope="row">D+</th><td>J1 → <code>USB_DP_CONN</code></td><td>U2 pin 3 → pin 4，网络变为 <code>USB_DP_ESD</code></td><td>R4，22 Ω</td><td><code>USB_DP_MCU</code> → U1 pin 22</td></tr>
+    </tbody>
+  </table>
+  <p>U2 的 pin 2 接地、pin 5 接 <code>VBUS_IN</code>，构成双线 ESD 导流拓扑。U2 必须靠近连接器，使“尚未受保护”的走线尽量短；R3、R4 则位于 ESD 级和 MCU 级之间，用于源端阻尼/调节。最终 CAD 几何显示三段 D+/D− 长度高度匹配，但这只证明几何长度，不证明生产叠层下的受控阻抗、眼图、EMI 或 ESD 合规。</p>
+  <div class="error-case">
+    <p><strong>常见误读：</strong>看到 D+、D− 最终都到 U1，就跳过 U2 和 R3/R4。这样会漏掉保护方向、分段网络名以及器件错装后“仍有铜连接但 USB 不工作”的故障模式。</p>
+  </div>
+</section>
+
+<section aria-labelledby="a-buck">
+  <h2 id="a-buck">A.5 5 V 到 3.3 V 的 Buck 电源</h2>
+  <p>U3（SY8089AAAC）、L1、C2、C3、R5 和 R6 构成始终开启的 3.3 V 电源：</p>
+  <ol>
+    <li><code>VBUS_IN</code> 同时进入 U3 pin 1、pin 4；C2（10 µF）在输入侧向地旁路。</li>
+    <li>U3 pin 3 输出高速切换的 <code>BUCK_SW</code>，经 L1（2.2 µH）传递能量。</li>
+    <li>L1 后端形成 <code>3V3_SYS</code>，C3（22 µF）提供输出储能和纹波滤波。</li>
+    <li>R5（453 kΩ）从 <code>3V3_SYS</code> 接到 <code>BUCK_FB</code>，R6（100 kΩ）再接地；按典型 0.6 V 反馈基准计算，标称输出约为 3.318 V。</li>
+    <li>U3 pin 2 接地，输入开关环、开关节点、输出环和反馈返回都必须在 PCB 上保持紧凑且彼此合理隔离。</li>
+  </ol>
+  <p><code>BUCK_SW</code> 不是“3.3 V 走线”，而是高 dv/dt 开关节点。其铜面积过大、靠近 USB/晶振/反馈网络，或输入输出回路过长，都可能造成纹波、EMI、温升或稳定性问题；这些问题不会因 ERC/DRC 为零而自动消失。完整公式见<a href="d-equations.html#eq-buck-feedback">附录 D</a>。</p>
+</section>
+
+<section aria-labelledby="a-switched-rails">
+  <h2 id="a-switched-rails">A.6 两路受控电源输出</h2>
+  <table>
+    <caption>U4 与 U5 的对应关系</caption>
+    <thead><tr><th scope="col">功能</th><th scope="col">5 V 通道</th><th scope="col">3.3 V 通道</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">负载开关</th><td>U4 SY6280AAC</td><td>U5 SY6280AAC</td></tr>
+      <tr><th scope="row">输入</th><td><code>VBUS_IN</code></td><td><code>3V3_SYS</code></td></tr>
+      <tr><th scope="row">输出</th><td><code>5V_SW</code></td><td><code>3V3_SW</code></td></tr>
+      <tr><th scope="row">MCU 使能</th><td><code>EN_5V</code>，U1 pin 26</td><td><code>EN_3V3</code>，U1 pin 27</td></tr>
+      <tr><th scope="row">默认关闭</th><td>R9 100 kΩ 下拉</td><td>R10 100 kΩ 下拉</td></tr>
+      <tr><th scope="row">限流设定</th><td>R7 16.9 kΩ，计算约 0.402 A</td><td>R8 27 kΩ，计算约 0.252 A</td></tr>
+      <tr><th scope="row">局部旁路/储能</th><td>C13 100 nF 输入，C4 10 µF 输出</td><td>C14 100 nF 输入，C5 10 µF 输出</td></tr>
+    </tbody>
+  </table>
+  <p>R9、R10 的作用不是“由软件关闭电源”，而是在 MCU 复位、高阻或尚未配置时给 EN 一个明确低电平。软件安全状态仍须实物和固件验证。U4/U5 最终没有故障输出网络；不得把提案中的可选 fault 信号描述成 R1 已实现功能。</p>
+</section>
+
+<section aria-labelledby="a-mcu-core">
+  <h2 id="a-mcu-core">A.7 MCU 供电、去耦与核心控制</h2>
+  <p>U1 为 CH32V203K8T6。pin 1、5、17 接 <code>3V3_SYS</code>，pin 16、32 接 <code>GND</code>。C6、C7、C8 各为 100 nF 高频去耦，C9 为 10 µF 区域储能。它们在原理图上都只是“电源到地”的并联电容，但在 PCB 上服务的瞬态路径不同；最终 CAD 最短路径记录为 C6/C7/C8 到 MCU 约 6.65/6.71/8.99 mm，C9 约 13.82 mm，这些是几何计算而非噪声实测。</p>
+  <p>U1 同时承担 USB 设备、八路 GPIO、四路 TIM3 PWM、目标 UART、两路电源使能、状态 LED 和 SWD。因多个功能共享同一 MCU，固件必须在复位、启动和 USB 挂起期间建立安全状态：外部 GPIO 高阻、PWM 停止、UART TX 未配置前高阻、两路受控电源关闭。该行为目前属于预期要求，尚无板上测量证据。</p>
+</section>
+
+<section aria-labelledby="a-clock-reset-led">
+  <h2 id="a-clock-reset-led">A.8 时钟、复位、启动与状态灯</h2>
+  <h3 id="a-clock">A.8.1 Y1、C11、C12</h3>
+  <p>Y1 的最终项目值是 12 MHz、标称负载 20 pF，覆盖了早期提案中的 8 MHz。Y1 pin 1/3 分别接 <code>OSC_IN</code>/<code>OSC_OUT</code>，pin 2/4 接地；C11、C12 各 12 pF，从两条振荡网络分别接地。只计算两只外接电容的串联等效得到 6 pF，仍须加上引脚、封装和走线杂散电容；因此负载匹配、频偏和起振裕量都标为待验证。</p>
+  <h3 id="a-reset-boot">A.8.2 R12、C10 与 R11</h3>
+  <p>R12（10 kΩ）把 <code>NRST</code> 上拉到 <code>3V3_SYS</code>，C10（100 nF）把 NRST 对地滤波，名义 RC 时间常数为 1 ms。实际复位释放时间还取决于 MCU 阈值和电源上升斜率。R11（100 kΩ）把 <code>BOOT0</code> 默认拉低，减少误入启动模式的风险。</p>
+  <h3 id="a-status-led">A.8.3 R13 与 D1</h3>
+  <p>U1 pin 28 的 <code>STATUS_LED</code> 经 R13（1 kΩ）到 <code>LED_A</code>，再经过黄绿色 LED D1 到地。由于最终源未给出板上 GPIO 高电平和 LED 正向压降的实测值，只能写成 <span aria-label="I LED">I<sub>LED</sub></span> = (<span aria-label="V O H">V<sub>OH</sub></span> − <span aria-label="V F">V<sub>F</sub></span>)/1 kΩ；令 <span aria-label="V F">V<sub>F</sub></span>=0 的保守数学上限为 3.3 mA，不是实测电流。</p>
+</section>
+
+<section aria-labelledby="a-io">
+  <h2 id="a-io">A.9 GPIO、PWM、UART 与目标接口</h2>
+  <p>U1 的十条外部数字信号先经过 220 Ω 串联电阻，再到 J2。电阻把 MCU 侧网络与连接器侧网络有意分开：</p>
+  <table>
+    <caption>MCU 到目标接口的信号链</caption>
+    <thead><tr><th scope="col">U1 功能</th><th scope="col">MCU 侧网络</th><th scope="col">串联器件</th><th scope="col">外部网络 / J2</th></tr></thead>
+    <tbody>
+      <tr><td>TIM3_CH1 / GPIO0</td><td><code>GPIO0_MCU</code></td><td>R14</td><td><code>GPIO0_PWM0</code> / pin 5</td></tr>
+      <tr><td>TIM3_CH2 / GPIO1</td><td><code>GPIO1_MCU</code></td><td>R15</td><td><code>GPIO1_PWM1</code> / pin 6</td></tr>
+      <tr><td>TIM3_CH3 / GPIO2</td><td><code>GPIO2_MCU</code></td><td>R16</td><td><code>GPIO2_PWM2</code> / pin 7</td></tr>
+      <tr><td>TIM3_CH4 / GPIO3</td><td><code>GPIO3_MCU</code></td><td>R17</td><td><code>GPIO3_PWM3</code> / pin 8</td></tr>
+      <tr><td>GPIO4–GPIO7</td><td><code>GPIO4_MCU</code>–<code>GPIO7_MCU</code></td><td>R18–R21</td><td><code>GPIO4</code>–<code>GPIO7</code> / pins 9–12</td></tr>
+      <tr><td>USART2_TX</td><td><code>UART_TX_MCU</code></td><td>R22</td><td><code>UART_TX</code> / pin 13</td></tr>
+      <tr><td>USART2_RX</td><td><code>UART_RX_MCU</code></td><td>R23</td><td><code>UART_RX</code> / pin 14</td></tr>
+    </tbody>
+  </table>
+  <p>四路 PWM 共用 TIM3 频率，但可有独立占空比。UART 是 3.3 V CMOS/TTL，不是 RS-232。R14–R23 可限制部分故障电流并与线路电容形成阻尼，但不能把 GPIO 变成隔离、5 V 兼容或大电流输出；最终板也没有外部 GPIO ESD 阵列。</p>
+</section>
+
+<section aria-labelledby="a-connectors-debug">
+  <h2 id="a-connectors-debug">A.10 J2、J3 与调试恢复路径</h2>
+  <p>J2 为 2×8、2.54 mm 目标排针，提供两地、两路受控电源、八路 GPIO/PWM、UART、NRST 和一个保留空脚。J3 为 1×5、1.27 mm SWD 接口，提供 <code>3V3_SYS</code>、<code>GND</code>、<code>SWDIO</code>、<code>SWCLK</code>、<code>NRST</code>。二者均为 DNP：裸板上有孔和铜，装配 BOM 中没有排针。</p>
+  <p>调试器接线必须以接口针脚表为准，不能凭连接器外观猜方向。J3 的 3.3 V 脚用于电平参考/按既定调试方案连接，不应在未确认供电方向时让两个电源互相驱动。完整针脚表见<a href="c-pin-mapping.html#connector-j3">附录 C</a>。</p>
+</section>
+
+<section aria-labelledby="a-net-inventory">
+  <h2 id="a-net-inventory">A.11 全部 47 个命名网络索引</h2>
+  <table>
+    <caption>按功能分组的最终命名网络；组内没有省略</caption>
+    <thead><tr><th scope="col">组</th><th scope="col">网络</th><th scope="col">阅读要点</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">电源、转换与控制（11）</th><td><code>GND</code>、<code>VBUS_IN</code>、<code>3V3_SYS</code>、<code>5V_SW</code>、<code>3V3_SW</code>、<code>BUCK_SW</code>、<code>BUCK_FB</code>、<code>ISET_5V</code>、<code>ISET_3V3</code>、<code>EN_5V</code>、<code>EN_3V3</code></td><td>区分能源路径、开关节点、模拟设定和逻辑控制。</td></tr>
+      <tr><th scope="row">USB 与 CC（8）</th><td><code>CC1</code>、<code>CC2</code>、<code>USB_DM_CONN</code>、<code>USB_DM_ESD</code>、<code>USB_DM_MCU</code>、<code>USB_DP_CONN</code>、<code>USB_DP_ESD</code>、<code>USB_DP_MCU</code></td><td>网络名显示保护链的三个物理阶段。</td></tr>
+      <tr><th scope="row">时钟、复位、启动、调试与指示（8）</th><td><code>OSC_IN</code>、<code>OSC_OUT</code>、<code>NRST</code>、<code>BOOT0</code>、<code>SWDIO</code>、<code>SWCLK</code>、<code>STATUS_LED</code>、<code>LED_A</code></td><td>这些网络决定能否启动、恢复和观察状态。</td></tr>
+      <tr><th scope="row">连接器侧 I/O（10）</th><td><code>GPIO0_PWM0</code>、<code>GPIO1_PWM1</code>、<code>GPIO2_PWM2</code>、<code>GPIO3_PWM3</code>、<code>GPIO4</code>、<code>GPIO5</code>、<code>GPIO6</code>、<code>GPIO7</code>、<code>UART_TX</code>、<code>UART_RX</code></td><td>位于 R14–R23 的外部一侧。</td></tr>
+      <tr><th scope="row">MCU 侧 I/O（10）</th><td><code>GPIO0_MCU</code>、<code>GPIO1_MCU</code>、<code>GPIO2_MCU</code>、<code>GPIO3_MCU</code>、<code>GPIO4_MCU</code>、<code>GPIO5_MCU</code>、<code>GPIO6_MCU</code>、<code>GPIO7_MCU</code>、<code>UART_TX_MCU</code>、<code>UART_RX_MCU</code></td><td>位于 R14–R23 的 U1 一侧。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="a-no-connects">
+  <h2 id="a-no-connects">A.12 九个刻意未连接引脚</h2>
+  <table>
+    <caption>最终原理图中明确计入审核的未连接引脚</caption>
+    <thead><tr><th scope="col">器件</th><th scope="col">引脚</th><th scope="col">说明</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">J1</th><td>A8、B8</td><td>USB-C SBU 引脚，本 USB 2.0-only 设计不使用。</td></tr>
+      <tr><th scope="row">J2</th><td>16</td><td>保留脚，最终网络为空。</td></tr>
+      <tr><th scope="row">U1</th><td>18、19、20、25、29、30</td><td>PA8、PA9、PA10、PA15、PB6、PB7 在 R1 中刻意未使用。</td></tr>
+    </tbody>
+  </table>
+  <p>“未连接”应是有意、可追溯的设计决定，而不是遗漏。最终审核记录九个引脚全部得到解释。</p>
+</section>
+
+<section aria-labelledby="a-end-to-end">
+  <h2 id="a-end-to-end">A.13 三条端到端复述练习</h2>
+  <ol>
+    <li><strong>USB 枚举链：</strong>J1 的 CC1/CC2 由 R1/R2 声明受电端；VBUS 形成 <code>VBUS_IN</code>；D+/D− 经 U2 和 R3/R4 到 U1；U1 还必须获得稳定的 <code>3V3_SYS</code>、时钟和复位释放。任何一环失败都可能表现为“不枚举”。</li>
+    <li><strong>5 V 输出链：</strong>J1 VBUS → <code>VBUS_IN</code> → U4 → <code>5V_SW</code> → J2 pin 3；U1 pin 26 通过 <code>EN_5V</code> 控制 U4，R9 提供默认关闭，R7 设置设计限流，C13/C4服务输入输出瞬态。</li>
+    <li><strong>PWM0 链：</strong>U1 pin 12 的 TIM3_CH1 → <code>GPIO0_MCU</code> → R14 → <code>GPIO0_PWM0</code> → J2 pin 5；返回电流必须经目标与本板的共同 GND 回到驱动源。</li>
+  </ol>
+  <div class="checkpoint">
+    <p><strong>完成标准：</strong>能够不依赖原理图注释，按上述方式复述每个电源域、每条外部信号和每个控制反馈环，并能指出哪些结论仍须实物验证。</p>
+  </div>
+</section>

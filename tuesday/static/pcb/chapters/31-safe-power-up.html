@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN" data-root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="31. 安全首次上电（Safe First Power-Up） — USB GPIO PCB 离线教程">
+  <title>31. 安全首次上电（Safe First Power-Up） | USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</title>
+  <link rel="stylesheet" href="../assets/css/book.css">
+  <link rel="stylesheet" href="../assets/css/print.css" media="print">
+  <script src="../assets/js/search-index.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/search.js" defer></script>
+</head>
+<body data-page-id="chapter-31">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">USB 转 GPIO PCB 设计：从基本原理到制造（Designing a USB-to-GPIO PCB: From First Principles to Fabrication）</a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">目录</button>
+  </header>
+  <div class="site-layout">
+    <aside class="site-sidebar" id="site-navigation" aria-label="教程目录">
+      <form class="search-form" role="search">
+  <label for="site-search">站内搜索</label>
+  <div class="search-row">
+    <input id="site-search" name="q" type="search" autocomplete="off">
+    <button type="submit">搜索</button>
+  </div>
+  <noscript><p>搜索需要 JavaScript；完整目录和顺序导航不需要。</p></noscript>
+  <ul class="search-results" id="search-results" aria-live="polite"></ul>
+</form>
+      <nav aria-label="全站目录"><ul><li><a href="../index.html">首页 / 总目录</a></li><li class="part-item"><span class="part-title">关于本教程（About This Tutorial）</span><ul><li><a href="../about.html">关于本教程（About This Tutorial）</a></li></ul></li><li class="part-item"><span class="part-title">第一部分：基础知识（Part I — Foundations）</span><ul><li><a href="01-pcb-basics.html">1. PCB 是什么以及如何工作（What a PCB Is and How It Works）</a></li><li><a href="02-reading-schematics.html">2. 阅读电子原理图（Reading Electronic Schematics）</a></li><li><a href="03-essential-components.html">3. 常用元器件及其作用（Essential Components and What They Do）</a></li></ul></li><li class="part-item"><span class="part-title">第二部分：定义 USB GPIO 板（Part II — Defining the USB GPIO Board）</span><ul><li><a href="04-engineering-specification.html">4. 将需求转化为工程规格（Turning Requirements into an Engineering Specification）</a></li><li><a href="05-system-architecture.html">5. 系统架构与功能模块（System Architecture and Functional Blocks）</a></li><li><a href="06-part-selection.html">6. 器件选型与数据手册核验（Selecting Parts and Verifying Datasheets）</a></li></ul></li><li class="part-item"><span class="part-title">第三部分：理解每个电路模块（Part III — Understanding Every Circuit Block）</span><ul><li><a href="07-usb-c-power-cc.html">7. USB-C 供电与配置通道（USB-C Power and Configuration Channel）</a></li><li><a href="08-usb-data-protection.html">8. USB 数据保护与信号调理（USB Data Protection and Signal Conditioning）</a></li><li><a href="09-buck-converter.html">9. Buck 降压转换器与 3.3 V 系统电源轨（Buck Converter and the 3.3 V System Rail）</a></li><li><a href="10-switched-power.html">10. 受控电源输出（Switched Power Outputs）</a></li><li><a href="11-microcontroller-core.html">11. 微控制器核心（The Microcontroller Core）</a></li><li><a href="12-clock-reset-status.html">12. 时钟、复位与状态指示（Clock, Reset, and Status Indication）</a></li><li><a href="13-interfaces-protection.html">13. GPIO、PWM、UART 与外部保护（GPIO, PWM, UART, and External Protection）</a></li><li><a href="14-component-walkthrough.html">14. 逐元器件电路导读（Component-by-Component Circuit Walkthrough）</a></li></ul></li><li class="part-item"><span class="part-title">第四部分：在 EasyEDA 中绘制原理图（Part IV — Schematic Capture in EasyEDA）</span><ul><li><a href="15-easyeda-project.html">15. 创建并组织 EasyEDA 工程（Creating and Organizing the EasyEDA Project）</a></li><li><a href="16-schematic-capture.html">16. 绘制原理图（Capturing the Schematic）</a></li><li><a href="17-schematic-review-erc.html">17. 原理图审查与 ERC（Schematic Review and ERC）</a></li></ul></li><li class="part-item"><span class="part-title">第五部分：PCB 规划与布局（Part V — PCB Planning and Layout）</span><ul><li><a href="18-schematic-to-pcb.html">18. 从原理图到实体 PCB（From Schematic to Physical PCB）</a></li><li><a href="19-footprints-mechanics.html">19. 封装与机械现实（Footprints and Mechanical Reality）</a></li><li><a href="20-functional-placement.html">20. 功能化布局（Functional Placement）</a></li><li><a href="21-routing-fundamentals.html">21. 布线基础（Routing Fundamentals）</a></li><li><a href="22-usb-differential-routing.html">22. USB 差分对布线（Routing USB Differential Pairs）</a></li><li><a href="23-power-ground-routing.html">23. 电源、地与 Buck 转换器布线（Routing Power, Ground, and the Buck Converter）</a></li><li><a href="24-copper-pours.html">24. 铺铜与地平面（Copper Pours and Ground Planes）</a></li><li><a href="25-silkscreen-human-factors.html">25. 丝印、装配信息与人因设计（Silkscreen, Assembly Information, and Human Factors）</a></li></ul></li><li class="part-item"><span class="part-title">第六部分：验证与制造（Part VI — Verification and Manufacturing）</span><ul><li><a href="26-drc-mechanical-audit.html">26. DRC、机械审核与设计签核（DRC, Mechanical Audit, and Design Sign-Off）</a></li><li><a href="27-bom-cpl-assembly.html">27. BOM、CPL 与装配规划（BOM, CPL, and Assembly Planning）</a></li><li><a href="28-fabrication-outputs.html">28. Gerber、钻孔与制造输出（Gerbers, Drills, and Fabrication Outputs）</a></li><li><a href="29-r1-manufacturing-case-study.html">29. USB GPIO R1 制造案例复盘（USB GPIO R1 Manufacturing Case Study）</a></li></ul></li><li class="part-item"><span class="part-title">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</span><ul><li><a href="30-receiving-inspection.html">30. PCB 收货与检验（Receiving and Inspecting the PCB）</a></li><li><a href="31-safe-power-up.html" aria-current="page">31. 安全首次上电（Safe First Power-Up）</a></li><li><a href="32-programming-validation.html">32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></li><li><a href="33-interface-experiments.html">33. 接口实验（Interface Experiments）</a></li><li><a href="34-performance-reliability.html">34. 性能与可靠性测量（Measuring Performance and Reliability）</a></li><li><a href="35-troubleshooting.html">35. 故障排查方法（Troubleshooting Method）</a></li></ul></li><li class="part-item"><span class="part-title">第八部分：设计反思与扩展（Part VIII — Design Reflection and Extension）</span><ul><li><a href="36-engineering-trade-offs.html">36. 最终设计中的工程权衡（Engineering Trade-offs in the Final Design）</a></li><li><a href="37-revision-b-projects.html">37. R2 版本建议项目（Suggested Revision-B Projects）</a></li></ul></li><li class="part-item"><span class="part-title">附录（Appendices）</span><ul><li><a href="../appendices/a-schematic-walkthrough.html">附录 A：USB GPIO R1 完整原理图导读（Complete USB GPIO R1 Schematic Walkthrough）</a></li><li><a href="../appendices/b-bom-reference-table.html">附录 B：完整 BOM 与位号功能表（Complete BOM and Reference-Designator Function Table）</a></li><li><a href="../appendices/c-pin-mapping.html">附录 C：目标连接器与 MCU 引脚映射表（Target Connector and MCU Pin-Mapping Tables）</a></li><li><a href="../appendices/d-equations.html">附录 D：核心公式与完整算例（Core Equations and Worked Calculations）</a></li><li><a href="../appendices/e-easyeda-quick-reference.html">附录 E：EasyEDA 工作流程速查（EasyEDA Workflow Quick Reference）</a></li><li><a href="../appendices/f-checklists.html">附录 F：ERC、DRC、机械与制造检查表（ERC, DRC, Mechanical, and Fabrication Checklists）</a></li><li><a href="../appendices/g-laboratory-worksheets.html">附录 G：实验工作表与结果记录表（Laboratory Worksheets and Result Tables）</a></li><li><a href="../appendices/h-symbols-units.html">附录 H：常用符号、封装、单位与前缀（Common Symbols, Packages, Units, and Prefixes）</a></li><li><a href="../appendices/i-datasheet-checklist.html">附录 I：数据手册阅读检查表（Datasheet Reading Checklist）</a></li><li><a href="../appendices/j-glossary.html">附录 J：术语表（Glossary）</a></li><li><a href="../appendices/k-answer-key.html">附录 K：复习题与答案（Review Questions and Answer Key）</a></li><li><a href="../appendices/l-references.html">附录 L：参考资料与延伸阅读（References and Further Reading）</a></li></ul></li></ul></nav>
+    </aside>
+    <main id="main-content" tabindex="-1">
+      <nav class="breadcrumbs" aria-label="面包屑"><ol><li><a href="../index.html">首页</a></li><li>第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</li><li aria-current="page">31. 安全首次上电（Safe First Power-Up）</li></ol></nav>
+      <article class="tutorial-page">
+        <header class="page-header">
+          <p class="part-label">第七部分：装配、上电调试与实验（Part VII — Assembly, Bring-Up, and Experiments）</p>
+          <h1>31. 安全首次上电（Safe First Power-Up）</h1>
+        </header>
+        <nav class="on-this-page" aria-labelledby="on-this-page-title"><h2 id="on-this-page-title">本页目录</h2><ul><li class="toc-level-2"><a href="#ch31-learning-objectives">学习目标与测量状态</a></li><li class="toc-level-2"><a href="#sec-31-1">31.1 绝不能从不受限制的电源开始</a></li><li class="toc-level-2"><a href="#sec-31-2">31.2 加电前的电阻检查</a></li><li class="toc-level-2"><a href="#sec-31-3">31.3 设置限流电源</a></li><li class="toc-level-3"><a href="#sec-31-3-setup">无板设置法</a></li><li class="toc-level-2"><a href="#sec-31-4">31.4 测量 VBUS 和 3V3_SYS</a></li><li class="toc-level-2"><a href="#sec-31-5">31.5 识别过大电流和发热器件</a></li><li class="toc-level-2"><a href="#sec-31-6">31.6 验证复位与时钟启动</a></li><li class="toc-level-3"><a href="#sec-31-6-reset">复位检查</a></li><li class="toc-level-3"><a href="#sec-31-6-clock">时钟检查</a></li><li class="toc-level-2"><a href="#sec-31-7">31.7 上电决策树与故障隔离</a></li><li class="toc-level-2"><a href="#sec-31-8">31.8 实验：首次上电工作表</a></li><li class="toc-level-3"><a href="#exp-31-1-title">实验 31-1 R1 受控首次上电</a></li><li class="toc-level-2"><a href="#ch31-summary">本章小结</a></li></ul></nav>
+        <section aria-labelledby="ch31-learning-objectives">
+  <h2 id="ch31-learning-objectives">学习目标与测量状态</h2>
+  <p>首次上电的核心不是“看看灯亮不亮”，而是限制故障能量、按顺序观察电源链，并在损坏扩大前停下来。R1 的 <code>VBUS_IN</code>、<code>3V3_SYS</code>、Buck 启动、温升、晶振和复位都<strong>尚未在实物上测量</strong>；本章给出的是安全方法、设计预期和待填记录，不是测试报告。</p>
+  <p>电源路径为：</p>
+  <pre aria-label="R1 首次上电电源路径"><code>限流 5 V 源 → J1 / VBUS_IN
+                    ├→ U4 → 5V_SW（复位时应关闭）
+                    └→ U3 + L1 → 3V3_SYS → U1
+                                      └→ U5 → 3V3_SW（复位时应关闭）</code></pre>
+  <aside class="warning" aria-label="首次上电总警告">
+    <p>首次上电不得直接使用不显示电流、不可限流的 USB 充电器或电脑端口。先使用带可调限流的实验电源和受保护夹具；确认电流、温度和电压基线后，才连接真实 USB 主机。不要同时让实验电源、调试器供电输出和 USB VBUS 驱动同一块板。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="sec-31-1">
+  <h2 id="sec-31-1">31.1 绝不能从不受限制的电源开始</h2>
+  <p>短路消耗的功率近似为 <var>P</var> = <var>V</var> × <var>I</var>。电源若能提供数安培，焊桥、反向器件或错误反馈网络可能在保护动作前烧毁铜箔和芯片；限流不能保证“绝对无损”，但能显著减小故障能量并给操作者留下观察时间。</p>
+  <table>
+    <caption>表 31-1　电源选择的适用性</caption>
+    <thead><tr><th scope="col">电源</th><th scope="col">首次上电是否适合</th><th scope="col">原因</th></tr></thead>
+    <tbody>
+      <tr><td>0～6 V 可调实验电源，具有恒流指示</td><td>适合</td><td>可从 0 V 启动、设置小电流并读取 V/I</td></tr>
+      <tr><td>带电流测量与断路开关的 USB 电源分析仪</td><td>仅在初步基线后</td><td>多数不能像实验电源那样精细控制故障电流</td></tr>
+      <tr><td>电脑 USB 端口、普通充电器、移动电源</td><td>不适合首次上电</td><td>故障能量和保护行为不可由本实验控制，还可能损伤主机端口</td></tr>
+    </tbody>
+  </table>
+  <p>限流值是实验保护门限，不是板的“正常电流规格”。R1 目前没有无负载电流实测值，因此任何具体电流都必须记录为本次样板结果。</p>
+</section>
+
+<section aria-labelledby="sec-31-2">
+  <h2 id="sec-31-2">31.2 加电前的电阻检查</h2>
+  <p>先执行第 30 章的外观与短路筛查，再做以下重复确认。测量前让所有电容放电，断开 J1、J2、J3 和示波器。万用表电阻档施加的测试电压和极性可能使半导体结导通，因此重点看“稳定硬短路”和样板间异常差异，而不是追求一个预设欧姆数。</p>
+  <ol>
+    <li>短接表笔，记录表线电阻。</li>
+    <li>测 <code>VBUS_IN</code>—GND 和 <code>3V3_SYS</code>—GND，分别记录刚接触与 5 s 后读数。</li>
+    <li>交换表笔重测；读数不对称可能来自 U2、U3、U1 等半导体，不自动判为故障。</li>
+    <li>测 <code>5V_SW</code>—GND、<code>3V3_SW</code>—GND，并确认 J2 未被外部负载短接。</li>
+    <li>若蜂鸣持续或读数接近表线电阻，使用显微镜检查 C1/C2/C3/C6～C9/C13/C14、U2～U5 和 U1 电源引脚附近。</li>
+  </ol>
+  <p><strong>停止条件：</strong>发现焊桥、反向器件、稳定近零电阻、烧蚀或与同批板显著不同的读数。修复后必须重新执行完整无电检查，不能直接跳回上电。</p>
+</section>
+
+<section aria-labelledby="sec-31-3">
+  <h2 id="sec-31-3">31.3 设置限流电源</h2>
+  <p>推荐电源范围为 0～6 V、至少 0.5 A 能力、具备电压/电流读回和明确的 CV/CC 状态。能力大不代表把限流设得大；它只是保证仪器在后续受控负载测试中有余量。</p>
+  <h3 id="sec-31-3-setup">无板设置法</h3>
+  <ol>
+    <li>电源输出关闭，电压旋钮设为 0 V。</li>
+    <li>短接输出端，在 <strong>20 mA</strong> 处设置第一阶段电流限制，然后解除短接。20 mA 是短路筛查起点，不是 R1 正常工作电流。</li>
+    <li>通过带保险或瞬时断开开关的夹具把正端接 <code>VBUS_IN</code>、负端接 GND；先接 GND，后接正端。</li>
+    <li>确认调试器目标供电关闭、USB 主机断开、J2 无负载、示波器地夹未接到非地节点。</li>
+    <li>把万用表分别准备在 6 V 直流电压档和合适的电流监测位置；不要在通电时把电流档表笔直接跨接电源轨。</li>
+  </ol>
+  <aside class="notice" aria-label="分阶段限流说明">
+    <p>若 20 mA 阶段没有异常，可在记录并断电后把限流提高到 50 mA，尝试完整启动。若 50 mA 仍进入 CC，不要为了“让它启动”而连续调大；先断电定位。只有当电路、数据手册和已知固件负载支持时，负责人才能批准下一档，例如 100 mA，并把理由写入记录。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="sec-31-4">
+  <h2 id="sec-31-4">31.4 测量 VBUS 和 <code>3V3_SYS</code></h2>
+  <p><code>VBUS_IN</code> 的设计名义值为 5 V。U3 反馈网络 R5 = 453 kΩ、R6 = 100 kΩ，按典型 0.6 V 反馈基准计算：</p>
+  <p class="example"><var>V</var><sub>OUT</sub> = 0.6 × (1 + 453/100) = <strong>3.318 V（计算值）</strong>。</p>
+  <p>3.318 V 不是实测值，也不包含反馈基准、电阻容差、负载、纹波和仪表误差。首次观察可采用 3.3 V ±5%（3.135～3.465 V）作为保守的<strong>实验调查窗</strong>；它不是器件绝对额定值或最终产品规范。超出该窗先断电调查。</p>
+  <ol>
+    <li>用 DMM 黑表笔固定在板上 GND；尽量使用测试点或夹具，避免手持探针滑到相邻引脚。</li>
+    <li>先测电源夹具输出，再测 J1 后的 <code>VBUS_IN</code>，两者差值反映线缆、夹具和接点压降。</li>
+    <li>测 C3 正端或确认过的 <code>3V3_SYS</code> 测试点，不在 U3/SW 小引脚间盲探。</li>
+    <li>记录空载稳态值、启动最低值和是否进入 CC。纹波测量留到第 34 章，DMM 数字不能证明纹波合格。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="sec-31-5">
+  <h2 id="sec-31-5">31.5 识别过大电流和发热器件</h2>
+  <p>电流异常可表现为立即进入 CC、周期性重启、供电电压被拉低或电流缓慢上升。发热点可用红外相机、贴片热电偶或少量易挥发诊断液辅助定位；禁止用手指寻找可能的高温或带电短路。</p>
+  <table>
+    <caption>表 31-2　电流/热现象的优先检查</caption>
+    <thead><tr><th scope="col">现象</th><th scope="col">优先怀疑</th><th scope="col">下一步</th></tr></thead>
+    <tbody>
+      <tr><td>一上电即 CC，3V3_SYS 为 0</td><td>VBUS 短路、C1/C2/C13 短路、U3 反向或焊桥</td><td>断电、分区测阻、显微镜检查</td></tr>
+      <tr><td>VBUS 正常，3V3_SYS 低且 U3/L1 热</td><td>3V3 短路、L1/U3 错装、反馈网络错误</td><td>核对 R5/R6、C3、U3/L1 焊接</td></tr>
+      <tr><td>电流周期跳变，USB/复位反复</td><td>电源打嗝、启动失败、固件复位循环</td><td>同时捕获 3V3_SYS、NRST 和电流</td></tr>
+      <tr><td>U4/U5 在未使能时发热</td><td>器件短路、EN 悬空/被拉高、输出反向供电</td><td>测 EN_5V/EN_3V3 和 J2 外部连接</td></tr>
+    </tbody>
+  </table>
+  <p><strong>教学停止门限：</strong>有烟、气味、变色、噪声，任何器件表面温度快速上升 10 °C 以上，或超过 50 °C 时立即断电。它是保守的台架停止条件，不等同于器件数据手册额定温度。</p>
+</section>
+
+<section aria-labelledby="sec-31-6">
+  <h2 id="sec-31-6">31.6 验证复位与时钟启动</h2>
+  <p>R12 = 10 kΩ、C10 = 100 nF 的名义时间常数为 1 ms，但 NRST 真正释放时刻还取决于电源斜率、引脚阈值和 MCU 内部复位。Y1 为 12 MHz 晶体，C11/C12 各 12 pF；不计杂散时等效只有 6 pF，而晶体元数据标称负载 20 pF，因此起振裕量、频偏和负载匹配均待实测。</p>
+  <h3 id="sec-31-6-reset">复位检查</h3>
+  <ol>
+    <li>用 10× 高阻探头观察 <code>NRST</code>，地线接邻近 GND；先确认探头额定和补偿。</li>
+    <li>捕获上电时 <code>3V3_SYS</code> 与 <code>NRST</code>。预期 NRST 先低后高，但不预填释放时间。</li>
+    <li>通过 J3 pin 5 用开漏方式或按规范短接到 GND 触发复位；释放后 NRST 应回到高电平。</li>
+  </ol>
+  <h3 id="sec-31-6-clock">时钟检查</h3>
+  <p>普通长地线探头直接压在 <code>OSC_IN</code>/<code>OSC_OUT</code> 上会增加电容并可能让本来能起振的晶体停振。优先使用 MCU 时钟输出、固件定时器或 USB/编程连接间接确认；必须直接测量时，使用经批准的低电容有源探头，并在探头接入前后比较行为。看到“12 MHz 附近”仍不证明频偏、抖动或 USB 时钟合格。</p>
+</section>
+
+<section aria-labelledby="sec-31-7">
+  <h2 id="sec-31-7">31.7 上电决策树与故障隔离</h2>
+  <figure aria-labelledby="fig-31-1-caption">
+    <pre><code>无电检查通过？
+ ├─ 否 → 隔离、返修、重新无电检查
+ └─ 是 → 1 V / 20 mA 短路筛查
+          ├─ 进入 CC 或发热 → 断电，定位 VBUS 区
+          └─ 正常 → 5 V / 50 mA 受控启动
+                   ├─ VBUS 异常 → 检查夹具、J1、C1/C2/C13、U2/U3
+                   ├─ 3V3_SYS 异常 → 检查 U3、L1、R5/R6、C3 和 3V3 短路
+                   ├─ NRST 不释放 → 检查 R12、C10、焊桥与外部调试器
+                   ├─ 时钟/编程失败 → 检查 Y1、C11/C12、BOOT0、SWD
+                   └─ 稳定 → 记录基线，再进入编程和 USB 验证</code></pre>
+    <figcaption id="fig-31-1-caption">图 31-1　一次只跨越一个质量门；任何异常都先断电并回到可重复的检查点。</figcaption>
+  </figure>
+  <p>隔离故障时只改变一个变量，例如拔掉调试器、降低电压、断开 J2 负载或复核某个焊点。不要同时换电源、刷固件和补焊，否则即使“恢复了”，也无法知道根因。</p>
+</section>
+
+<section aria-labelledby="sec-31-8">
+  <h2 id="sec-31-8">31.8 实验：首次上电工作表</h2>
+  <article class="experiment" aria-labelledby="exp-31-1-title">
+    <h3 id="exp-31-1-title">实验 31-1　R1 受控首次上电</h3>
+
+    <h4 id="exp-31-1-purpose">实验目的</h4>
+    <p>在不连接电脑 USB 端口的条件下，为一片通过收板检验的 R1 建立首个 VBUS、3V3_SYS、电流、复位和温度基线，并决定该板是“可进入编程验证”还是“断电隔离”。</p>
+
+    <h4 id="exp-31-1-theory">原理</h4>
+    <p>限流电源限制故障电流；分阶段升压减少瞬时能量。U3 应把 VBUS_IN 转换为 3V3_SYS，反馈计算值为 3.318 V。R9/R10 使 U4/U5 的使能在 MCU 高阻或复位时默认低，因此 5V_SW、3V3_SW 应处于安全关闭状态；这些行为尚未通过实物确认。</p>
+
+    <h4 id="exp-31-1-equipment">器材与量程</h4>
+    <ul>
+      <li>0～6 V 可调电源，至少 0.5 A 能力，具 CV/CC 指示；初始限流可调到 20 mA。</li>
+      <li>两台 CAT 等级适合低压台架的数字万用表：6 V 直流电压档、Ω 档；或一台表配合电源读回。</li>
+      <li>带开关和保险保护的 VBUS/GND 夹具；不能露出易短接的相邻探针。</li>
+      <li>红外相机或绝缘贴片热电偶，测量范围至少覆盖室温至 80 °C。</li>
+      <li>可选：≥20 MHz 示波器与 10× 探头，用于 NRST；不在本实验中用普通探头直接测晶体脚。</li>
+    </ul>
+
+    <h4 id="exp-31-1-safety">安全与停止条件</h4>
+    <ul>
+      <li>佩戴护目镜，在不燃台面操作；板下方不得有导电碎屑。</li>
+      <li>烟、异味、变色、噪声、立即 CC、轨电压异常、器件温升快速超过 10 °C 或表面超过 50 °C时，立刻关闭输出。</li>
+      <li>3V3_SYS 超出 3.135～3.465 V 的调查窗时停止；该窗是本实验的保守门限，不是最终规格。</li>
+      <li>不把电流表档跨接电源，不触摸带电器件，不在通电时移动焊接夹具。</li>
+    </ul>
+
+    <h4 id="exp-31-1-wiring">接线指导</h4>
+    <pre aria-label="首次上电实验接线"><code>实验电源 +（输出关闭）── 保险/开关 ── VBUS_IN
+实验电源 − ─────────────────────── GND
+DMM V 黑表笔 ──────────────────── GND
+DMM V 红表笔 ── 依次测 VBUS_IN、3V3_SYS、5V_SW、3V3_SW
+
+USB 主机：断开     调试器供电：关闭     J2 负载：断开</code></pre>
+    <p>若通过 J1 夹具供电，确认夹具只提供受控 VBUS/GND，且不会由另一端 USB 主机反向供电。先接 GND，再接 VBUS；拆线顺序相反。</p>
+
+    <h4 id="exp-31-1-precheck">上电前检查</h4>
+    <ol>
+      <li>核对板号、R1 版本和第 30 章放行记录。</li>
+      <li>确认 J1、U2～U5、L1、D1 的方向与装配图一致，电源电容无桥连。</li>
+      <li>完成四条电源轨对 GND 的电阻记录，没有稳定硬短路。</li>
+      <li>电源输出为关闭状态，电压 0 V，限流 20 mA；正负极用表确认。</li>
+      <li>温度传感器已对准 U3、L1、U1、U4/U5，并记录环境温度。</li>
+    </ol>
+
+    <h4 id="exp-31-1-procedure">编号步骤</h4>
+    <ol>
+      <li>开启输出，把电压缓慢升到 1.0 V；观察 5 s。若进入 CC 或温升，立即关闭并隔离。</li>
+      <li>仍在 20 mA 限流下升到 3.0 V，再观察 5 s，记录电流和 CV/CC 状态。</li>
+      <li>升到 5.0 V。若进入 CC，不提高限流；关闭输出并检查短路、U3 方向及反馈网络。</li>
+      <li>若未异常，测量 VBUS_IN 和 3V3_SYS，随后测 5V_SW、3V3_SW；记录但不假定关闭态一定为 0 V。</li>
+      <li>关闭输出，等待轨电压降到 0.2 V 以下；把限流设为 50 mA并记录批准人/理由。</li>
+      <li>重新以 5.0 V 上电 30 s，连续记录启动峰值、稳态电流和 U3/L1/U1 的温度变化。</li>
+      <li>可选地捕获 3V3_SYS 与 NRST 上升；不直接探测 Y1 引脚。</li>
+      <li>关闭输出，确认电源轨放电，再拆下 VBUS，最后拆 GND。</li>
+    </ol>
+
+    <h4 id="exp-31-1-expected">预期结果（非实测）</h4>
+    <ul>
+      <li>设计上，VBUS_IN 应跟随受控 5 V 输入，3V3_SYS 应接近 3.3 V；计算中心值为 3.318 V。</li>
+      <li>设计意图是复位/启动期间 5V_SW 与 3V3_SW 关闭，NRST 随电源建立后释放。</li>
+      <li>板不应持续进入限流，不应出现快速局部发热、气味或可见损伤。</li>
+      <li>R1 尚无任何上述项目的实测结果；实际电流、启动时间、轨电压和温度必须填写下表。</li>
+    </ul>
+
+    <h4 id="exp-31-1-record">原始数据记录表</h4>
+    <table>
+      <caption>表 31-3　首次上电原始记录</caption>
+      <thead><tr><th scope="col">阶段/时间</th><th scope="col">设定 V / 限流</th><th scope="col">电源电流</th><th scope="col">VBUS_IN</th><th scope="col">3V3_SYS</th><th scope="col">5V_SW</th><th scope="col">3V3_SW</th><th scope="col">最高温度/位置</th><th scope="col">CV/CC 与备注</th></tr></thead>
+      <tbody>
+        <tr><td>1.0 V，5 s</td><td>1.0 V / 20 mA</td><td>____ mA</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ °C / ____</td><td>____</td></tr>
+        <tr><td>3.0 V，5 s</td><td>3.0 V / 20 mA</td><td>____ mA</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ °C / ____</td><td>____</td></tr>
+        <tr><td>5.0 V，首次</td><td>5.0 V / 20 mA</td><td>____ mA</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ °C / ____</td><td>____</td></tr>
+        <tr><td>5.0 V，1 s</td><td>5.0 V / 50 mA</td><td>____ mA</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ °C / ____</td><td>____</td></tr>
+        <tr><td>5.0 V，30 s</td><td>5.0 V / 50 mA</td><td>____ mA</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ V</td><td>____ °C / ____</td><td>____</td></tr>
+      </tbody>
+    </table>
+
+    <h4 id="exp-31-1-criteria">通过/失败判据</h4>
+    <p><strong>通过本质量门：</strong>无停止事件；电源保持 CV；VBUS 接近设定值；3V3_SYS 位于预先声明的调查窗；没有快速局部温升；关闭态输出没有给外部负载造成危险；所有数据、仪器和板号均已记录。<strong>失败/隔离：</strong>任一停止条件触发、读数不可重复、版本不明或记录不完整。通过只允许进入第 32 章，不代表 USB、时钟、负载能力或可靠性合格。</p>
+
+    <h4 id="exp-31-1-analysis">结果分析</h4>
+    <p>计算电源夹具压降 <var>V</var><sub>DROP</sub> = <var>V</var><sub>SUPPLY</sub> − <var>V</var><sub>VBUS</sub>，比较两次 5 V 上电的电流和温升。若 3V3_SYS 与 3.318 V 有偏差，先计入 DMM 精度和反馈电阻/基准容差，再考虑负载、纹波和反馈布局。不要用一次样板结果定义整批“典型值”。</p>
+
+    <h4 id="exp-31-1-troubleshooting">故障排查</h4>
+    <ul>
+      <li><strong>1 V 即 CC：</strong>优先查 VBUS-GND 焊桥、C1/C2/C13、U2/U3 方向和夹具极性。</li>
+      <li><strong>VBUS 正常而 3V3_SYS 为 0：</strong>查 U3、L1 开路/错装、C3 短路和 R5/R6 焊接。</li>
+      <li><strong>3V3_SYS 偏高：</strong>立即断电，查 R5/R6 错值、开路和 BUCK_FB 焊桥；不可继续给 U1 供电。</li>
+      <li><strong>5V_SW/3V3_SW 意外上电：</strong>查 EN_5V/EN_3V3、R9/R10、U4/U5 短路及外部反向供电。</li>
+      <li><strong>电流周期变化：</strong>同步观察 3V3_SYS 与 NRST，区分电源保护打嗝和固件复位循环。</li>
+    </ul>
+    <h4 id="exp-31-1-questions">思考题</h4>
+    <ol>
+      <li>为什么 20 mA 限流只能作为短路筛查起点，而不能直接定义为“正常电流上限”？</li>
+      <li>若电源读数稳定但板端 VBUS 明显偏低，应怎样区分夹具压降与板上短路？</li>
+    </ol>
+  </article>
+</section>
+
+<section aria-labelledby="ch31-summary">
+  <h2 id="ch31-summary">本章小结</h2>
+  <p>安全上电是一组逐级放行门：无电检查、低能量短路筛查、5 V 限流启动、轨电压、温升、复位与记录。只有数据稳定且可重复的板才进入编程；任何“为了让它工作而调大限流”的行为都会破坏诊断证据并增加损坏风险。</p>
+</section>
+      </article>
+      <nav class="page-navigation" aria-label="顺序导航"><a class="previous" rel="prev" href="30-receiving-inspection.html"><small>上一页</small>30. PCB 收货与检验（Receiving and Inspecting the PCB）</a><a class="next" rel="next" href="32-programming-validation.html"><small>下一页</small>32. 编程与基础固件验证（Programming and Basic Firmware Validation）</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>离线教程构建；核心阅读与导航不依赖 JavaScript。</p>
+  </footer>
+</body>
+</html>

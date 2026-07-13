@@ -1,0 +1,203 @@
+<section class="notice" aria-labelledby="ch10-learning-objectives">
+  <h2 id="ch10-learning-objectives">学习目标与位号校正</h2>
+  <p>本章解释两只 SY6280 负载开关如何让 U1 用低电流逻辑控制 5V_SW 与 3V3_SW，并分析默认关闭、可调限流、输入/输出电容、反向供电和共享 USB 预算。</p>
+  <p><strong>位号校正：</strong><code>toc.md</code> 的 10.4 写成“R6 和 R9”。最终 R1 的两只使能下拉是 <strong>R9/R10</strong>；R6 是 U3 反馈下臂。限流设定为 R7/R8。以下内容按最终工程源。</p>
+  <p><strong>事实状态：</strong>网络、标称值和目标电流为【设计】；0.40237 A 与 0.25185 A 为【计算】；限流容差、压降、热关断、恢复和真实 USB 预算为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch10-10-1">
+  <h2 id="ch10-10-1">10.1 为什么不能让 MCU 引脚直接开关负载电流</h2>
+  <p>MCU GPIO 的任务是传送逻辑状态，不是承载数百毫安电源电流。若把目标负载直接接到 U1 引脚，输出晶体管、封装焊线和 3V3_SYS 都可能过流，感性负载还会产生反向电压。R1 让 U1 只驱动 <code>EN_5V</code> 与 <code>EN_3V3</code>，大电流则通过 U4/U5 的高侧功率通道。</p>
+  <p>这种分工带来四个好处：逻辑与功率路径分离、上电默认可控、可设置电流限制、过载时由专用器件承担热应力。但它不等于完全防误接；目标端仍与主机共地，且最终设计没有隔离、外部 GPIO ESD 阵列或负载开关故障输出。</p>
+</section>
+
+<section aria-labelledby="ch10-10-2">
+  <h2 id="ch10-10-2">10.2 U4 与 U5：受控高侧负载开关</h2>
+  <table>
+    <caption>两路 SY6280AAC 的最终连接【设计】</caption>
+    <thead><tr><th scope="col">器件</th><th scope="col">输入/输出</th><th scope="col">控制与设定</th><th scope="col">目标</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>U4，SY6280AAC，SOT-23-5</td>
+        <td>焊盘 5：<code>VBUS_IN</code>；焊盘 1：<code>5V_SW</code>；焊盘 2：GND</td>
+        <td>焊盘 4：<code>EN_5V</code>；焊盘 3：<code>ISET_5V</code></td>
+        <td>约 0.4 A 的 5 V 受控输出【设计目标】</td>
+      </tr>
+      <tr>
+        <td>U5，SY6280AAC，SOT-23-5</td>
+        <td>焊盘 5：<code>3V3_SYS</code>；焊盘 1：<code>3V3_SW</code>；焊盘 2：GND</td>
+        <td>焊盘 4：<code>EN_3V3</code>；焊盘 3：<code>ISET_3V3</code></td>
+        <td>约 0.25 A 的 3.3 V 受控输出【设计目标】</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>两只器件都是高电平使能的高侧开关，事实库记录其导通电阻为 80 mΩ 级，并具有过流/过热保护机理【设计资料】。真实工作点的导通电阻、限流阈值和热行为尚未在 R1 上测量。</p>
+  <p>U4/U5 开路或缺失时对应电源无输出；内部开关短路时输出可能无法关闭；过载时预计出现压降、限流或热保护【预期】。最终 R1 没有把“故障输出”接回 U1，因为所用网络只有 IN、OUT、EN、ISET 与 GND。</p>
+</section>
+
+<section aria-labelledby="ch10-10-3">
+  <h2 id="ch10-10-3">10.3 5V_SW 与 3V3_SW 不是同一电源</h2>
+  <table>
+    <caption>两路受控电源的来源与风险</caption>
+    <thead><tr><th scope="col">电源</th><th scope="col">上游</th><th scope="col">控制器</th><th scope="col">主要约束</th></tr></thead>
+    <tbody>
+      <tr><td><code>5V_SW</code></td><td>J1 的 <code>VBUS_IN</code></td><td>U4</td><td>共享 USB 主机、线缆、连接器和全板输入电流预算。</td></tr>
+      <tr><td><code>3V3_SW</code></td><td>U3 的 <code>3V3_SYS</code></td><td>U5</td><td>同时受 U3 转换能力、3V3_SYS 压降、U5 热和全板 3.3 V 负载约束。</td></tr>
+    </tbody>
+  </table>
+  <p><code>5V_SW</code> 是电源输出，不是 5 V GPIO 逻辑电平。R1 的 GPIO、PWM 与 UART 均为 3.3 V 逻辑【设计】。把 5V_SW 接到任一 MCU I/O 可能损坏 U1。</p>
+</section>
+
+<section aria-labelledby="ch10-10-4">
+  <h2 id="ch10-10-4">10.4 R9 与 R10：让两路电源默认关闭</h2>
+  <table>
+    <caption>使能下拉网络</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">连接</th><th scope="col">作用</th><th scope="col">失效影响</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>R9，100 kΩ</td>
+        <td><code>EN_5V</code>—<code>GND</code>【设计】</td>
+        <td>U1 复位或高阻时把 U4 EN 明确拉低；靠近 U4 可缩短悬空段。</td>
+        <td>开路：5V_SW 启动状态可能不确定；短路：无法使能，并可能使 U1 输出过流【预期】。</td>
+      </tr>
+      <tr>
+        <td>R10，100 kΩ</td>
+        <td><code>EN_3V3</code>—<code>GND</code>【设计】</td>
+        <td>同理保证 U5 默认关闭。</td>
+        <td>开路：3V3_SW 启动状态可能不确定；短路：无法使能，并可能使 U1 输出过流【预期】。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>当 U1 输出高电平时，100 kΩ 下拉只产生很小的静态电流；当 U1 尚未配置、复位或失电时，它又能防止 EN 漂浮。硬件下拉是安全状态的第一层，固件仍必须在启动、异常和 USB 挂起时主动关闭两路电源【预期，待验证】。</p>
+</section>
+
+<section aria-labelledby="ch10-10-5">
+  <h2 id="ch10-10-5">10.5 R7 与 R8：设置典型限流值</h2>
+  <figure class="example" id="ch10-current-limit-equation">
+    <figcaption>SY6280 电流限制设定</figcaption>
+    <p><var>I</var><sub>LIMIT</sub>(A) = 6800 / <var>R</var><sub>SET</sub>(Ω)</p>
+    <dl>
+      <dt><var>I</var><sub>LIMIT</sub></dt><dd>典型限流值，单位 A。</dd>
+      <dt><var>R</var><sub>SET</sub></dt><dd>ISET 到 GND 的外接电阻，单位 Ω。</dd>
+    </dl>
+    <p><strong>适用边界：</strong>公式来自已复核器件资料；结果是典型计算，不包含电阻公差、器件分散、温度、供电压降和动态保护。</p>
+  </figure>
+  <table>
+    <caption>R1 两路限流算例【计算】</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">网络</th><th scope="col">代入</th><th scope="col">结果</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>R7 = 16.9 kΩ</td>
+        <td><code>ISET_5V</code>—GND；服务 U4</td>
+        <td>6800 / 16900</td>
+        <td>0.40237 A，约对应 0.4 A 目标</td>
+      </tr>
+      <tr>
+        <td>R8 = 27 kΩ</td>
+        <td><code>ISET_3V3</code>—GND；服务 U5</td>
+        <td>6800 / 27000</td>
+        <td>0.25185 A，约对应 0.25 A 目标</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>R7/R8 应靠近各自 ISET 并接安静地，防止漏电和噪声改变设定。电阻开路时限流设定异常，不能假定器件会进入某个安全默认；电阻短路或错小可能允许更大电流并增加 USB、Buck、走线和开关的热风险【预期】。</p>
+</section>
+
+<section aria-labelledby="ch10-10-6">
+  <h2 id="ch10-10-6">10.6 输入与输出电容如何应对负载阶跃</h2>
+  <table>
+    <caption>负载开关周围的四只电容【设计】</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">值与网络</th><th scope="col">服务对象</th><th scope="col">失效影响【预期】</th></tr></thead>
+    <tbody>
+      <tr><td>C13</td><td>100 nF，<code>VBUS_IN</code>—GND</td><td>U4 输入高频旁路；靠近 IN/GND。</td><td>开路时输入高频噪声/压降增加；短路使 VBUS 对地短路。</td></tr>
+      <tr><td>C4</td><td>10 µF，<code>5V_SW</code>—GND</td><td>U4 输出储能与负载阶跃。</td><td>开路时输出跌落/噪声增加；短路使 U4 限流或热保护。</td></tr>
+      <tr><td>C14</td><td>100 nF，<code>3V3_SYS</code>—GND</td><td>U5 输入高频旁路。</td><td>开路时噪声/瞬态压降增加；短路使 3V3_SYS 对地短路。</td></tr>
+      <tr><td>C5</td><td>10 µF，<code>3V3_SW</code>—GND</td><td>U5 输出储能与负载阶跃。</td><td>开路时输出跌落增加；短路会同时压迫 U5 与 U3。</td></tr>
+    </tbody>
+  </table>
+  <p>输出电容在“开”的瞬间从 0 V 充电，会形成浪涌。电容越大，短时所需电荷越多；线路、开关限流和上游电源共同决定上升速度。R1 的 10 µF 是标称值，直流偏压后的有效电容与实际浪涌均为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch10-10-7">
+  <h2 id="ch10-10-7">10.7 浪涌、短路、限流与热关断</h2>
+  <p>当负载电流试图超过设定值时，U4/U5 预计通过调节内部开关限制电流；持续过载会产生功耗 <var>P</var> ≈ <var>V</var><sub>DROP</sub> × <var>I</var>，温度上升后可能进入热保护【预期】。恢复方式、阈值分散和自动重试行为必须按实际器件资料及板上试验确认。</p>
+  <p>限流并不消除能量：</p>
+  <ul>
+    <li>5V_SW 短路时，U4、VBUS 走线、J1 和主机端口承受压力；</li>
+    <li>3V3_SW 短路时，U5 之外还会加载 U3，可能拖低 U1 的 3V3_SYS；</li>
+    <li>热关断只保护器件达到其机制边界，不保证目标板、线缆或接头不会过热。</li>
+  </ul>
+  <aside class="warning">
+    <strong>不要用金属线直接短路做“测试”。</strong>使用电子负载或额定功率电阻，在限流电源下逐步逼近，并由教师或具备资质的工程人员监督故障测试。
+  </aside>
+</section>
+
+<section aria-labelledby="ch10-10-8">
+  <h2 id="ch10-10-8">10.8 反向供电与未上电目标板</h2>
+  <p>反向供电（back-powering）是指电流从信号或电源输出进入本应断电的目标板，再经其保护二极管、稳压器或内部电源网反向流动。常见危险场景包括：</p>
+  <ul>
+    <li>目标板自己有电，而 R1 的 5V_SW/3V3_SW 关闭，两端电源被直接并联；</li>
+    <li>受控电源关闭，但某个 GPIO/UART 仍输出高电平，经目标输入保护结构供电；</li>
+    <li>目标板把电压送回 J2 的电源脚，内部开关是否允许反向电流未被验证。</li>
+  </ul>
+  <p>因此上电顺序必须明确：先共地、核对电压域，再决定由哪一侧供电；在关闭目标电源前，GPIO/PWM/UART 应先回到高阻或安全状态【预期】。R1 没有隔离，不能靠软件完全消除错误接线风险。</p>
+</section>
+
+<section aria-labelledby="ch10-10-9">
+  <h2 id="ch10-10-9">10.9 USB 总电流、压降与热预算</h2>
+  <figure class="definition" id="ch10-voltage-drop">
+    <figcaption>电源路径压降的一阶估算</figcaption>
+    <p><var>V</var><sub>DROP</sub> = <var>I</var> × <var>R</var><sub>PATH</sub></p>
+    <p><var>I</var> 为 A，<var>R</var><sub>PATH</sub> 为开关、走线、连接器和接点的总电阻（Ω），结果为 V。温升会改变电阻，器件还需查工作点曲线。</p>
+  </figure>
+  <p>若只为说明数量级，采用事实库记录的“80 mΩ 级”开关电阻并忽略其他路径，U4 在 0.4 A 时开关本体压降约为 0.4 × 0.08 = 0.032 V，U5 在 0.25 A 时约为 0.020 V【理想化计算】。这不是保证值：温度、器件分散、PCB、J1、J2 和线缆都会增加压降。</p>
+  <p>USB 输入还要同时供应 U1、U3 损耗、LED、两路开关静态消耗和外部负载。实际主机/线缆能力、总输入电流和热平衡为【待验证】。</p>
+</section>
+
+<section class="experiment" aria-labelledby="ch10-10-10">
+  <h2 id="ch10-10-10">10.10 实验：安全测试使能、过载、压降与恢复</h2>
+  <h3 id="ch10-experiment-prerequisites">前提与器材</h3>
+  <p>仅在 U3、U1、固件安全状态和 J2 接线已先验证后进行。器材：限流 5 V 电源、USB-C 供电夹具、电子负载、万用表、示波器、温度测量工具及已核对方向的 J2 夹具。</p>
+  <h3 id="ch10-experiment-safety">安全与停止条件</h3>
+  <ul>
+    <li>首次测试不使用电脑 USB 口作为故障能量源。</li>
+    <li>先把电子负载设为 0 A；确认共地、极性和两路输出默认关闭。</li>
+    <li>出现 3V3_SYS 下跌、U1 复位、器件快速升温、异味、波形持续振荡或输入限流时立即断电。</li>
+    <li>不允许用导线硬短路；不要同时改变负载、电源限制和固件状态。</li>
+  </ul>
+  <h3 id="ch10-experiment-procedure">步骤</h3>
+  <ol>
+    <li>复位或保持 U1 高阻，确认 5V_SW、3V3_SW 为关闭状态；记录而非假定。</li>
+    <li>分别使能 U4、U5，在轻载下测输入与输出电压，计算路径压降。</li>
+    <li>逐步增加负载，每一步等待稳定并记录电流、电压、温度和是否复位。</li>
+    <li>在经批准范围内接近预期限流，观察输出电压和电流；到达停止条件立即退回。</li>
+    <li>撤去过载，记录能否恢复、恢复时间和是否需要重新使能。</li>
+    <li>关闭输出后记录电压衰减；不要把衰减误称为“集成放电功能”，除非有相应证据。</li>
+  </ol>
+  <table>
+    <caption>实验 10-1 记录表</caption>
+    <thead><tr><th scope="col">电源/负载</th><th scope="col">EN 状态</th><th scope="col">V<sub>IN</sub>/V<sub>OUT</sub></th><th scope="col">I<sub>OUT</sub></th><th scope="col">温度/恢复/备注</th></tr></thead>
+    <tbody>
+      <tr><td>5V_SW，轻载</td><td>待填</td><td>待填</td><td>待填</td><td>待填</td></tr>
+      <tr><td>5V_SW，递增负载</td><td>待填</td><td>待填</td><td>待填</td><td>待填</td></tr>
+      <tr><td>3V3_SW，轻载</td><td>待填</td><td>待填</td><td>待填</td><td>待填</td></tr>
+      <tr><td>3V3_SW，递增负载</td><td>待填</td><td>待填</td><td>待填</td><td>待填</td></tr>
+    </tbody>
+  </table>
+  <p>限流值、压降、温度和恢复只有填入仪器数据后才是【实测】；0.40237 A 与 0.25185 A 仍只是公式计算。</p>
+</section>
+
+<section aria-labelledby="ch10-summary">
+  <h2 id="ch10-summary">本章小结</h2>
+  <ul>
+    <li>U4 从 VBUS_IN 产生 5V_SW，U5 从 3V3_SYS 产生 3V3_SW；U1 只控制 EN。</li>
+    <li>R9/R10 使两路默认关闭，R7/R8 分别计算得到约 0.402 A 与 0.252 A 的典型限流。</li>
+    <li>C13/C14 服务输入高频回路，C4/C5 服务输出浪涌和负载阶跃。</li>
+    <li>反向供电、共享 USB 预算、压降、限流和热恢复均需受控实验验证。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch10-sources">
+  <h2 id="ch10-sources">事实来源</h2>
+  <p>最终 EasyEDA 工程中的 U4、U5、R7–R10、C4、C5、C13、C14 网络与元件元数据；已复核的 SY6280 高电平使能、限流公式和过流/热保护机理；结构化事实库中的受控电源目标与待验证清单。</p>
+</section>

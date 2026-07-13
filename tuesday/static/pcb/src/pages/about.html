@@ -1,0 +1,118 @@
+<section aria-labelledby="about-audience">
+  <h2 id="about-audience">读者、先修知识与学习目标</h2>
+  <p>本教程面向电子学基础有限的大学生，也适合作为第一次完整完成原理图、印制电路板（Printed Circuit Board，PCB）与制造审核的课程教材。开始时只要求会进行基本代数运算、能阅读表格，并愿意把“看起来合理”改写成可检查的工程判断；不要求预先学过模拟电子技术、开关电源或高速 PCB 设计。</p>
+  <aside class="definition">
+    <p><strong>本教程中的“设计”不是把元件摆到板上。</strong>它是从用户问题出发，依次建立需求、选择电路、核对数据手册、定义网络、安排实体空间、生成制造文件，再用检查和实验寻找反例的过程。</p>
+  </aside>
+  <p>完成教程后，学生应能够：</p>
+  <ul>
+    <li>用电压、电流、功率、能量和闭合回路解释低压数字电路，而不只背诵符号；</li>
+    <li>从原理图中的位号、网络和引脚关系追踪电源、信号与控制路径；</li>
+    <li>说明电阻、电容、电感、二极管、晶振、连接器和集成电路的物理作用及失效后果；</li>
+    <li>把 USB、GPIO、PWM、UART 和受控电源等愿望改写为有边界、可验证的规格；</li>
+    <li>核对符号、封装、引脚映射、器件额定值和装配属性，不盲信元件库；</li>
+    <li>理解 ERC、DRC、机械审核、Gerber 检查与实物测量各自能证明什么、不能证明什么；</li>
+    <li>在限流、断电复核和明确停止条件下完成基础实验，并保留原始记录。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="about-board">
+  <h2 id="about-board">贯穿全书的 USB GPIO R1</h2>
+  <p>教程使用真实的 <strong>USB GPIO R1</strong> 作为贯穿案例。它是一块由通用串行总线（Universal Serial Bus，USB）Type-C 供电、以 USB 2.0 Full-Speed 通信设备类（CDC，表现为虚拟串口）与主机通信的非隔离控制板。主控制器是微控制器（Microcontroller Unit，MCU）U1 CH32V203K8T6；目标接口提供 8 路通用输入输出（General-Purpose Input/Output，GPIO），其中 4 路可使用 MCU 定时器 TIM3 产生共享频率的脉宽调制（Pulse-Width Modulation，PWM），还提供一路 3.3 V 通用异步收发器（Universal Asynchronous Receiver/Transmitter，UART）、受控的 <code>5V_SW</code> 与 <code>3V3_SW</code> 电源输出。</p>
+  <table>
+    <caption>R1 发布资料中已经确定的板级事实</caption>
+    <thead>
+      <tr><th scope="col">项目</th><th scope="col">事实</th><th scope="col">状态</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">板尺寸与层数</th><td>名义 50 mm × 24 mm，两层铜</td><td>设计值；Gerber 计算外形为 49.999900 mm × 24.000460 mm</td></tr>
+      <tr><th scope="row">元件</th><td>PCB 上 48 个物理位号，46 个拟装配；J2、J3 为不装配（Do Not Populate，DNP）</td><td>设计与发布文件已交叉核对</td></tr>
+      <tr><th scope="row">连接</th><td>172 个焊盘、47 个命名网络，47/47 网络几何连通</td><td>计算机辅助设计（Computer-Aided Design，CAD）/制造文件计算值，不是实物导通测量</td></tr>
+      <tr><th scope="row">制造审核</th><td>最终原理图电气规则检查（ERC）与 PCB 设计规则检查（DRC）无阻断错误，1,128 对器件完成实体与包络检查</td><td>发布审核通过，可送原型制造</td></tr>
+      <tr><th scope="row">实物性能</th><td>电压、纹波、温升、USB 枚举、限流和接口波形尚无装配板记录</td><td>待验证；当前实测事实数量为 0</td></tr>
+    </tbody>
+  </table>
+  <aside class="warning">
+    <p><strong>“可制造”不等于“已证明能工作”。</strong>R1 的发布包证明了文件一致性、几何连通、机械间距和制造数据完整性；它没有替代上电、热、USB、时钟、固件安全状态或 ESD 实验。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="about-activities">
+  <h2 id="about-activities">学生将设计、检查、计算与测量什么</h2>
+  <p>学习活动按证据强度逐步推进。先在纸面和 CAD 中建立可追踪的设计，再在制造数据中寻找几何问题，最后才在有实物时进行测量。</p>
+  <table>
+    <caption>四类学习活动及其输出</caption>
+    <thead>
+      <tr><th scope="col">活动</th><th scope="col">典型任务</th><th scope="col">应保留的证据</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">设计</th><td>写需求、划分功能块、选择器件、定义安全默认状态</td><td>规格表、决策理由、网络与引脚映射</td></tr>
+      <tr><th scope="row">检查</th><td>核对符号/封装、ERC、DRC、板框、碰撞、物料清单（BOM）、元件坐标表（CPL）与描述制造图层的 Gerber 文件</td><td>检查清单、差异记录、发布清单</td></tr>
+      <tr><th scope="row">计算</th><td>反馈分压、限流设定、RC 时间常数、功耗、压降与单位换算</td><td>公式、变量、单位、假设和可复算步骤</td></tr>
+      <tr><th scope="row">测量</th><td>上电电流、各电源轨、纹波、温升、USB、GPIO/PWM/UART 与保护行为</td><td>仪器设置、原始数据、波形、通过判据和异常说明</td></tr>
+    </tbody>
+  </table>
+  <p>例如，R5 = 453 kΩ、R6 = 100 kΩ 与典型 0.6 V 反馈基准给出 <code>0.6 × (1 + 453/100) = 3.318 V</code>。这是<strong>计算值</strong>；只有在装配板上注明仪器、负载和测点后读到的电压，才可称为<strong>实测值</strong>。</p>
+</section>
+
+<section aria-labelledby="about-tools">
+  <h2 id="about-tools">所需软件、资料、工具与实验设备</h2>
+  <table>
+    <caption>按学习阶段准备的资源</caption>
+    <thead>
+      <tr><th scope="col">类别</th><th scope="col">最低配置</th><th scope="col">用途与限制</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">软件</th><td>现代浏览器、Python 3.9 或更高版本、EasyEDA</td><td>离线阅读、构建教程、查看并复核原理图与 PCB；教程正文不依赖联网运行</td></tr>
+      <tr><th scope="row">项目资料</th><td>最终 EasyEDA 工程归档、BOM、CPL、原理图 PDF、装配 PDF、Gerber、发布清单</td><td>最终项目源优先于早期提案；文件版本必须保持为 R1</td></tr>
+      <tr><th scope="row">数据手册</th><td>CH32V203、SY8089、SY6280、USBLC6-2SC6、USB-C 连接器、晶振与关键无源器件资料</td><td>核对工作条件、引脚、封装尺寸和公式；不要把供应商摘要当作完整规格</td></tr>
+      <tr><th scope="row">基础工具</th><td>防静电工作面、放大镜、镊子、可靠 USB 线、连续性/电阻/电压可用的数字万用表</td><td>收板检查、断电短路检查和低压测量</td></tr>
+      <tr><th scope="row">受控上电</th><td>可设电压与电流限制的台式电源，或具有等效保护的 USB 测试供电方案</td><td>第一次上电与故障隔离；普通 USB 端口不是可调实验电源</td></tr>
+      <tr><th scope="row">进阶仪器</th><td>示波器、逻辑分析仪、可控电子负载、温度测量工具</td><td>纹波、启动、PWM、UART、负载阶跃和温升；必须理解探头接地</td></tr>
+    </tbody>
+  </table>
+  <p>没有装配板或相应仪器时，仍可完成需求、原理图、计算、CAD 审核和数据手册核对。实验页中的测量表应保持空白，而不是用“典型值”代替结果。</p>
+</section>
+
+<section aria-labelledby="about-safety">
+  <h2 id="about-safety">电气、USB、ESD 与实验台安全规则</h2>
+  <aside class="warning">
+    <p><strong>本教程只讨论安全特低电压电子实验，不处理市电。</strong>不要把 R1、面包板、示波器探头或 USB 线直接连接到市电、未经隔离的离线电源或不明高压设备。</p>
+  </aside>
+  <ol>
+    <li><strong>先断电、后改线。</strong>每次接线后由第二人或按清单复核电源、地、极性和连接器方向，再上电。</li>
+    <li><strong>第一次上电必须限流。</strong>若电流立即达到限制、器件快速升温、出现气味、烟雾、异常声响或电源轨超出预期，立即断电。</li>
+    <li><strong>USB 主机与目标共地。</strong>R1 不隔离；把目标系统或台式仪器接入后可能形成地环路或短路。连接前先确认两侧参考电位。</li>
+    <li><strong>5 V 不是 5 V 逻辑。</strong><code>5V_SW</code> 是电源输出；所有 GPIO 和 UART 均按 3.3 V 逻辑使用。未由最终引脚资料确认前，不得假设输入可耐受 5 V。</li>
+    <li><strong>不要用 GPIO 直接驱动功率负载。</strong>电机、继电器、大电流 LED 和长电缆需要外部驱动、续流、限流与保护。</li>
+    <li><strong>示波器地夹不是任意节点。</strong>接地式示波器的地夹通常与保护地相连；夹错位置可能把电路节点直接短路到地。</li>
+    <li><strong>执行静电放电（Electrostatic Discharge，ESD）防护。</strong>接触 U1、U2、USB 与外部接口前释放人体静电，使用防静电工作面，并避免用手触摸裸露引脚。</li>
+    <li><strong>禁止无监督故障注入。</strong>短路电源、反接、过压、ESD 冲击和满载热测试只可在有风险评估、保护设备与教师监督时进行。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="about-reading">
+  <h2 id="about-reading">如何使用讲解、算例、实验与复习题</h2>
+  <p>建议按顺序阅读第 1–6 章，再进入具体电路。每遇到一个新术语，先读定义，再回答“电流从哪里来、经过什么、如何返回”；每遇到一个数值，先确认它属于哪一种事实状态。</p>
+  <table>
+    <caption>全教程统一使用的事实状态</caption>
+    <thead>
+      <tr><th scope="col">状态</th><th scope="col">含义</th><th scope="col">允许的写法</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">设计值</th><td>最终设计源采用的标称值或规则</td><td>“R7 的设计阻值为 16.9 kΩ”</td></tr>
+      <tr><th scope="row">计算值</th><td>由公式、CAD 几何或制造文件推导</td><td>“按典型公式计算约 0.402 A”</td></tr>
+      <tr><th scope="row">预期</th><td>依据机理或规格预测，但尚未由该实物确认</td><td>“过载时预期进入限流或热保护”</td></tr>
+      <tr><th scope="row">实测</th><td>由装配实物和注明条件的仪器记录得到</td><td>必须同时给出测点、条件、仪器和原始数据</td></tr>
+      <tr><th scope="row">待验证</th><td>还缺数据手册细节、生产叠层或实物实验</td><td>“晶振负载匹配与起振裕量待验证”</td></tr>
+    </tbody>
+  </table>
+  <p>算例必须保留公式、变量、单位、近似条件和中间步骤。实验应先写停止条件，再写接线；先记录原始数据，再判断通过或失败。复习题不是记忆测验：回答时应指出证据来源，并说明自动检查或计算尚未覆盖的风险。</p>
+  <aside class="checkpoint">
+    <p><strong>开始第 1 章前的自检：</strong>你是否能解释“当前 R1 没有实测事实”为何不妨碍我们学习设计，同时又为何禁止写出一个虚构的 3.3 V 测量结果？若不能，请重读本页的事实状态表。</p>
+  </aside>
+</section>
+
+<footer class="notice">
+  <p><strong>本页事实依据：</strong><code>tutorial/toc.md</code>、批准的实施计划、<code>project-facts.json</code>、<code>source-index.json</code> 与 R1 制造检查清单。最终项目源和发布资料优先于早期提案。</p>
+</footer>

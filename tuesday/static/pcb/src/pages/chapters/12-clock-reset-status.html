@@ -1,0 +1,175 @@
+<section class="notice" aria-labelledby="ch12-learning-objectives">
+  <h2 id="ch12-learning-objectives">学习目标与最终设计校正</h2>
+  <p>本章解释 Y1/C11/C12 的振荡网络、R12/C10 的复位网络、R11 的 BOOT0 偏置，以及 D1/R13 的状态指示。</p>
+  <p><strong>频率校正：</strong><code>toc.md</code> 的 12.2 保留了早期“8 MHz”文字；最终 R1 工程明确采用 <strong>Y1 = 12 MHz</strong>。教材必须以最终源为准，并把这一差异作为设计迭代记录。</p>
+  <p><strong>事实状态：</strong>器件值和网络为【设计】；1 ms、6 pF 和 3.3 mA 上限为【计算】；真实起振、频率、复位释放和 LED 电流为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch12-12-1">
+  <h2 id="ch12-12-1">12.1 数字逻辑为什么需要时钟</h2>
+  <p>时钟为 CPU 和同步外设提供统一的时间基准。每个时钟边沿推动状态机前进一步；USB、定时器、UART 波特率和指令执行都依赖由时钟树派生的频率。频率不正确、抖动过大或振荡未启动，可能造成固件不运行、通信定时错误或 USB 无法工作【预期】。</p>
+  <p>晶振不是独立输出方波的有源模块。Y1 与 U1 内部振荡放大器、C11/C12 和板级寄生共同构成闭环振荡器，因此器件值与毫米级布局不可分割。</p>
+</section>
+
+<section aria-labelledby="ch12-12-2">
+  <h2 id="ch12-12-2">12.2 Y1：最终 R1 的 12 MHz 石英晶振</h2>
+  <p>Y1 是 X322512MSB4SI、3225 四焊盘无源晶振，标称 <strong>12 MHz、20 pF 负载电容</strong>【设计】。焊盘 1 接 <code>OSC_IN</code>，焊盘 3 接 <code>OSC_OUT</code>，焊盘 2/4 接 <code>GND</code>。</p>
+  <p>最终 12 MHz 覆盖了提案和目录中旧的 8 MHz。不能一边焊 12 MHz 器件、一边按 8 MHz 配置固件时钟；原理图值、BOM 料号、固件时钟树和 USB 时序必须一致。</p>
+  <p>Y1 开路、虚焊或错装时外部时钟可能不起振；错频率或负载不匹配时可能出现频偏、起振裕量不足或 USB 时钟问题【预期】。这些行为尚无板级测量。</p>
+</section>
+
+<section aria-labelledby="ch12-12-3">
+  <h2 id="ch12-12-3">12.3 C11 与 C12：晶振两侧的负载电容</h2>
+  <table>
+    <caption>晶振负载元件【设计】</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">值与网络</th><th scope="col">布局</th><th scope="col">失效影响【预期】</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>C11</td>
+        <td>12 pF、C0603、C0G；<code>OSC_IN</code>—GND</td>
+        <td>紧靠 Y1/U1，地回路短，与 C12 尽量对称。</td>
+        <td>开路会减小负载；短路或错大可能重载 OSC_IN，增加不起振风险。</td>
+      </tr>
+      <tr>
+        <td>C12</td>
+        <td>12 pF、C0603、C0G；<code>OSC_OUT</code>—GND</td>
+        <td>与 C11 对称，远离 BUCK_SW 和快速数字线。</td>
+        <td>开路会改变频偏；短路或错大可能重载 OSC_OUT。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>C0G 介质适合小容量、稳定性要求较高的谐振网络，但“介质正确”不自动保证负载匹配。引脚、焊盘、走线和邻近铜都贡献杂散电容。</p>
+</section>
+
+<section aria-labelledby="ch12-12-4">
+  <h2 id="ch12-12-4">12.4 含杂散电容的负载计算</h2>
+  <figure class="example" id="ch12-crystal-load-calculation">
+    <figcaption>晶振看到的近似负载</figcaption>
+    <p><var>C</var><sub>L</sub> ≈ (<var>C</var><sub>11</sub> × <var>C</var><sub>12</sub>) / (<var>C</var><sub>11</sub> + <var>C</var><sub>12</sub>) + <var>C</var><sub>STRAY</sub></p>
+    <dl>
+      <dt><var>C</var><sub>L</sub></dt><dd>晶振看到的等效负载，单位 pF。</dd>
+      <dt><var>C</var><sub>11</sub>、<var>C</var><sub>12</sub></dt><dd>各为 12 pF【设计】。</dd>
+      <dt><var>C</var><sub>STRAY</sub></dt><dd>U1 引脚、Y1 封装、焊盘、走线和邻近铜的总杂散电容，单位 pF。</dd>
+    </dl>
+    <p>不含杂散时：(12 × 12) / (12 + 12) = <strong>6 pF</strong>【计算】。</p>
+    <p>Y1 元数据标称负载 20 pF，但 <var>C</var><sub>STRAY</sub> 和 U1 振荡器模型未知，因此不能仅凭“6 pF + 未知量”判断一定匹配或一定不匹配。频偏、起振时间和裕量均为【待验证】。</p>
+  </figure>
+  <aside class="warning">
+    <strong>不要反向猜数：</strong>不能为了让公式凑成 20 pF，就宣称板上杂散必定是 14 pF。杂散必须由模型、提取或测量支持。
+  </aside>
+</section>
+
+<section aria-labelledby="ch12-12-5">
+  <h2 id="ch12-12-5">12.5 晶振走线要短、对称、安静</h2>
+  <p><code>OSC_IN</code> 和 <code>OSC_OUT</code> 是高阻、低能量的模拟节点，容易受开关噪声影响。布局原则包括：</p>
+  <ul>
+    <li>Y1 靠近 U1 的 2/3 脚，走线短、无支路、少过孔；</li>
+    <li>C11/C12 紧靠对应晶振端，地回路短且对称；</li>
+    <li>不要让 BUCK_SW、PWM、USB 或时钟之外的快速线从其下方或附近经过；</li>
+    <li>晶振下方和周围保持可理解的地参考，避免高电流回流穿越；</li>
+    <li>测试点和长探针会增加电容，不应随意挂在振荡节点。</li>
+  </ul>
+  <p>Y1、C11、C12 的布局等级均为关键【设计】。即使 ERC/DRC 为零，也不能证明振荡器有足够负阻裕量。</p>
+</section>
+
+<section aria-labelledby="ch12-12-6">
+  <h2 id="ch12-12-6">12.6 R12 与 C10：复位上拉、滤波和时间常数</h2>
+  <p>R12 是 10 kΩ，从 <code>3V3_SYS</code> 上拉 <code>NRST</code>；C10 是 100 nF，从 <code>NRST</code> 接 GND【设计】。上电时 C10 起初近似未充电，使 NRST 上升受限；随后通过 R12 充电，NRST 逐步释放。</p>
+  <figure class="example" id="ch12-reset-rc-calculation">
+    <figcaption>复位 RC 名义时间常数</figcaption>
+    <p>&tau; = <var>R</var> × <var>C</var></p>
+    <p><var>R</var> = 10 kΩ = 10,000 Ω，<var>C</var> = 100 nF = 100 × 10<sup>−9</sup> F。</p>
+    <p>&tau; = 10,000 × 100 × 10<sup>−9</sup> = 0.001 s = <strong>1 ms</strong>【计算】。</p>
+    <p><strong>假设：</strong>理想阶跃电源、理想 R/C、无内部上拉和漏电。实际复位释放时刻取决于 NRST 阈值、3V3_SYS 上升斜率、U1 内部复位电路和外部调试器，因此不等于简单的 1 ms。</p>
+  </figure>
+  <p>R12 开路时 NRST 可能悬空；C10 开路时抗噪和上电延时减弱；C10 短路或 NRST 对地短路会使 U1 保持复位【预期】。二者都应靠近 U1，复位线避开 BUCK_SW。</p>
+</section>
+
+<section aria-labelledby="ch12-12-7">
+  <h2 id="ch12-12-7">12.7 R11：BOOT0 默认低电平</h2>
+  <p>R11 是 100 kΩ，从 <code>BOOT0</code> 接 GND【设计】，使 U1 默认进入正常启动路径。阻值足够大，便于调试器或测试夹具在需要时覆盖，又能避免引脚悬空。</p>
+  <p>R11 开路时 BOOT0 可能受噪声影响而进入错误启动模式；误短到高电平或装错网络可能使板持续进入引导模式【预期】。R11 应靠近 U1 的 BOOT0 脚，且不能把“进入引导模式”误诊为 MCU 已损坏。</p>
+</section>
+
+<section aria-labelledby="ch12-12-8">
+  <h2 id="ch12-12-8">12.8 D1 与 R13：由 PB5 控制的状态灯</h2>
+  <p>U1 的 PB5/封装脚 28 输出 <code>STATUS_LED</code>，经 R13 到 <code>LED_A</code>，再通过 D1 回到 GND【设计】。</p>
+  <table>
+    <caption>状态指示元件</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">设计事实</th><th scope="col">布局与失效</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>R13</td>
+        <td>1 kΩ、0603；<code>STATUS_LED</code>—<code>LED_A</code>，限制 LED/GPIO 电流。</td>
+        <td>靠近 D1 便于识别。开路或错大：灯不亮；短路或错小：D1/U1 电流可能过大【预期】。</td>
+      </tr>
+      <tr>
+        <td>D1</td>
+        <td>19-217/G7C-BK2L2VY/3T，0603 黄绿色 LED；阳极 <code>LED_A</code>，阴极 GND。</td>
+        <td>必须检查极性和可视方向。反装/开路时不亮；短路时经 R13 持续拉低 STATUS_LED【预期】。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>状态灯是诊断工具，不是系统正常的充分证据：LED 能闪不证明 USB、时钟精度或所有 GPIO 已通过；LED 不亮也可能只是 D1/R13 极性、焊接或固件问题。</p>
+</section>
+
+<section aria-labelledby="ch12-12-9">
+  <h2 id="ch12-12-9">12.9 LED 电流公式与 GPIO 驱动边界</h2>
+  <figure class="example" id="ch12-led-current-calculation">
+    <figcaption>状态 LED 电流</figcaption>
+    <p><var>I</var><sub>LED</sub> = (<var>V</var><sub>OH</sub> − <var>V</var><sub>F</sub>) / <var>R</var><sub>13</sub></p>
+    <dl>
+      <dt><var>I</var><sub>LED</sub></dt><dd>LED 电流，单位 A。</dd>
+      <dt><var>V</var><sub>OH</sub></dt><dd>PB5 带载高电平，单位 V。</dd>
+      <dt><var>V</var><sub>F</sub></dt><dd>D1 在该电流和温度下的正向压降，单位 V。</dd>
+      <dt><var>R</var><sub>13</sub></dt><dd>1 kΩ。</dd>
+    </dl>
+    <p>事实库没有最终板的 <var>V</var><sub>OH</sub> 或 <var>V</var><sub>F</sub> 实测。若只取极端数学假设 <var>V</var><sub>F</sub> = 0、<var>V</var><sub>OH</sub> = 3.3 V，则 <var>I</var><sub>LED</sub> ≤ 3.3/1000 = <strong>3.3 mA</strong>【理论上界】。真实 LED 电流会更低，但具体数值必须测量。</p>
+  </figure>
+  <p>检查 GPIO 能否驱动 LED 时，必须查推荐工作条件和输出高电平随电流变化的数据，而不能用绝对最大额定值作为日常工作点。R13 既保护 LED，也限制 U1 引脚电流。</p>
+</section>
+
+<section class="experiment" aria-labelledby="ch12-12-10">
+  <h2 id="ch12-12-10">12.10 实验：测量时钟、复位和 LED 电流</h2>
+  <h3 id="ch12-experiment-equipment">器材</h3>
+  <p>限流电源、万用表、示波器、低电容有源探头或合适的时钟测量方法、短地弹簧、调试器和温度记录工具。</p>
+  <h3 id="ch12-experiment-safety">安全与停止条件</h3>
+  <ul>
+    <li>普通 10× 探头的电容可能改变晶振负载甚至令其停振；没有低电容探头时，不直接探 OSC_IN/OSC_OUT。</li>
+    <li>不要把示波器地夹接到晶振信号；只接确认过的 GND。</li>
+    <li>不要把电流表串入微小晶振回路。LED 电流优先通过测 R13 两端压降计算。</li>
+    <li>若 3V3_SYS 异常、U1 过热、NRST 长期低或探头使系统停止，立即断电。</li>
+  </ul>
+  <h3 id="ch12-experiment-procedure">步骤</h3>
+  <ol>
+    <li>先记录上电时 3V3_SYS 与 NRST 波形，测量 NRST 达到逻辑释放条件的时间；不要直接把它写成 1 ms。</li>
+    <li>通过 MCU 输出时钟功能、调试器或低电容探测方法验证系统时钟；记录方法和负载影响。</li>
+    <li>让固件分别关闭和点亮 D1，测 R13 两端电压 <var>V</var><sub>R13</sub>。</li>
+    <li>按 <var>I</var> = <var>V</var><sub>R13</sub>/1 kΩ 计算 LED 电流，并记录 LED 极性与亮度的主观观察。</li>
+  </ol>
+  <table>
+    <caption>实验 12-1 记录表</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">设计/计算参考</th><th scope="col">测量方法</th><th scope="col">实测</th><th scope="col">备注</th></tr></thead>
+    <tbody>
+      <tr><td>时钟频率</td><td>Y1 = 12 MHz【设计】</td><td>待填</td><td>待填</td><td>记录探头负载</td></tr>
+      <tr><td>NRST 释放</td><td>&tau; = 1 ms【计算】</td><td>待填</td><td>待填</td><td>阈值/电源斜率</td></tr>
+      <tr><td>R13 压降</td><td>R13 = 1 kΩ【设计】</td><td>待填</td><td>待填</td><td>LED 开/关状态</td></tr>
+      <tr><td>LED 电流</td><td>理论上界 3.3 mA【计算】</td><td>由压降计算</td><td>待填</td><td>不得预填</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch12-summary">
+  <h2 id="ch12-summary">本章小结</h2>
+  <ul>
+    <li>最终 Y1 是 12 MHz、20 pF 标称负载，不是目录遗留的 8 MHz。</li>
+    <li>C11/C12 各 12 pF，理想串联等效 6 pF；加入未知杂散后的匹配仍待验证。</li>
+    <li>R12/C10 的名义时间常数为 1 ms，R11 以 100 kΩ 把 BOOT0 默认拉低。</li>
+    <li>D1 为黄绿色 0603 LED，R13 为 1 kΩ；实际 LED 电流必须由压降测量。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch12-sources">
+  <h2 id="ch12-sources">事实来源</h2>
+  <p>最终 EasyEDA 工程中的 Y1、C10–C12、R11–R13、D1 网络和值；结构化事实库的时钟/复位和公式；Y1 元数据与晶振资料。目录和早期提案中的 8 MHz 已由最终 12 MHz 设计覆盖。</p>
+</section>

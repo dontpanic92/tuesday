@@ -1,0 +1,171 @@
+<section aria-labelledby="j-use">
+  <h2 id="j-use">J.1 使用说明</h2>
+  <p>术语按教程首次系统定义的顺序汇总。英文缩写第一次出现时给出全称；每个词条都有稳定锚点，可从其他页面直接链接。定义以 USB GPIO R1 的语境为例，但注意其中的通用概念与项目特例之间的区别。</p>
+  <nav aria-label="术语分类">
+    <ul>
+      <li><a href="#j-pcb-terms">PCB 与制造</a></li>
+      <li><a href="#j-usb-power-terms">USB、电源与保护</a></li>
+      <li><a href="#j-digital-terms">MCU 与数字接口</a></li>
+      <li><a href="#j-evidence-terms">事实与证据状态</a></li>
+    </ul>
+  </nav>
+</section>
+
+<section aria-labelledby="j-pcb-terms">
+  <h2 id="j-pcb-terms">J.2 PCB、原理图与制造术语</h2>
+  <dl>
+    <dt id="term-pcb">印制电路板（<abbr title="Printed Circuit Board">PCB</abbr>）</dt>
+    <dd>用绝缘基材、铜层、孔和表面材料实现电气连接与机械承载的板。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-schematic">原理图（Schematic）</dt>
+    <dd>按逻辑关系表达元件、引脚和网络的电路文档，不表示真实几何距离。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-net">网络（Net）</dt>
+    <dd>在电气上应互相连接的一组引脚、焊盘和铜图元。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-reference-designator">位号（<abbr title="Reference Designator">RefDes</abbr>）</dt>
+    <dd>元件实例的唯一标签，例如 R5、U1、J2。 <small>首次系统定义：第 2 章。</small></dd>
+    <dt id="term-symbol">符号（Schematic Symbol）</dt>
+    <dd>原理图中表示器件功能和引脚的图形模型。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-footprint">封装/焊盘图（Footprint / Land Pattern）</dt>
+    <dd>PCB 上焊盘、孔、丝印和装配边界的几何定义。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-component-body">器件实体（Component Body）</dt>
+    <dd>元件真实外壳占据的三维或二维投影空间。 <small>首次系统定义：第 19 章。</small></dd>
+    <dt id="term-courtyard">庭院（Courtyard）</dt>
+    <dd>为贴装、返修和邻件间距预留的装配边界。 <small>首次系统定义：第 19 章。</small></dd>
+    <dt id="term-pad">焊盘（Pad）</dt>
+    <dd>用于焊接器件引脚或连接测试点的铜区域。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-track">走线（Track / Trace）</dt>
+    <dd>PCB 铜层上的线状导体。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-via">过孔（Via）</dt>
+    <dd>用金属化孔连接不同铜层的结构。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-pth">金属化通孔（<abbr title="Plated Through Hole">PTH</abbr>）</dt>
+    <dd>孔壁有铜，可用于电气连接或通孔元件。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-npth">非金属化孔（<abbr title="Non-Plated Through Hole">NPTH</abbr>）</dt>
+    <dd>孔壁无铜，通常用于机械定位或安装。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-solder-mask">阻焊层（Solder Mask）</dt>
+    <dd>覆盖非焊接铜面的绝缘保护层。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-paste-mask">锡膏层/钢网开口（Paste Mask）</dt>
+    <dd>规定表面贴装焊盘上锡膏开口的制造层。 <small>首次系统定义：第 28 章。</small></dd>
+    <dt id="term-silkscreen">丝印（Silkscreen）</dt>
+    <dd>用于名称、方向、警告和装配标识的印刷层。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-board-outline">板框（Board Outline）</dt>
+    <dd>定义 PCB 最终外形的闭合制造边界。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-ground">地（<abbr title="Ground">GND</abbr>）</dt>
+    <dd>本板共同电压参考和回流网络，不是电流消失的地方。 <small>首次系统定义：第 2 章。</small></dd>
+    <dt id="term-return-path">回流路径（Return Path）</dt>
+    <dd>信号或电源电流返回源端所经过的导体路径。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-copper-pour">铺铜（Copper Pour）</dt>
+    <dd>按网络和间距规则自动生成的大面积铜区域；边界本身不等于已有制造铜。 <small>首次系统定义：第 1 章。</small></dd>
+    <dt id="term-static-fill">静态铜填充（Static Copper Fill）</dt>
+    <dd>不会随规则或几何自动重算的固定铜图元；R1 使用 17 个 GND FILL 区域。 <small>首次系统定义：第 24 章。</small></dd>
+    <dt id="term-stitching-via">地缝合过孔（Ground Stitching Via）</dt>
+    <dd>连接不同层地铜、缩短回流和降低高频阻抗的过孔。 <small>首次系统定义：第 23 章。</small></dd>
+    <dt id="term-clearance">间距（Clearance）</dt>
+    <dd>不同铜、器件或板边之间必须保留的最小距离。 <small>首次系统定义：第 18 章。</small></dd>
+    <dt id="term-erc">电气规则检查（<abbr title="Electrical Rules Check">ERC</abbr>）</dt>
+    <dd>检查原理图引脚类型、未连接和电气冲突的自动规则；不能证明机械可制造。 <small>首次系统定义：第 17 章。</small></dd>
+    <dt id="term-drc">设计规则检查（<abbr title="Design Rule Check">DRC</abbr>）</dt>
+    <dd>检查 PCB 连通、间距、尺寸等规则；不能替代器件碰撞、热和信号完整性验证。 <small>首次系统定义：第 18 章。</small></dd>
+    <dt id="term-bom">物料清单（<abbr title="Bill of Materials">BOM</abbr>）</dt>
+    <dd>列出拟采购/装配元件、数量、位号、料号和封装的文件。 <small>首次系统定义：第 27 章。</small></dd>
+    <dt id="term-cpl">元件坐标表（<abbr title="Component Placement List">CPL</abbr>）</dt>
+    <dd>列出位号、坐标、旋转和装配面的贴装/定位文件。 <small>首次系统定义：第 27 章。</small></dd>
+    <dt id="term-dnp">不装配（<abbr title="Do Not Populate">DNP</abbr>）</dt>
+    <dd>PCB 保留元件位置但制造 BOM 不安装；R1 的 J2/J3 属于此状态。 <small>首次系统定义：第 2 章。</small></dd>
+    <dt id="term-gerber">Gerber 制造文件（Gerber）</dt>
+    <dd>描述铜、阻焊、锡膏、丝印和板框几何的制造数据。 <small>首次系统定义：第 28 章。</small></dd>
+    <dt id="term-manifest">发布清单（Release Manifest）</dt>
+    <dd>记录版本、统计、检查结果、交付物和哈希的发布文件。 <small>首次系统定义：第 28 章。</small></dd>
+  </dl>
+</section>
+
+<section aria-labelledby="j-usb-power-terms">
+  <h2 id="j-usb-power-terms">J.3 USB、电源、模拟与保护术语</h2>
+  <dl>
+    <dt id="term-usb">通用串行总线（<abbr title="Universal Serial Bus">USB</abbr>）</dt>
+    <dd>本板用于供电和与主机通信的串行接口。 <small>首次系统定义：第 4 章。</small></dd>
+    <dt id="term-usb-c">USB Type-C（<abbr title="USB Type-C">USB-C</abbr>）</dt>
+    <dd>可翻转连接器体系；R1 只实现 USB 2.0 设备和受电端 CC 检测。 <small>首次系统定义：第 5 章。</small></dd>
+    <dt id="term-vbus">USB 总线电源（<abbr title="USB VBUS">VBUS</abbr>）</dt>
+    <dd>J1 提供的约 5 V 电源；板内网络名为 VBUS_IN。 <small>首次系统定义：第 7 章。</small></dd>
+    <dt id="term-cc">配置通道（<abbr title="Configuration Channel">CC</abbr>）</dt>
+    <dd>USB-C 用于方向、角色和供电能力检测的引脚；R1 用 R1/R2 下拉。 <small>首次系统定义：第 7 章。</small></dd>
+    <dt id="term-rd">受电端下拉（<abbr title="Sink Pull-Down">Rd</abbr>）</dt>
+    <dd>USB-C 受电设备在 CC1/CC2 上使用的下拉电阻。 <small>首次系统定义：第 7 章。</small></dd>
+    <dt id="term-differential-pair">差分对（Differential Pair）</dt>
+    <dd>用两根互补信号线传输差分信息；USB D+ 与 D− 构成一对。 <small>首次系统定义：第 8 章。</small></dd>
+    <dt id="term-skew">偏斜（Skew）</dt>
+    <dd>差分对两条路径长度或传播时间之差；长度小不等于阻抗合格。 <small>首次系统定义：第 8 章。</small></dd>
+    <dt id="term-impedance">阻抗（Impedance）</dt>
+    <dd>交流下电压与电流的复数关系；USB 走线阻抗取决于实际生产叠层和几何。 <small>首次系统定义：第 8 章。</small></dd>
+    <dt id="term-esd">静电放电（<abbr title="Electrostatic Discharge">ESD</abbr>）</dt>
+    <dd>短时高压放电事件；U2 用于把 USB 数据线上的事件导向参考网络。 <small>首次系统定义：第 3 章。</small></dd>
+    <dt id="term-buck">降压型开关变换器（Buck Converter）</dt>
+    <dd>用开关、电感和电容把较高直流电压高效变为较低电压。 <small>首次系统定义：第 9 章。</small></dd>
+    <dt id="term-switch-node">开关节点（Switch Node）</dt>
+    <dd>U3 与 L1 之间高速跃变的 BUCK_SW 网络，具有高 dv/dt 和 EMI 风险。 <small>首次系统定义：第 9 章。</small></dd>
+    <dt id="term-feedback">反馈（<abbr title="Feedback">FB</abbr>）</dt>
+    <dd>把输出分压送回稳压器以调节输出；R5/R6 构成 BUCK_FB 分压。 <small>首次系统定义：第 9 章。</small></dd>
+    <dt id="term-load-switch">负载开关（Load Switch）</dt>
+    <dd>用逻辑信号控制电源通断并可提供限流/热保护的高侧器件。 <small>首次系统定义：第 10 章。</small></dd>
+    <dt id="term-current-limit">限流（Current Limit）</dt>
+    <dd>负载超过设定值时限制输出电流；R7/R8 设置 U4/U5 的典型阈值。 <small>首次系统定义：第 10 章。</small></dd>
+    <dt id="term-decoupling">去耦（Decoupling）</dt>
+    <dd>用近端电容向快速负载提供瞬态电流并缩小高频回路。 <small>首次系统定义：第 3 章。</small></dd>
+    <dt id="term-bulk-capacitor">储能/大容量电容（Bulk Capacitor）</dt>
+    <dd>主要服务较低频负载变化和能量储备的电容。 <small>首次系统定义：第 3 章。</small></dd>
+  </dl>
+</section>
+
+<section aria-labelledby="j-digital-terms">
+  <h2 id="j-digital-terms">J.4 MCU 与数字接口术语</h2>
+  <dl>
+    <dt id="term-mcu">微控制器（<abbr title="Microcontroller Unit">MCU</abbr>）</dt>
+    <dd>集成 CPU、存储器和外设的控制芯片；R1 使用 U1 CH32V203K8T6。 <small>首次系统定义：第 3 章。</small></dd>
+    <dt id="term-gpio">通用输入输出（<abbr title="General-Purpose Input/Output">GPIO</abbr>）</dt>
+    <dd>可由固件配置为数字输入、输出或复用功能的引脚。 <small>首次系统定义：第 4 章。</small></dd>
+    <dt id="term-pwm">脉宽调制（<abbr title="Pulse-Width Modulation">PWM</abbr>）</dt>
+    <dd>通过改变周期内高电平比例控制平均效果；R1 四路 PWM 共用 TIM3 频率。 <small>首次系统定义：第 4 章。</small></dd>
+    <dt id="term-uart">通用异步收发器（<abbr title="Universal Asynchronous Receiver/Transmitter">UART</abbr>）</dt>
+    <dd>按波特率、数据位、校验和停止位传输的异步串口；R1 为 3.3 V TTL/CMOS。 <small>首次系统定义：第 4 章。</small></dd>
+    <dt id="term-swd">串行线调试（<abbr title="Serial Wire Debug">SWD</abbr>）</dt>
+    <dd>使用 SWDIO、SWCLK、NRST、电源和地进行编程调试的接口。 <small>首次系统定义：第 11 章。</small></dd>
+    <dt id="term-high-impedance">高阻态（<abbr title="High Impedance">Hi-Z</abbr>）</dt>
+    <dd>引脚既不主动拉高也不主动拉低的状态。 <small>首次系统定义：第 2 章。</small></dd>
+    <dt id="term-absolute-maximum">绝对最大额定值（Absolute Maximum Rating）</dt>
+    <dd>不得长期工作的损坏边界，不是推荐工作点。 <small>首次系统定义：第 6 章。</small></dd>
+    <dt id="term-recommended-operating">推荐工作条件（Recommended Operating Conditions）</dt>
+    <dd>数据手册保证正常功能所要求的电压、温度等范围。 <small>首次系统定义：第 6 章。</small></dd>
+  </dl>
+</section>
+
+<section aria-labelledby="j-evidence-terms">
+  <h2 id="j-evidence-terms">J.5 事实与证据状态</h2>
+  <dl>
+    <dt id="term-design-state">设计值（Design Value）</dt>
+    <dd>最终源中采用的标称值，不表示已测量。 <small>首次系统定义：关于页。</small></dd>
+    <dt id="term-calculated-state">计算值（Calculated Value）</dt>
+    <dd>由设计值、公式或 CAD 几何推导的结果。 <small>首次系统定义：关于页。</small></dd>
+    <dt id="term-expected-state">预期值/行为（Expected Value / Behavior）</dt>
+    <dd>依据机理或规格预测、尚未由实物确认的结果。 <small>首次系统定义：关于页。</small></dd>
+    <dt id="term-measured-state">实测值（Measured Value）</dt>
+    <dd>来自装配实物和仪器的原始或处理后数据；当前 R1 事实库尚无。 <small>首次系统定义：关于页。</small></dd>
+    <dt id="term-unverified-state">待验证（Unverified）</dt>
+    <dd>需要进一步数据手册复核、生产信息或实物实验才能确认。 <small>首次系统定义：关于页。</small></dd>
+  </dl>
+</section>
+
+<section aria-labelledby="j-distinguish">
+  <h2 id="j-distinguish">J.6 最容易混淆的词</h2>
+  <table>
+    <caption>表 J-1　相近术语的边界</caption>
+    <thead><tr><th scope="col">不要混为一谈</th><th scope="col">区别</th></tr></thead>
+    <tbody>
+      <tr><td>symbol / footprint / package / body</td><td>分别描述逻辑图形、PCB 焊盘几何、供应商外壳和真实占用空间。</td></tr>
+      <tr><td>GND / 回流路径</td><td>GND 是网络名称；真实回流会选择随频率变化的物理路径。</td></tr>
+      <tr><td>铺铜边界 / 生成铜 / Gerber 铜</td><td>边界是输入，生成铜是 CAD 结果，Gerber 铜才是送制造的几何。</td></tr>
+      <tr><td>ERC / DRC / 机械审核</td><td>分别检查原理图规则、PCB 规则和实体可装配性，互不替代。</td></tr>
+      <tr><td>标称 / 典型 / 保证 / 实测</td><td>来源和置信边界不同，必须在数字旁明确标注。</td></tr>
+      <tr><td>5V_SW 电源 / 5 V 逻辑</td><td>前者是受控电源输出；R1 的 GPIO/UART 仍是 3.3 V 逻辑。</td></tr>
+      <tr><td>CAD 长度匹配 / 受控阻抗</td><td>长度差很小不代表生产叠层下的阻抗或眼图合格。</td></tr>
+    </tbody>
+  </table>
+</section>

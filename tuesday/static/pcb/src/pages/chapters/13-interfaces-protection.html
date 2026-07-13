@@ -1,0 +1,223 @@
+<section class="notice" aria-labelledby="ch13-learning-objectives">
+  <h2 id="ch13-learning-objectives">学习目标与安全边界</h2>
+  <p>本章解释 8 路 GPIO、4 路共享 TIM3 的 PWM、一路 3.3 V TTL/CMOS UART，以及 R14–R23 与 J2 的接口保护作用。</p>
+  <p><strong>关键边界：</strong>R1 的外部接口是 3.3 V 逻辑、与 USB 主机共地、无隔离；最终板没有外部 GPIO ESD 阵列。220 Ω 串联电阻可限制部分故障电流和边沿，但不是电平转换器、保险丝或完整 ESD 钳位。</p>
+  <p><strong>事实状态：</strong>引脚映射和值为【设计】；公式算例为【计算】；逻辑阈值、边沿、最大波特率、负载能力和抗扰度为【待验证】。</p>
+</section>
+
+<section aria-labelledby="ch13-13-1">
+  <h2 id="ch13-13-1">13.1 数字输入阈值与数字输出电平</h2>
+  <p>数字输入并不是“高于 0 V 就是 1”。器件数据手册会规定输入低电平上限和输入高电平下限；两者之间是不可依赖的过渡区。数字输出也不是理想电压源：负载电流增加时，高电平会下降、低电平会上升。</p>
+  <p>R1 将 GPIO、PWM 与 UART 定义为 3.3 V CMOS/TTL 逻辑【设计】。连接目标板前必须确认：</p>
+  <ul>
+    <li>目标输出高/低电平落入 U1 的推荐输入范围；</li>
+    <li>U1 输出电平满足目标输入范围；</li>
+    <li>双方共地且没有把 5V_SW 当作 5 V 逻辑；</li>
+    <li>目标在 R1 断电时不会经信号线反向供电。</li>
+  </ul>
+  <p>事实库没有给出本板工作点的输入阈值或输出驱动曲线，因此不能在这里虚构具体阈值或允许电流。</p>
+</section>
+
+<section aria-labelledby="ch13-13-2">
+  <h2 id="ch13-13-2">13.2 推挽、开漏、上拉、下拉与高阻</h2>
+  <dl>
+    <dt>推挽输出</dt>
+    <dd>主动拉高也主动拉低，边沿快，适合普通数字输出；两个推挽输出互接且电平相反会形成冲突电流。</dd>
+    <dt>开漏输出</dt>
+    <dd>只主动拉低，释放时依靠外部或内部上拉变高；可实现线与，但上拉阻值与电容决定上升时间。</dd>
+    <dt>输入上拉/下拉</dt>
+    <dd>为开关或开路信号提供默认状态；内部弱拉不能替代所有外部抗噪设计。</dd>
+    <dt>高阻态（Hi-Z）</dt>
+    <dd>引脚不主动驱动高或低。R1 要求复位、启动和未配置期间外部 GPIO 与 UART_TX 保持高阻【预期】。</dd>
+  </dl>
+  <p>改变模式时应先设置安全输出值，再切换方向或复用功能，避免瞬时毛刺。目标板断电时尤其应优先高阻。</p>
+</section>
+
+<section aria-labelledby="ch13-13-3">
+  <h2 id="ch13-13-3">13.3 R14–R23：暴露信号的 220 Ω 串联电阻</h2>
+  <table>
+    <caption>全部十路外部信号串联电阻【设计】</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">MCU 侧</th><th scope="col">J2 侧</th><th scope="col">功能</th><th scope="col">开路/错值后果【预期】</th></tr></thead>
+    <tbody>
+      <tr><td>R14，220 Ω</td><td><code>GPIO0_MCU</code></td><td><code>GPIO0_PWM0</code></td><td>GPIO0 / TIM3_CH1</td><td>开路使通道 0 断开；过小降低限流，过大增加延迟。</td></tr>
+      <tr><td>R15，220 Ω</td><td><code>GPIO1_MCU</code></td><td><code>GPIO1_PWM1</code></td><td>GPIO1 / TIM3_CH2</td><td>开路使通道 1 断开；错值改变边沿和故障电流。</td></tr>
+      <tr><td>R16，220 Ω</td><td><code>GPIO2_MCU</code></td><td><code>GPIO2_PWM2</code></td><td>GPIO2 / TIM3_CH3</td><td>开路使通道 2 断开；错值改变边沿和故障电流。</td></tr>
+      <tr><td>R17，220 Ω</td><td><code>GPIO3_MCU</code></td><td><code>GPIO3_PWM3</code></td><td>GPIO3 / TIM3_CH4</td><td>开路使通道 3 断开；错值改变边沿和故障电流。</td></tr>
+      <tr><td>R18，220 Ω</td><td><code>GPIO4_MCU</code></td><td><code>GPIO4</code></td><td>普通 GPIO4</td><td>开路使 GPIO4 断开；过小减弱保护。</td></tr>
+      <tr><td>R19，220 Ω</td><td><code>GPIO5_MCU</code></td><td><code>GPIO5</code></td><td>普通 GPIO5</td><td>开路使 GPIO5 断开；错值影响边沿。</td></tr>
+      <tr><td>R20，220 Ω</td><td><code>GPIO6_MCU</code></td><td><code>GPIO6</code></td><td>普通 GPIO6</td><td>开路使 GPIO6 断开；过大限制速度/负载。</td></tr>
+      <tr><td>R21，220 Ω</td><td><code>GPIO7_MCU</code></td><td><code>GPIO7</code></td><td>普通 GPIO7</td><td>开路使 GPIO7 断开；过小减弱保护。</td></tr>
+      <tr><td>R22，220 Ω</td><td><code>UART_TX_MCU</code></td><td><code>UART_TX</code></td><td>板到目标的 UART TX</td><td>开路无发送；过大可能使高速边沿过慢并产生误码。</td></tr>
+      <tr><td>R23，220 Ω</td><td><code>UART_RX_MCU</code></td><td><code>UART_RX</code></td><td>目标到板的 UART RX</td><td>开路无接收；过大与输入/线缆电容形成更大延迟。</td></tr>
+    </tbody>
+  </table>
+  <p>十只电阻均为 0603，并按通道靠近 U1 整齐布置【设计】。靠近 MCU 的意义是让大部分外部走线位于电阻“外侧”，从而限制进入 U1 引脚的瞬态电流并减小 MCU 侧支路。</p>
+</section>
+
+<section aria-labelledby="ch13-13-4">
+  <h2 id="ch13-13-4">13.4 串联电阻如何限流并减慢边沿</h2>
+  <figure class="example" id="ch13-fault-current-calculation">
+    <figcaption>理想化故障电流估算</figcaption>
+    <p><var>I</var><sub>FAULT</sub> ≈ (<var>V</var><sub>OUT</sub> − <var>V</var><sub>FAULT</sub>) / <var>R</var><sub>SERIES</sub></p>
+    <p>若仅作最坏方向的教学估算，假设 U1 输出 3.3 V、外部被理想短接到 0 V、只计算 R14–R23 的 220 Ω：</p>
+    <p><var>I</var><sub>FAULT</sub> ≈ 3.3 / 220 = <strong>0.015 A = 15 mA</strong>【理想化计算】。</p>
+    <p><strong>重要：</strong>15 mA 不是 U1 的允许短路电流或安全额定值。真实电流还受 GPIO 输出阻抗、钳位结构、供电、外部源和时间影响，必须查数据手册并避免持续冲突。</p>
+  </figure>
+  <figure class="definition" id="ch13-edge-time">
+    <figcaption>串联电阻与负载电容的一阶时间常数</figcaption>
+    <p>&tau; ≈ <var>R</var><sub>SERIES</sub> × <var>C</var><sub>LOAD</sub></p>
+    <p><var>R</var> 为 Ω，<var>C</var> 为 F，&tau; 为 s。线缆、输入和探头电容越大，220 Ω 造成的上升/下降时间越长。该式是一阶近似，不描述传输线反射。</p>
+  </figure>
+  <p>因此 220 Ω 是故障限流、振铃抑制和速度之间的折中。它不能钳住 ESD 电压，也不能让 5 V 信号自动变成 3.3 V。</p>
+</section>
+
+<section aria-labelledby="ch13-13-5">
+  <h2 id="ch13-13-5">13.5 八路 GPIO 与四路共享定时器 PWM</h2>
+  <table>
+    <caption>GPIO/PWM 最终映射【设计】</caption>
+    <thead><tr><th scope="col">外部通道</th><th scope="col">U1 引脚</th><th scope="col">替代功能</th><th scope="col">J2</th></tr></thead>
+    <tbody>
+      <tr><td>GPIO0/PWM0</td><td>PA6，封装脚 12</td><td>TIM3_CH1</td><td>5</td></tr>
+      <tr><td>GPIO1/PWM1</td><td>PA7，封装脚 13</td><td>TIM3_CH2</td><td>6</td></tr>
+      <tr><td>GPIO2/PWM2</td><td>PB0，封装脚 14</td><td>TIM3_CH3</td><td>7</td></tr>
+      <tr><td>GPIO3/PWM3</td><td>PB1，封装脚 15</td><td>TIM3_CH4</td><td>8</td></tr>
+      <tr><td>GPIO4</td><td>PA0，封装脚 6</td><td>普通 GPIO</td><td>9</td></tr>
+      <tr><td>GPIO5</td><td>PA1，封装脚 7</td><td>普通 GPIO</td><td>10</td></tr>
+      <tr><td>GPIO6</td><td>PA4，封装脚 10</td><td>普通 GPIO</td><td>11</td></tr>
+      <tr><td>GPIO7</td><td>PA5，封装脚 11</td><td>普通 GPIO</td><td>12</td></tr>
+    </tbody>
+  </table>
+  <p>PWM0–PWM3 使用同一个 TIM3 的四个通道，因此共享一个计数周期和频率，但各通道可以有独立比较值与占空比【设计】。若软件试图给四路设置互不相同的频率，必须拒绝、重配整个定时器或采用其他资源，不能悄悄改变正在运行的通道。</p>
+</section>
+
+<section aria-labelledby="ch13-13-6">
+  <h2 id="ch13-13-6">13.6 PWM 的频率、占空比、分辨率与平均效果</h2>
+  <p>PWM 在每个周期内只输出高或低电平。频率 <var>f</var> 的单位为 Hz，周期 <var>T</var> = 1/<var>f</var>；占空比 <var>D</var> 是高电平时间占周期的比例，范围 0–1 或 0%–100%。</p>
+  <figure class="example" id="ch13-pwm-average">
+    <figcaption>充分平均后的近似电压</figcaption>
+    <p><var>V</var><sub>AVG</sub> ≈ <var>D</var> × <var>V</var><sub>HIGH</sub></p>
+    <p><var>V</var><sub>AVG</sub> 和 <var>V</var><sub>HIGH</sub> 单位为 V，<var>D</var> 无量纲。假设后级低通或负载对 PWM 充分平均；对 LED、马达或数字输入，实际效果不能简单等同于直流电压。</p>
+    <p>例如仅以 3.3 V 为理想高电平、<var>D</var> = 25% 作教学计算，平均值约 0.25 × 3.3 = 0.825 V【假设计算】；这不是 R1 的实测输出。</p>
+  </figure>
+  <p>定时器时钟与周期计数共同决定频率和分辨率。频率越高，固定计数时钟下可用的占空比分级通常越少。实际频率、抖动和负载波形必须用示波器或逻辑分析仪验证。</p>
+</section>
+
+<section aria-labelledby="ch13-13-7">
+  <h2 id="ch13-13-7">13.7 UART 的方向、波特率、帧格式与共地</h2>
+  <p>R1 的目标 UART 是 3.3 V TTL/CMOS 电平【设计】：</p>
+  <ul>
+    <li>U1 PA2/USART2_TX → R22 → J2-13 <code>UART_TX</code>，方向为板到目标；</li>
+    <li>J2-14 <code>UART_RX</code> → R23 → U1 PA3/USART2_RX，方向为目标到板；</li>
+    <li>双方必须共地，并配置相同波特率、数据位、校验和停止位。</li>
+  </ul>
+  <figure class="definition" id="ch13-uart-bit-time">
+    <figcaption>UART 位时间</figcaption>
+    <p><var>t</var><sub>BIT</sub> = 1 / <var>baud</var></p>
+    <p><var>t</var><sub>BIT</sub> 单位为 s，<var>baud</var> 单位为 bit/s。该式是理想异步串口时序；两端时钟误差、边沿、采样点和帧长度会影响误码率。</p>
+  </figure>
+  <p>UART 空闲电平、帧格式和实际最高可靠波特率必须由固件配置与实物测试确认。R22/R23、线缆电容和目标输入会共同改变边沿。</p>
+</section>
+
+<section aria-labelledby="ch13-13-8">
+  <h2 id="ch13-13-8">13.8 TTL UART 不是 RS-232</h2>
+  <p>TTL/CMOS UART 以 0–3.3 V 附近的逻辑电平工作，并直接参考 GND。传统 RS-232 使用不同的电压极性与幅度，需要专用收发器。把 J2 的 UART_TX/RX 直接接到真正 RS-232 端口可能损坏 U1【预期】。</p>
+  <p>连接前不要只看“都是串口”：</p>
+  <ul>
+    <li>确认接口标为 3.3 V TTL/CMOS，而非 RS-232、RS-485 或 5 V TTL；</li>
+    <li>交叉连接 TX→RX、RX←TX，并连接 GND；</li>
+    <li>若目标电平不同，使用经过验证的电平转换器；</li>
+    <li>长线、工业环境或不同接地系统应使用更合适的差分/隔离接口。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch13-13-9">
+  <h2 id="ch13-13-9">13.9 J2 的复位脚与保留脚</h2>
+  <p>J2 是 2×8、2.54 mm 目标接口，PCB/CPL 中存在但不装配【设计-DNP】。完整映射如下：</p>
+  <table>
+    <caption>J2 最终引脚表【设计】</caption>
+    <thead><tr><th scope="col">引脚</th><th scope="col">网络</th><th scope="col">引脚</th><th scope="col">网络</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>GND</td><td>2</td><td>GND</td></tr>
+      <tr><td>3</td><td>5V_SW</td><td>4</td><td>3V3_SW</td></tr>
+      <tr><td>5</td><td>GPIO0_PWM0</td><td>6</td><td>GPIO1_PWM1</td></tr>
+      <tr><td>7</td><td>GPIO2_PWM2</td><td>8</td><td>GPIO3_PWM3</td></tr>
+      <tr><td>9</td><td>GPIO4</td><td>10</td><td>GPIO5</td></tr>
+      <tr><td>11</td><td>GPIO6</td><td>12</td><td>GPIO7</td></tr>
+      <tr><td>13</td><td>UART_TX</td><td>14</td><td>UART_RX</td></tr>
+      <tr><td>15</td><td>NRST</td><td>16</td><td>未连接/保留</td></tr>
+    </tbody>
+  </table>
+  <p>J2-15 是 U1 的 NRST，而不是任意目标复位输出；外接电路拉低它会复位本板。J2-16 在最终 R1 中无网络，必须标为保留，不能猜测为 ADC、流控或电源。排针方向装反可能把电源送入信号脚，故 Pin 1 与线缆方向必须实物核对。</p>
+</section>
+
+<section aria-labelledby="ch13-13-10">
+  <h2 id="ch13-13-10">13.10 GPIO 不应直接驱动马达、继电器或大电流 LED</h2>
+  <p>这些负载超出逻辑引脚的用途：</p>
+  <ul>
+    <li>马达和继电器需要远大于 GPIO 的电流，并产生感性反冲；</li>
+    <li>高功率 LED 需要受控电流，不能只靠 GPIO 内阻；</li>
+    <li>长线和外部接口会引入 ESD、浪涌和地电位差；</li>
+    <li>R14–R23 只能串联限流，最终 R1 没有外部 I/O ESD 阵列【设计事实】。</li>
+  </ul>
+  <p>正确做法是使用逻辑级 MOSFET/驱动器、续流二极管、独立电源与必要的隔离/保护，并把地、电流回路和关断状态一起设计。5V_SW/3V3_SW 可给外部小负载供电，但也不能替代负载驱动级。</p>
+</section>
+
+<section class="experiment" aria-labelledby="ch13-13-11">
+  <h2 id="ch13-13-11">13.11 实验：LED、按键、PWM 与 UART 回环</h2>
+  <h3 id="ch13-experiment-prerequisites">准备与安全</h3>
+  <ul>
+    <li>J2 默认 DNP；使用方向已核对的排针或夹具，并在断电时接线。</li>
+    <li>外接 LED 必须串联限流电阻；按键只接 3.3 V/GND 逻辑，不接 5 V。</li>
+    <li>UART 回环连接 J2-13 与 J2-14，并共用本板地；不要接 RS-232。</li>
+    <li>不要接马达、继电器或未知目标板；出现过流、复位、异常发热立即断电。</li>
+  </ul>
+  <h3 id="ch13-experiment-digital-output">A. 数字输出与 LED</h3>
+  <ol>
+    <li>断电连接一个带限流电阻的低电流 LED 到选定 GPIO。</li>
+    <li>上电后先保持高阻，再配置推挽输出并交替高/低。</li>
+    <li>记录 GPIO 电压、LED 状态和供电电流；不要预设亮度。</li>
+  </ol>
+  <h3 id="ch13-experiment-digital-input">B. 数字输入与按键</h3>
+  <ol>
+    <li>用按键把选定输入接到 GND，并配置合适上拉。</li>
+    <li>记录按下/释放读数以及机械抖动；软件去抖时只改变一个参数。</li>
+  </ol>
+  <h3 id="ch13-experiment-pwm">C. PWM</h3>
+  <ol>
+    <li>在 GPIO0–GPIO3 中选择一路 TIM3 通道，从低频、低风险设置开始。</li>
+    <li>用示波器测频率、高低电平时间和占空比，再计算平均值。</li>
+    <li>同时启用第二通道，验证两路频率相同而占空比可不同。</li>
+  </ol>
+  <h3 id="ch13-experiment-uart">D. UART 回环</h3>
+  <ol>
+    <li>断电短接 J2-13 UART_TX 与 J2-14 UART_RX。</li>
+    <li>配置一致的 UART 帧格式，发送已知字节序列并比较接收结果。</li>
+    <li>逐步改变波特率或线缆条件，记录首次错误条件；不要直接跳到未经验证的最高速度。</li>
+  </ol>
+  <table>
+    <caption>实验 13-1 综合记录表</caption>
+    <thead><tr><th scope="col">子实验</th><th scope="col">配置</th><th scope="col">仪器/接线</th><th scope="col">原始结果</th><th scope="col">通过判定</th></tr></thead>
+    <tbody>
+      <tr><td>GPIO 输出 LED</td><td>待填</td><td>待填</td><td>待填</td><td>待评</td></tr>
+      <tr><td>GPIO 输入按键</td><td>待填</td><td>待填</td><td>待填</td><td>待评</td></tr>
+      <tr><td>PWM</td><td>频率/占空比待填</td><td>待填</td><td>待填</td><td>待评</td></tr>
+      <tr><td>UART 回环</td><td>帧格式/波特率待填</td><td>待填</td><td>待填</td><td>待评</td></tr>
+    </tbody>
+  </table>
+  <p>只有记录真实电平、频率、占空比和收发数据后，才能标记为【实测】。本章不给出虚构的通过波形或最大波特率。</p>
+</section>
+
+<section aria-labelledby="ch13-summary">
+  <h2 id="ch13-summary">本章小结</h2>
+  <ul>
+    <li>R14–R23 全部为 220 Ω，逐一隔开 U1 侧与 J2 侧的 8 GPIO/PWM 和 UART TX/RX。</li>
+    <li>前四路共享 TIM3 频率而可独立设置占空比；PWM 平均效果取决于负载。</li>
+    <li>UART 是 3.3 V TTL/CMOS，不是 RS-232；双方必须共地并交叉 TX/RX。</li>
+    <li>J2-15 是 NRST，J2-16 保留；最终板没有外部 GPIO ESD 阵列或隔离。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch13-sources">
+  <h2 id="ch13-sources">事实来源</h2>
+  <p>最终 EasyEDA 工程中的 U1、R14–R23、J2 网络；<code>project-facts.json</code> 的连接器和 MCU 引脚表；<code>formula-facts.json</code> 的欧姆定律、PWM 平均值与 UART 位时间；早期提案只用于安全状态和资源分配意图，最终工程覆盖其不一致项。</p>
+</section>

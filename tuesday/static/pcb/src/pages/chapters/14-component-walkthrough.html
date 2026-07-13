@@ -1,0 +1,434 @@
+<section class="notice" aria-labelledby="ch14-reading-guide">
+  <h2 id="ch14-reading-guide">本章读法与完整性声明</h2>
+  <p>本章把 R1 的 48 个 PCB 物理位号逐一串起来：R1–R23、C1–C14、U1–U5、J1–J3、L1、D1、Y1。每项均给出最终值或型号、网络、功能、选值理由、布局理由、失效影响和证据状态。</p>
+  <ul>
+    <li><strong>【设计】</strong>最终 EasyEDA 工程明确采用的值、网络、型号或 DNP 状态。</li>
+    <li><strong>【计算】</strong>由公式或 CAD 数据得到，不是仪器测量。</li>
+    <li><strong>【预期】</strong>依据机理推断的失效现象。</li>
+    <li><strong>【待验证】</strong>没有装配板证据；当前事实库的实测条目为 0。</li>
+  </ul>
+  <p>表格中的“开路/短路”是诊断假设，不是建议人为制造的故障。涉及电源、USB、晶振或过流的验证必须使用限流、合适探具和明确停止条件。</p>
+</section>
+
+<section aria-labelledby="ch14-14-1">
+  <h2 id="ch14-14-1">14.1 如何联合使用 BOM、原理图、PCB 与装配图</h2>
+  <ol>
+    <li><strong>从位号开始：</strong>例如 R7 是一个实例，不应只搜索“16.9 kΩ”。</li>
+    <li><strong>在原理图确认网络：</strong>看它的每个引脚连接到哪里，以及信号/电源流向。</li>
+    <li><strong>在最终工程确认值和型号：</strong>R1 的 BOM CSV 的 Value 列为空，不能把空白误读为“未知值”；最终值来自项目归档的 DEVICE/实例元数据。</li>
+    <li><strong>在 PCB/CPL 确认位置、方向和装配面：</strong>全部 48 个物理位号在顶层；CPL 含 48 行。</li>
+    <li><strong>在 BOM 确认是否装配：</strong>46 个位号拟装，J2/J3 为【设计-DNP】，因此不在采购 BOM，但仍在 PCB、CPL 和装配图中。</li>
+    <li><strong>用装配图定位：</strong>板上丝印为减少拥挤而隐藏密集位号，装配 PDF 和 CPL 才是定位依据。</li>
+    <li><strong>最后核对状态：</strong>CAD 连通、值和位置正确不等于电压、温升、USB 或时钟已经实测。</li>
+  </ol>
+  <table>
+    <caption>四类文档分别能证明什么</caption>
+    <thead><tr><th scope="col">资料</th><th scope="col">主要证据</th><th scope="col">不能单独证明</th></tr></thead>
+    <tbody>
+      <tr><td>原理图/项目源</td><td>网络、引脚、值、DNP、器件绑定</td><td>真实焊接、热、纹波、机械配合</td></tr>
+      <tr><td>PCB/CPL</td><td>物理位置、旋转、层、焊盘网络</td><td>器件是否买对、是否焊好、是否工作</td></tr>
+      <tr><td>BOM</td><td>拟采购的 46 个位号及料号/封装</td><td>J2/J3 位置、完整网络、板级性能</td></tr>
+      <tr><td>装配图</td><td>48 个位号的人工定位与方向</td><td>电气连通和器件内部功能</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-2">
+  <h2 id="ch14-14-2">14.2 C1–C5：输入、输出与受控电源储能</h2>
+  <table>
+    <caption>C1–C5 逐件说明</caption>
+    <thead>
+      <tr><th scope="col">位号与值</th><th scope="col">网络、作用与选值</th><th scope="col">布局理由</th><th scope="col">失效与状态</th></tr>
+    </thead>
+    <tbody>
+      <tr id="ch14-c1">
+        <td><strong>C1</strong><br>10 µF，C0805，GRM21BR61H106KE43L</td>
+        <td><code>VBUS_IN</code>—GND。J1/VBUS 区域的本地储能和旁路；10 µF X5R 为最终标称值，与 C2/C13 电气并联但服务不同物理回路。</td>
+        <td>靠近其 VBUS 负载并缩小 VBUS—GND 环路；不能用远处同网电容替代。</td>
+        <td>开路：VBUS 瞬态与噪声裕量下降；短路：USB VBUS 对地短路【预期】。值/网络【设计】，有效电容与硬件行为【待验证】。</td>
+      </tr>
+      <tr id="ch14-c2">
+        <td><strong>C2</strong><br>10 µF，C0805，GRM21BR61H106KE43L</td>
+        <td><code>VBUS_IN</code>—GND。U3 输入侧储能，向 SY8089 的脉冲开关电流就地供能；符合最终 Buck 输入电容方向。</td>
+        <td>布局等级关键：紧邻 U3 输入/GND，回路短而宽。</td>
+        <td>开路：输入纹波、EMI 或稳定性风险增加；短路：VBUS 短路【预期】。值/网络【设计】，纹波/稳定性【待验证】。</td>
+      </tr>
+      <tr id="ch14-c3">
+        <td><strong>C3</strong><br>22 µF，C0805，CL21A226MAQNNNE</td>
+        <td><code>3V3_SYS</code>—GND。U3/L1 后的输出储能、纹波滤波和负载阶跃支撑；22 µF X5R 是最终值。</td>
+        <td>靠近 L1/U3 输出回路，地回流短而宽；避免扩大 BUCK_SW。</td>
+        <td>开路/有效容量低：纹波、跌落或稳定性风险增加；短路：3V3_SYS 故障并使 U3 过流【预期】。实际有效容量与稳定性【待验证】。</td>
+      </tr>
+      <tr id="ch14-c4">
+        <td><strong>C4</strong><br>10 µF，C0805，GRM21BR61H106KE43L</td>
+        <td><code>5V_SW</code>—GND。U4 输出的本地储能和负载瞬态电容；最终设计值 10 µF。</td>
+        <td>靠近 U4/J2 的 5V_SW 路径，减小高电流回路与接线感抗。</td>
+        <td>开路：负载阶跃跌落/噪声增加；短路：U4 进入限流或热保护并增加 VBUS 负担【预期】。浪涌与恢复【待验证】。</td>
+      </tr>
+      <tr id="ch14-c5">
+        <td><strong>C5</strong><br>10 µF，C0805，GRM21BR61H106KE43L</td>
+        <td><code>3V3_SW</code>—GND。U5 输出储能和负载瞬态电容；充电浪涌由 U5 与上游 U3 共同承担。</td>
+        <td>靠近 U5/J2，缩短 3V3_SW 回路。</td>
+        <td>开路：3V3_SW 瞬态跌落增加；短路：U5/U3 过流，可能扰动 U1 的 3V3_SYS【预期】。浪涌、压降和热【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-3">
+  <h2 id="ch14-14-3">14.3 C6–C10、C13、C14：局部去耦与滤波</h2>
+  <table>
+    <caption>局部去耦和复位电容逐件说明</caption>
+    <thead>
+      <tr><th scope="col">位号与值</th><th scope="col">网络与功能</th><th scope="col">布局与选值</th><th scope="col">失效与状态</th></tr>
+    </thead>
+    <tbody>
+      <tr id="ch14-c6">
+        <td><strong>C6</strong><br>100 nF，C0603，X7R</td>
+        <td><code>3V3_SYS</code>—GND；U1 的高频本地去耦之一。</td>
+        <td>100 nF 适合高频旁路；到 MCU 的记录路径约 6.65 mm【计算】，仍应尽量缩小实际环路。</td>
+        <td>开路：U1 瞬态/EMI 裕量下降；短路：3V3_SYS 对地短路【预期】。值【设计】，噪声效果【待验证】。</td>
+      </tr>
+      <tr id="ch14-c7">
+        <td><strong>C7</strong><br>100 nF，C0603，X7R</td>
+        <td><code>3V3_SYS</code>—GND；U1 的第二个高频去耦点。</td>
+        <td>记录路径约 6.71 mm【计算】；应靠近所服务电源脚，地返回不绕行。</td>
+        <td>开路：局部去耦减少；短路：3V3_SYS 短路【预期】。实际瞬态【待验证】。</td>
+      </tr>
+      <tr id="ch14-c8">
+        <td><strong>C8</strong><br>100 nF，C0603，X7R</td>
+        <td><code>3V3_SYS</code>—GND；U1 的第三个高频去耦点。</td>
+        <td>记录路径约 8.99 mm【计算】；曾与 C9 发生机械重叠，最终已修正，电气回路仍需复核。</td>
+        <td>开路：局部去耦减少；短路：3V3_SYS 短路【预期】。机械间距已计算通过，电气效果【待验证】。</td>
+      </tr>
+      <tr id="ch14-c9">
+        <td><strong>C9</strong><br>10 µF，C0805，X5R</td>
+        <td><code>3V3_SYS</code>—GND；U1 区域的低频/负载阶跃储能。</td>
+        <td>补充 C6–C8；到 MCU 的记录路径约 13.82 mm【计算】，并保持与 C8 的装配间距。</td>
+        <td>开路：负载阶跃时电压跌落增加；短路：3V3_SYS 短路【预期】。有效容量【待验证】。</td>
+      </tr>
+      <tr id="ch14-c10">
+        <td><strong>C10</strong><br>100 nF，C0603，X7R</td>
+        <td><code>NRST</code>—GND；与 R12 形成复位滤波/上电延时，名义 &tau; = 1 ms【计算】。</td>
+        <td>靠近 U1 NRST，复位线远离 BUCK_SW 和快速边沿。</td>
+        <td>开路：抗噪和延时减弱；短路：NRST 被拉低、U1 无法运行【预期】。真实释放时序【待验证】。</td>
+      </tr>
+      <tr id="ch14-c13">
+        <td><strong>C13</strong><br>100 nF，C0603，X7R</td>
+        <td><code>VBUS_IN</code>—GND；U4 输入的高频本地旁路，补充较大的 VBUS 电容。</td>
+        <td>靠近 U4 IN/GND，缩小负载开关输入瞬态回路。</td>
+        <td>开路：U4 输入高频噪声/压降增加；短路：VBUS_IN 对地短路【预期】。效果【待验证】。</td>
+      </tr>
+      <tr id="ch14-c14">
+        <td><strong>C14</strong><br>100 nF，C0603，X7R</td>
+        <td><code>3V3_SYS</code>—GND；U5 输入高频旁路，减少受控 3.3 V 负载对系统轨的耦合。</td>
+        <td>靠近 U5 IN/GND，回流短而宽。</td>
+        <td>开路：输入噪声/瞬态压降增加；短路：3V3_SYS 对地短路【预期】。效果【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-4">
+  <h2 id="ch14-14-4">14.4 C11 与 C12：晶振负载</h2>
+  <table>
+    <caption>晶振电容逐件说明</caption>
+    <thead><tr><th scope="col">位号与值</th><th scope="col">网络与功能</th><th scope="col">布局与选择</th><th scope="col">失效与状态</th></tr></thead>
+    <tbody>
+      <tr id="ch14-c11">
+        <td><strong>C11</strong><br>12 pF，C0603，C0G</td>
+        <td><code>OSC_IN</code>—GND；Y1 输入侧负载电容。</td>
+        <td>与 C12 的理想串联等效为 6 pF【计算】；紧靠 Y1/U1，短、对称、安静。</td>
+        <td>开路：负载下降、频偏/不起振风险；短路或错大：OSC_IN 被重载【预期】。与 Y1 20 pF 的实际匹配【待验证】。</td>
+      </tr>
+      <tr id="ch14-c12">
+        <td><strong>C12</strong><br>12 pF，C0603，C0G</td>
+        <td><code>OSC_OUT</code>—GND；Y1 输出侧负载电容。</td>
+        <td>与 C11 对称，地回路短，远离 BUCK_SW/USB/快速数字线。</td>
+        <td>开路：频偏或不起振风险；短路或错大：OSC_OUT 被重载【预期】。杂散、频率和起振裕量【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-5">
+  <h2 id="ch14-14-5">14.5 R1 与 R2：USB-C CC 下拉</h2>
+  <table>
+    <caption>CC 电阻逐件说明</caption>
+    <thead><tr><th scope="col">位号与值</th><th scope="col">网络与功能</th><th scope="col">布局与选择</th><th scope="col">失效与状态</th></tr></thead>
+    <tbody>
+      <tr id="ch14-r1">
+        <td><strong>R1</strong><br>5.1 kΩ，R0603</td>
+        <td><code>CC1</code>—GND；Type-C 受电端的独立 Rd，使一个插头方向可被识别。</td>
+        <td>5.1 kΩ 为最终设计值；靠近 J1，避免长支路，不能与 CC2 短接。</td>
+        <td>开路/错大：对应方向可能不识别或不供电；短路/错小：CC 电流异常【预期】。USB-C 实物兼容性【待验证】。</td>
+      </tr>
+      <tr id="ch14-r2">
+        <td><strong>R2</strong><br>5.1 kΩ，R0603</td>
+        <td><code>CC2</code>—GND；另一插头方向的独立 Rd。</td>
+        <td>与 R1 同值但不同网络；靠近 J1 并保持独立。</td>
+        <td>开路/错大：另一个方向可能失败；短路/错小：CC 检测异常【预期】。实物兼容性【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-6">
+  <h2 id="ch14-14-6">14.6 R3 与 R4：USB 串联阻尼</h2>
+  <table>
+    <caption>USB 数据串联电阻逐件说明</caption>
+    <thead><tr><th scope="col">位号与值</th><th scope="col">网络与功能</th><th scope="col">布局与选择</th><th scope="col">失效与状态</th></tr></thead>
+    <tbody>
+      <tr id="ch14-r3">
+        <td><strong>R3</strong><br>22 Ω，R0603</td>
+        <td><code>USB_DM_ESD</code>—<code>USB_DM_MCU</code>；D− 串联阻尼/源端调节。</td>
+        <td>与 R4 成对、靠近 U1，避免支路和不对称；22 Ω 是最终值，不是实测优化结果。</td>
+        <td>开路：D− 断路、无法枚举；错小可能增加振铃，错大可能削弱边沿【预期】。眼图/阻抗【待验证】。</td>
+      </tr>
+      <tr id="ch14-r4">
+        <td><strong>R4</strong><br>22 Ω，R0603</td>
+        <td><code>USB_DP_ESD</code>—<code>USB_DP_MCU</code>；D+ 串联阻尼/源端调节。</td>
+        <td>拓扑、阻值和路径与 R3 对称；CAD 等长不等于阻抗合格。</td>
+        <td>开路：D+ 断路；与 R3 不匹配会造成差分不对称【预期】。USB 传输/眼图【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-7">
+  <h2 id="ch14-14-7">14.7 R5–R13：反馈、限流、默认状态、复位与 LED</h2>
+  <table>
+    <caption>R5–R13 逐件说明</caption>
+    <thead><tr><th scope="col">位号与值</th><th scope="col">网络、作用与选值</th><th scope="col">布局理由</th><th scope="col">失效与状态</th></tr></thead>
+    <tbody>
+      <tr id="ch14-r5">
+        <td><strong>R5</strong><br>453 kΩ，R0603</td>
+        <td><code>3V3_SYS</code>—<code>BUCK_FB</code>；U3 反馈上臂。与 R6、0.6 V 典型基准计算 3.318 V。</td>
+        <td>FB 走线短且远离 BUCK_SW，从安静输出点取样。</td>
+        <td>开路可能使 FB 偏低并令输出上升；错值改变 3V3_SYS【预期】。值【设计】、3.318 V【计算】、实物输出【待验证】。</td>
+      </tr>
+      <tr id="ch14-r6">
+        <td><strong>R6</strong><br>100 kΩ，R0603</td>
+        <td><code>BUCK_FB</code>—GND；U3 反馈下臂，与 R5 共同设定输出。</td>
+        <td>地端接安静参考，避免大电流地压降进入反馈。</td>
+        <td>开路可能压低输出；短路/错小可能令输出上升【预期】。稳压精度/稳定性【待验证】。</td>
+      </tr>
+      <tr id="ch14-r7">
+        <td><strong>R7</strong><br>16.9 kΩ，R0603</td>
+        <td><code>ISET_5V</code>—GND；U4 限流设定。6800/16900 = 0.40237 A【计算】，对应约 0.4 A 目标。</td>
+        <td>靠近 U4 ISET，避免漏电和噪声改变设定。</td>
+        <td>开路：设定异常；短路/错小：可能允许过大电流【预期】。阈值/温升【待验证】。</td>
+      </tr>
+      <tr id="ch14-r8">
+        <td><strong>R8</strong><br>27 kΩ，R0603</td>
+        <td><code>ISET_3V3</code>—GND；U5 限流设定。6800/27000 = 0.25185 A【计算】，对应约 0.25 A 目标。</td>
+        <td>靠近 U5 ISET，并接安静地。</td>
+        <td>开路：设定异常；短路/错小：可能超过 U3/U5 热与压降预算【预期】。阈值【待验证】。</td>
+      </tr>
+      <tr id="ch14-r9">
+        <td><strong>R9</strong><br>100 kΩ，R0603</td>
+        <td><code>EN_5V</code>—GND；U4 的默认关闭下拉，U1 高阻/复位时保持 5V_SW 关闭。</td>
+        <td>靠近 U4 EN，减少悬空段拾取噪声。</td>
+        <td>开路：启动状态可能不确定；短路：U4 无法使能并可能使 U1 输出过流【预期】。启动行为【待验证】。</td>
+      </tr>
+      <tr id="ch14-r10">
+        <td><strong>R10</strong><br>100 kΩ，R0603</td>
+        <td><code>EN_3V3</code>—GND；U5 的默认关闭下拉。</td>
+        <td>靠近 U5 EN，保证明确低电平。</td>
+        <td>开路：3V3_SW 启动不确定；短路：无法使能【预期】。启动/挂起安全状态【待验证】。</td>
+      </tr>
+      <tr id="ch14-r11">
+        <td><strong>R11</strong><br>100 kΩ，R0603</td>
+        <td><code>BOOT0</code>—GND；使 U1 默认进入正常启动路径，同时允许调试夹具覆盖。</td>
+        <td>靠近 U1 BOOT0，避免长悬空线。</td>
+        <td>开路：可能受噪声进入错误启动模式；误接高电平：可能持续进入引导模式【预期】。启动恢复【待验证】。</td>
+      </tr>
+      <tr id="ch14-r12">
+        <td><strong>R12</strong><br>10 kΩ，R0603</td>
+        <td><code>3V3_SYS</code>—<code>NRST</code>；复位上拉，与 C10 形成 &tau; = 1 ms【计算】。</td>
+        <td>靠近 U1 NRST，远离开关噪声。</td>
+        <td>开路：NRST 可能不可靠；短到 GND：U1 保持复位【预期】。实际释放时序【待验证】。</td>
+      </tr>
+      <tr id="ch14-r13">
+        <td><strong>R13</strong><br>1 kΩ，R0603</td>
+        <td><code>STATUS_LED</code>—<code>LED_A</code>；D1 限流。若假设 Vf=0，3.3 V/1 kΩ 给出 3.3 mA 理论上界【计算】。</td>
+        <td>靠近 D1，支路短且不干扰晶振区域。</td>
+        <td>开路/错大：灯不亮；短路/错小：D1/U1 电流过大【预期】。真实 VOH/Vf/电流【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-8">
+  <h2 id="ch14-14-8">14.8 R14–R23：外部接口串联保护</h2>
+  <p>以下十只均为 220 Ω、R0603【设计】，位于 U1 与 J2 暴露信号之间。220 Ω 是故障限流与边沿速度的折中；不是 ESD 阵列、电平转换器或可熔保险丝。</p>
+  <table>
+    <caption>R14–R23 逐件说明</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">网络与功能</th><th scope="col">布局/选择</th><th scope="col">失效与状态</th></tr></thead>
+    <tbody>
+      <tr id="ch14-r14"><td><strong>R14</strong></td><td><code>GPIO0_MCU</code>—<code>GPIO0_PWM0</code>；GPIO0/TIM3_CH1。</td><td>靠近 U1，通道整齐排列；220 Ω 限制部分故障电流并阻尼边沿。</td><td>开路：GPIO0/PWM0 断开；错小保护减弱，错大延迟增加【预期】。速度/负载【待验证】。</td></tr>
+      <tr id="ch14-r15"><td><strong>R15</strong></td><td><code>GPIO1_MCU</code>—<code>GPIO1_PWM1</code>；GPIO1/TIM3_CH2。</td><td>与 R14 同一策略并保持通道对齐。</td><td>开路：通道 1 断开；错值改变边沿与冲突电流【预期】。硬件【待验证】。</td></tr>
+      <tr id="ch14-r16"><td><strong>R16</strong></td><td><code>GPIO2_MCU</code>—<code>GPIO2_PWM2</code>；GPIO2/TIM3_CH3。</td><td>靠近 U1，缩短未受串阻限制的 MCU 侧支路。</td><td>开路：通道 2 断开；错值改变保护/速度【预期】。硬件【待验证】。</td></tr>
+      <tr id="ch14-r17"><td><strong>R17</strong></td><td><code>GPIO3_MCU</code>—<code>GPIO3_PWM3</code>；GPIO3/TIM3_CH4。</td><td>与前三路保持相同拓扑，便于检查和一致响应。</td><td>开路：通道 3 断开；错值影响 PWM 边沿【预期】。硬件【待验证】。</td></tr>
+      <tr id="ch14-r18"><td><strong>R18</strong></td><td><code>GPIO4_MCU</code>—<code>GPIO4</code>；普通 GPIO4。</td><td>靠近 U1，外部支路保持短。</td><td>开路：GPIO4 断开；错小增加故障风险，错大限制速度【预期】。硬件【待验证】。</td></tr>
+      <tr id="ch14-r19"><td><strong>R19</strong></td><td><code>GPIO5_MCU</code>—<code>GPIO5</code>；普通 GPIO5。</td><td>与 R18 同一保护和排列策略。</td><td>开路：GPIO5 断开；错值影响故障电流/边沿【预期】。硬件【待验证】。</td></tr>
+      <tr id="ch14-r20"><td><strong>R20</strong></td><td><code>GPIO6_MCU</code>—<code>GPIO6</code>；普通 GPIO6。</td><td>靠近 U1，避免长 MCU 侧暴露铜。</td><td>开路：GPIO6 断开；错大可能造成 RC 延迟【预期】。硬件【待验证】。</td></tr>
+      <tr id="ch14-r21"><td><strong>R21</strong></td><td><code>GPIO7_MCU</code>—<code>GPIO7</code>；普通 GPIO7。</td><td>与 GPIO 阵列对齐，便于通道核对。</td><td>开路：GPIO7 断开；错小减弱保护【预期】。硬件【待验证】。</td></tr>
+      <tr id="ch14-r22"><td><strong>R22</strong></td><td><code>UART_TX_MCU</code>—<code>UART_TX</code>；板到目标的 USART2_TX。</td><td>靠近 U1/接口路径；220 Ω 与线缆/输入电容形成 RC，最高速率需验证。</td><td>开路：无发送；错大：边沿过慢、可能误码【预期】。波特率裕量【待验证】。</td></tr>
+      <tr id="ch14-r23"><td><strong>R23</strong></td><td><code>UART_RX_MCU</code>—<code>UART_RX</code>；目标到板的 USART2_RX。</td><td>靠近 U1，限制外部故障进入 MCU。</td><td>开路：无接收；错大：边沿过慢、可能误码【预期】。输入阈值/速率【待验证】。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-9">
+  <h2 id="ch14-14-9">14.9 L1：Buck 能量存储元件</h2>
+  <article id="ch14-l1">
+    <h3 id="ch14-l1-details">L1 — SWPA252012S2R2MT，2.2 µH</h3>
+    <dl>
+      <dt>网络与功能</dt><dd><code>BUCK_SW</code>—<code>3V3_SYS</code>；在 U3 两个开关阶段中储存/释放磁能，把脉冲节点变成连续输出电流【设计】。</dd>
+      <dt>选值</dt><dd>2.2 µH 与最终 SY8089 应用相符；项目元数据记录 1.25 A 额定、2.07 A 饱和电流，但板级裕量未测。</dd>
+      <dt>布局</dt><dd>紧靠 U3；BUCK_SW 铜短小，输出尽快进入 C3，并远离 USB、Y1 与 BUCK_FB。</dd>
+      <dt>失效</dt><dd>开路：3V3_SYS 无输出；短路、错感值或饱和：纹波、峰值、效率和温升恶化，可能触发 U3 保护【预期】。</dd>
+      <dt>状态</dt><dd>值/网络【设计】；纹波公式为【预期计算模型】；饱和、温升和效率【待验证】。</dd>
+    </dl>
+  </article>
+</section>
+
+<section aria-labelledby="ch14-14-10">
+  <h2 id="ch14-14-10">14.10 D1：可见的状态输出</h2>
+  <article id="ch14-d1">
+    <h3 id="ch14-d1-details">D1 — 19-217/G7C-BK2L2VY/3T 黄绿色 0603 LED</h3>
+    <dl>
+      <dt>网络与功能</dt><dd>焊盘 1/阳极接 <code>LED_A</code>，焊盘 2/阴极接 GND；由 U1 PB5 经 R13 驱动【设计】。</dd>
+      <dt>选型与布局</dt><dd>最终料号为黄绿色 LED；极性、Pin 1/阴阳极和可视方向必须正确，不能被连接器或丝印遮挡。</dd>
+      <dt>失效</dt><dd>反装或开路时不发光但核心功能可能继续；短路时 STATUS_LED 经 R13 被持续拉低并增加 GPIO 电流【预期】。</dd>
+      <dt>状态</dt><dd>料号/网络【设计】；正向压降和亮度未记录；LED 电流【待验证】。</dd>
+    </dl>
+  </article>
+</section>
+
+<section aria-labelledby="ch14-14-11">
+  <h2 id="ch14-14-11">14.11 U1–U5：MCU、ESD、Buck 与负载开关</h2>
+  <table>
+    <caption>五只集成电路逐件说明</caption>
+    <thead><tr><th scope="col">位号/型号</th><th scope="col">网络与功能</th><th scope="col">选型与布局</th><th scope="col">失效与状态</th></tr></thead>
+    <tbody>
+      <tr id="ch14-u1">
+        <td><strong>U1</strong><br>CH32V203K8T6，LQFP-32</td>
+        <td>由 <code>3V3_SYS</code>/GND 供电；连接 USB D±、OSC、NRST、SWD、8 GPIO、4 PWM、UART、EN_5V、EN_3V3、STATUS_LED 和 BOOT0。承担 USB CDC 与全板控制【设计】。</td>
+        <td>原生 USB、定时器、UART、调试和 LQFP 可返修性满足 R1；Pin 1、去耦、晶振、USB 和复位布局均关键。</td>
+        <td>缺失/反装/虚焊：整板或部分功能失败；过压/短路：可能永久损坏；不安全固件：启动或挂起状态危险【预期】。全部功能【待验证】。</td>
+      </tr>
+      <tr id="ch14-u2">
+        <td><strong>U2</strong><br>USBLC6-2SC6，SOT-23-6</td>
+        <td>连接 <code>USB_DM_CONN/ESD</code>、<code>USB_DP_CONN/ESD</code>、VBUS_IN 与 GND；为 D+/D− 提供双线低电容 ESD 导流路径【设计】。</td>
+        <td>必须位于连接器入口附近，未保护段、支路和地回路尽量短；方向不可错。</td>
+        <td>缺失/开路：USB 可能仍通信但 ESD 防护下降；短路/漏电/反装：数据或 VBUS 被钳住【预期】。实际 ESD 等级【待验证】。</td>
+      </tr>
+      <tr id="ch14-u3">
+        <td><strong>U3</strong><br>SY8089AAAC，SOT-23-5</td>
+        <td>焊盘 1/4 <code>VBUS_IN</code>，2 GND，3 <code>BUCK_SW</code>，5 <code>BUCK_FB</code>；同步 Buck 生成始终开启的 <code>3V3_SYS</code>【设计】。</td>
+        <td>替代旧 LDO 方案以降低连续负载热损耗；输入环、开关节点、L1/C3 和反馈必须紧凑分离。</td>
+        <td>缺失：无 3V3_SYS；反装/短路：可能把 5 V 或开关节点带入逻辑域；布局失稳：纹波/EMI/过热【预期】。输出、效率和稳定性【待验证】。</td>
+      </tr>
+      <tr id="ch14-u4">
+        <td><strong>U4</strong><br>SY6280AAC，SOT-23-5</td>
+        <td><code>VBUS_IN</code>→<code>5V_SW</code>；EN_5V 高电平控制，R7 设约 0.402 A，R9 默认关闭【设计/计算】。</td>
+        <td>80 mΩ 级高侧开关并有过流/热保护机理；靠近输出路径，IN/OUT 加宽，ISET/EN 避噪。</td>
+        <td>开路：无 5V_SW；内部短路：无法关闭；过载：压降、限流或热关断【预期】。阈值、压降、热和恢复【待验证】。</td>
+      </tr>
+      <tr id="ch14-u5">
+        <td><strong>U5</strong><br>SY6280AAC，SOT-23-5</td>
+        <td><code>3V3_SYS</code>→<code>3V3_SW</code>；EN_3V3 控制，R8 设约 0.252 A，R10 默认关闭【设计/计算】。</td>
+        <td>靠近 J2/C5；IN/OUT 和散热铜必须同时考虑 U3 总负载。</td>
+        <td>开路：无 3V3_SW；内部短路：无法关闭/可能反向供电；过载可能拖低 3V3_SYS【预期】。阈值、压降和热【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-12">
+  <h2 id="ch14-14-12">14.12 J1–J3：主机、目标与调试连接</h2>
+  <table>
+    <caption>三只连接器逐件说明</caption>
+    <thead><tr><th scope="col">位号/型号</th><th scope="col">网络与功能</th><th scope="col">布局/装配</th><th scope="col">失效与状态</th></tr></thead>
+    <tbody>
+      <tr id="ch14-j1">
+        <td><strong>J1</strong><br>TYPE-C-31-M-12，16P USB2 Type-C</td>
+        <td>提供 VBUS_IN、GND、CC1/CC2 和可翻转 D+/D−；A8/B8 未连接；外壳焊盘接 GND【设计】。无 SuperSpeed、无 USB-PD。</td>
+        <td>左向板边外伸、旋转 270°；方向、固定脚、插拔空间和 D± 扇出必须联合检查。</td>
+        <td>反装/错位：无法插接或网络错误；外壳/焊盘焊接差：机械、屏蔽或供电可靠性下降；VBUS 短路会触发主机保护【预期】。配合/ESD【待验证】。</td>
+      </tr>
+      <tr id="ch14-j2">
+        <td><strong>J2</strong><br>2×8、2.54 mm 通孔排针位</td>
+        <td>GND×2、5V_SW、3V3_SW、GPIO0–7、UART_TX/RX、NRST，16 脚保留未连接【设计】。</td>
+        <td>位于右板边、旋转 90°；PCB/CPL 存在但 Add into BOM=no【设计-DNP】，用户按需焊接或用夹具。</td>
+        <td>方向/接线错误可把电源送入信号并损坏目标或主机；未装是预期而非漏件【预期/设计】。实物排针、线缆和外壳配合【待验证】。</td>
+      </tr>
+      <tr id="ch14-j3">
+        <td><strong>J3</strong><br>1×5、1.27 mm 通孔调试位</td>
+        <td>1:3V3_SYS，2:GND，3:SWDIO，4:SWCLK，5:NRST【设计】。</td>
+        <td>节省面积；PCB/CPL 存在但 Add into BOM=no【设计-DNP】。Pin 1、供电方向和探针空间必须清楚。</td>
+        <td>方向/接线错误可能把电源接错或无法调试；未装需准备排针/夹具【预期/设计】。调试与恢复【待验证】。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch14-14-13">
+  <h2 id="ch14-14-13">14.13 Y1：系统外部时钟源</h2>
+  <article id="ch14-y1">
+    <h3 id="ch14-y1-details">Y1 — X322512MSB4SI，12 MHz，20 pF 标称负载</h3>
+    <dl>
+      <dt>网络与功能</dt><dd>焊盘 1 <code>OSC_IN</code>，焊盘 3 <code>OSC_OUT</code>，焊盘 2/4 GND；与 U1 内部振荡器和 C11/C12 构成外部高速时钟【设计】。</dd>
+      <dt>最终选择</dt><dd>最终源明确为 12 MHz，覆盖提案/目录中的 8 MHz；封装为 3225 四焊盘。</dd>
+      <dt>布局</dt><dd>紧靠 U1，OSC_IN/OUT 短、对称、无支路，远离 BUCK_SW、USB 和快速数字回流。</dd>
+      <dt>失效</dt><dd>开路/虚焊：可能不起振；错频率/负载：频偏、起振裕量不足或 USB 时钟不合格【预期】。</dd>
+      <dt>状态</dt><dd>型号、12 MHz、20 pF 与网络【设计】；C11/C12 理想等效 6 pF【计算】；实际负载匹配、频率和起振【待验证】。</dd>
+    </dl>
+  </article>
+</section>
+
+<section class="experiment" aria-labelledby="ch14-14-14">
+  <h2 id="ch14-14-14">14.14 练习：不看原理图注释解释全部位号</h2>
+  <h3 id="ch14-exercise-method">步骤</h3>
+  <ol>
+    <li>随机抽取一个位号，只看 BOM/装配图定位，再在原理图追踪两端网络。</li>
+    <li>用一句话说明“它是什么、给谁服务、为何需要”。</li>
+    <li>写出值/型号的来源及状态：设计、计算、预期或待验证。</li>
+    <li>说明必须靠近谁、应远离谁，以及开路、短路或错值的后果。</li>
+    <li>最后用 PCB/CPL 确认位置和方向，不凭丝印猜位号。</li>
+  </ol>
+  <h3 id="ch14-exercise-checklist">48 位号核对清单</h3>
+  <p>
+    □ R1　□ R2　□ R3　□ R4　□ R5　□ R6　□ R7　□ R8　□ R9　□ R10　□ R11　□ R12　□ R13<br>
+    □ R14　□ R15　□ R16　□ R17　□ R18　□ R19　□ R20　□ R21　□ R22　□ R23<br>
+    □ C1　□ C2　□ C3　□ C4　□ C5　□ C6　□ C7　□ C8　□ C9　□ C10　□ C11　□ C12　□ C13　□ C14<br>
+    □ U1　□ U2　□ U3　□ U4　□ U5　□ J1　□ J2　□ J3　□ L1　□ D1　□ Y1
+  </p>
+  <table>
+    <caption>评分量规</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">合格要求</th></tr></thead>
+    <tbody>
+      <tr><td>身份</td><td>位号、值/型号、封装与 DNP 状态正确。</td></tr>
+      <tr><td>电气</td><td>两端网络、功能和电流/信号方向正确。</td></tr>
+      <tr><td>选择</td><td>能解释数值或型号为何适合本功能，不用“因为原理图这样画”。</td></tr>
+      <tr><td>布局</td><td>指出关键回路、敏感节点、方向或机械约束。</td></tr>
+      <tr><td>失效</td><td>区分开路、短路、错值/错装，并使用“可能/预期”而非伪实测。</td></tr>
+      <tr><td>证据</td><td>明确哪些是设计、计算和待验证；不把 DRC 或 CAD 长度当成硬件性能。</td></tr>
+    </tbody>
+  </table>
+  <aside class="warning">
+    <strong>练习安全：</strong>本练习首先是文档追踪，不要求在通电板上逐件制造故障。若进入实验验证，必须另写限流、接线、探具和停止条件。
+  </aside>
+</section>
+
+<section aria-labelledby="ch14-summary">
+  <h2 id="ch14-summary">本章小结</h2>
+  <p>R1 的 48 个物理位号形成一条完整因果链：J1/R1/R2 建立 Type-C 受电连接；U2/R3/R4 处理 USB 数据入口；U3/L1/C2/C3/R5/R6 生成 3V3_SYS；U4/U5 及其阻容控制两路电源；U1/C6–C12/R11/R12/J3 构成控制核心；R13/D1 提供状态；R14–R23/J2 把 GPIO、PWM、UART 和电源带到目标端。任何“省略一件仍然一样”的判断，都必须经过网络、机理、故障和实物证据四重检查。</p>
+</section>
+
+<section aria-labelledby="ch14-sources">
+  <h2 id="ch14-sources">事实来源</h2>
+  <p>本章以最终 EasyEDA 项目归档为位号、值、器件、网络和 DNP 的最高权威，并与最终 BOM、CPL、原理图 PDF、装配 PDF、fabrication manifest/checklist 及 <code>component-atlas.json</code> 交叉核对。BOM 空 Value 列未被解释为未知值；J2/J3 的 DNP 状态未被误写成缺件；所有硬件性能仍按【待验证】处理。</p>
+</section>

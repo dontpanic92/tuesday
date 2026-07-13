@@ -1,0 +1,254 @@
+<section class="notice" aria-labelledby="ch28-evidence-boundary">
+  <h2 id="ch28-evidence-boundary">本章证据边界</h2>
+  <p>制造输出是“工厂将要加工的几何和工艺指令”，不是编辑器画面的截图。USB GPIO R1 的 Gerber、钻孔和发布 ZIP
+    已通过结构、内容与 SHA-256 完整性检查；这仍不代表裸板已经生产，也不代表装配板已经通过上电或 USB 测试。</p>
+</section>
+
+<section aria-labelledby="ch28-learning-goals">
+  <h2 id="ch28-learning-goals">学习目标</h2>
+  <ul>
+    <li>解释制造商如何把铜、阻焊、钢网、丝印、板框和钻孔文件转化为 PCB。</li>
+    <li>区分 PTH、NPTH 与过孔钻孔数据，并避免重复统计。</li>
+    <li>在独立 Gerber 查看器中审核板框闭合、孔位、焊盘、阻焊、钢网和实际铜区域。</li>
+    <li>说明项目归档、原理图 PDF、装配 PDF 与制造文件各自的责任边界。</li>
+    <li>用 manifest、哈希、ZIP 完整性和可复现步骤建立发布包质量门。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch28-1-manufacturing-flow">
+  <h2 id="ch28-1-manufacturing-flow">28.1 制造商怎样把文件变成 PCB</h2>
+  <ol>
+    <li><strong>CAM 导入：</strong>识别单位、坐标格式、层名、极性和钻孔格式。</li>
+    <li><strong>工程审核：</strong>检查板框、最小线宽/间距、孔径、环宽、阻焊桥、槽孔和特殊工艺。</li>
+    <li><strong>拼板与成像：</strong>把顶/底铜图形转移到覆铜板，经过蚀刻保留导体。</li>
+    <li><strong>钻孔与孔金属化：</strong>按 PTH/过孔数据钻孔并电镀；NPTH 通常不做孔壁金属化。</li>
+    <li><strong>阻焊、表面处理和丝印：</strong>开放待焊区域，覆盖需保护铜面，并印刷可读标记。</li>
+    <li><strong>外形加工、电测与检验：</strong>按板框铣切/分板，执行电气测试和外观检查。</li>
+  </ol>
+  <p>工厂真正使用的是导出的制造数据。若编辑器里有铺铜、但 GTL/GBL 中没有实体区域，工厂不会替设计者“猜出”那块铜。</p>
+</section>
+
+<section aria-labelledby="ch28-2-gerber-layers">
+  <h2 id="ch28-2-gerber-layers">28.2 铜、阻焊、钢网、丝印与板框 Gerber</h2>
+  <p>R1 的 Gerber ZIP 有 14 个有效条目。审核应按功能映射，而不是只检查“ZIP 能打开”。</p>
+  <table>
+    <caption>R1 Gerber/钻孔归档内容</caption>
+    <thead>
+      <tr><th scope="col">文件</th><th scope="col">作用</th><th scope="col">R1 审核要点</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Gerber_TopLayer.GTL</code></td><td>顶层铜</td><td>含 11 个 G36/G37 实体 GND 区域。</td></tr>
+      <tr><td><code>Gerber_BottomLayer.GBL</code></td><td>底层铜</td><td>含 6 个 G36/G37 实体 GND 区域。</td></tr>
+      <tr><td><code>Gerber_TopSolderMaskLayer.GTS</code></td><td>顶层阻焊开窗</td><td>168 个闪光和 4 个区域。</td></tr>
+      <tr><td><code>Gerber_BottomSolderMaskLayer.GBS</code></td><td>底层阻焊开窗</td><td>25 个闪光。</td></tr>
+      <tr><td><code>Gerber_TopPasteMaskLayer.GTP</code></td><td>顶层钢网开口</td><td>77 个闪光和 74 个区域。</td></tr>
+      <tr><td>底层钢网</td><td>底面贴片焊膏</td><td>没有该文件，符合 R1 单面顶层装配。</td></tr>
+      <tr><td><code>Gerber_TopSilkscreenLayer.GTO</code></td><td>顶层丝印</td><td>含 13 个功能标签；密集位号由装配图承载。</td></tr>
+      <tr><td><code>Gerber_BottomSilkscreenLayer.GBO</code></td><td>底层丝印</td><td>文件存在；仍需在查看器中确认内容和方向。</td></tr>
+      <tr><td><code>Gerber_BoardOutlineLayer.GKO</code></td><td>成品板框</td><td>单一闭合矩形，尺寸经独立解析。</td></tr>
+      <tr><td><code>Gerber_DocumentLayer.GDL</code></td><td>文档层</td><td>不是铜层；下单映射时避免误当制造铜。</td></tr>
+      <tr><td>3 个 <code>.DRL</code></td><td>PTH、NPTH、过孔钻孔</td><td>按文件和刀具实际落点核对。</td></tr>
+      <tr><td><code>FlyingProbeTesting.json</code></td><td>飞针测试元数据</td><td>属于测试辅助数据，不替代铜/钻孔检查。</td></tr>
+      <tr><td><code>PCB下单必读.txt</code></td><td>下单说明</td><td>保留在包中，但不能替代正式 manifest。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch28-3-drills">
+  <h2 id="ch28-3-drills">28.3 PTH、NPTH 与过孔钻孔文件</h2>
+  <p>镀通孔（Plated Through Hole，PTH）需要导电孔壁；非镀通孔（Non-Plated Through Hole，NPTH）通常用于机械定位；
+    过孔是 PTH 的一个电气子集。R1 同时提供完整 PTH 文件和过孔专用文件，因此不能把两者孔数相加。</p>
+  <table>
+    <caption>R1 钻孔文件的实际刀具与落点</caption>
+    <thead>
+      <tr><th scope="col">文件</th><th scope="col">孔径与落点</th><th scope="col">审核解释</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Drill_PTH_Through_Via.DRL</code></td><td>0.304800 mm：130 个</td><td>与 PCB 中 130 个 12 mil 过孔一一对应。</td></tr>
+      <tr><td rowspan="3"><code>Drill_PTH_Through.DRL</code></td><td>0.304800 mm：130 个</td><td>同一批过孔在完整 PTH 文件中的子集，不可重复计数。</td></tr>
+      <tr><td>0.649986 mm：5 个</td><td>器件镀孔落点。</td></tr>
+      <tr><td>1.199998 mm：16 个</td><td>器件镀孔落点。</td></tr>
+      <tr><td><code>Drill_NPTH_Through.DRL</code></td><td>0.750011 mm：2 个</td><td>两个非镀机械孔。</td></tr>
+    </tbody>
+  </table>
+  <p>完整 PTH 文件还声明了一个 0.799998 mm 刀具，但没有该刀具的坐标落点。这不是额外的孔。
+    这个细节说明审核必须统计实际坐标，而不能只数刀具声明。还应叠加检查孔中心、焊盘环宽、J1 外壳孔和 J2/J3 DNP 孔位。</p>
+</section>
+
+<section aria-labelledby="ch28-4-mask-paste">
+  <h2 id="ch28-4-mask-paste">28.4 阻焊与焊膏不是同一层</h2>
+  <table>
+    <caption>阻焊和钢网的不同责任</caption>
+    <thead>
+      <tr><th scope="col">层</th><th scope="col">物理含义</th><th scope="col">错误后果</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>阻焊开窗（GTS/GBS）</td><td>决定哪些铜不被阻焊油墨覆盖</td><td>开窗过小会盖住焊盘；过大可能降低阻焊桥和防连锡能力。</td></tr>
+      <tr><td>焊膏开口（GTP/GBP）</td><td>决定钢网向 SMT 焊盘印多少焊膏</td><td>开口错误会造成少锡、立碑、桥连或器件漂移。</td></tr>
+      <tr><td>通孔焊盘</td><td>通常需要阻焊开窗，但不依赖常规 SMT 钢网</td><td>误以为“没有钢网开口就没有焊盘”会产生错误报警。</td></tr>
+    </tbody>
+  </table>
+  <p>R1 顶层阻焊为 168 个闪光加 4 个区域，底层阻焊为 25 个闪光；顶层钢网为 77 个闪光加 74 个区域，
+    底层钢网缺省符合顶面单面装配。数量是异常筛查线索，不是充分证明；仍要在查看器中逐个检查细间距、热焊盘和连接器。</p>
+</section>
+
+<section aria-labelledby="ch28-5-outline">
+  <h2 id="ch28-5-outline">28.5 板框闭合与尺寸</h2>
+  <p>R1 名义尺寸为 50 mm × 24 mm。GKO 实际坐标形成以下闭合路径：</p>
+  <pre><code>(0, 0)
+→ (0, 24.000460 mm)
+→ (49.999900 mm, 24.000460 mm)
+→ (49.999900 mm, 0)
+→ (0, 0)</code></pre>
+  <p>因此 Gerber 外框为 49.999900 mm × 24.000460 mm，是一个闭合片段。小数差异来自导出坐标精度，
+    不应擅自改写为新的板规格。审核还确认没有重复或断开的板框片段、没有隐含铣槽或特殊板工艺。</p>
+  <ol>
+    <li>只显示 GKO，检查每个端点首尾相接。</li>
+    <li>测量最大/最小 X、Y，而不是读取文件名中的尺寸。</li>
+    <li>与铜、焊盘、过孔叠加，检查 12.9/16.9/17.5 mil 的最小板边距离对象。</li>
+    <li>区分 J1 外壳有意悬边与板框/铜错误越界。</li>
+  </ol>
+</section>
+
+<section aria-labelledby="ch28-6-visual-inspection">
+  <h2 id="ch28-6-visual-inspection">28.6 检查焊盘、外壳、孔、间距与铺铜</h2>
+  <p>独立 CAM 审核应按“层叠加—隐藏—再叠加”的方式寻找不一致：</p>
+  <table>
+    <caption>R1 制造几何检查点</caption>
+    <thead>
+      <tr><th scope="col">查看组合</th><th scope="col">应确认的事实</th><th scope="col">典型失败</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>GTL/GBL + 钻孔</td><td>孔落在预期焊盘，过孔为 130 个，PTH/NPTH 类型正确</td><td>孔偏离焊盘、机械孔被误镀。</td></tr>
+      <tr><td>铜 + GTS/GBS</td><td>所有待焊铜开放，细间距处仍有合理阻焊定义</td><td>阻焊盖盘或不必要的大开窗。</td></tr>
+      <tr><td>GTP + 顶层焊盘</td><td>SMT 器件有合理钢网开口，通孔件不被误要求印膏</td><td>漏开口、极大开口或底面多余钢网。</td></tr>
+      <tr><td>GKO + J1 外壳/孔</td><td>插口朝外，两个 0.750011 mm NPTH 和外壳结构对齐</td><td>连接器朝板内、孔型错误、铜越板边。</td></tr>
+      <tr><td>GTL/GBL 单独显示</td><td>11 个顶层和 6 个底层 GND 实体区域真实存在</td><td>只有铺铜边界，没有制造铜。</td></tr>
+    </tbody>
+  </table>
+  <p>R1 的 17 个地铜区域必须能在 Gerber 中看到，而不能只在项目源中找到 FILL 对象。对于静态 FILL，
+    每次移动器件、孔或走线后都必须重新生成并重复以上检查。</p>
+</section>
+
+<section aria-labelledby="ch28-7-independent-viewer">
+  <h2 id="ch28-7-independent-viewer">28.7 使用独立 Gerber 查看器</h2>
+  <p>“独立”意味着查看器不依赖原设计软件的内部对象和缓存。建议按以下顺序审核：</p>
+  <ol>
+    <li>对 ZIP 执行压缩数据完整性测试，确认 14 个条目均可读。</li>
+    <li>手动核对层映射；不要只依赖文件名自动猜测。</li>
+    <li>只开 GKO，检查闭合、尺寸、重复线和意外槽。</li>
+    <li>分别只开 GTL、GBL，检查实际铜、孤岛、越界和 17 个地铜区域。</li>
+    <li>叠加 PTH、NPTH、via drill，检查孔中心和孔型。</li>
+    <li>叠加阻焊，再叠加钢网；确认两者没有被混淆。</li>
+    <li>叠加丝印，检查文字不压住暴露焊盘，板名和 R1 修订可见。</li>
+    <li>将关键观察结果、查看器版本和异常处置写入发布记录。</li>
+  </ol>
+  <aside class="warning" aria-labelledby="ch28-viewer-warning">
+    <h3 id="ch28-viewer-warning">不要让同一个错误由同一个视图重复背书</h3>
+    <p>若只在 EasyEDA 中查看 EasyEDA 导出的结果，源对象和查看过程可能共享同一错误假设。
+      独立查看器和直接文件解析能提供不同失效模式的第二份证据。</p>
+  </aside>
+</section>
+
+<section aria-labelledby="ch28-8-supporting-artifacts">
+  <h2 id="ch28-8-supporting-artifacts">28.8 项目归档、原理图 PDF 与装配 PDF</h2>
+  <table>
+    <caption>R1 支持性交付物</caption>
+    <thead>
+      <tr><th scope="col">文件</th><th scope="col">已验证内容</th><th scope="col">不能替代</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>usb_gpio_R1_project.epro2</code></td><td>有效 ZIP；四个有效载荷文件及一个目录项。含 <code>project2.json</code>、<code>usb_gpio.epru</code> 和两张当前预览图；编辑器版本 3.2.166。</td><td>不能替代工厂使用的 Gerber/钻孔，也不能证明硬件工作。</td></tr>
+      <tr><td><code>usb_gpio_R1_Schematic.pdf</code></td><td>有效 PDF，1 页</td><td>不能替代可解析网络表或项目源。</td></tr>
+      <tr><td><code>usb_gpio_R1_Assembly.pdf</code></td><td>有效 PDF，7 页，保留 48 个位号和方向信息</td><td>不能替代机器使用的 CPL 或 DNP 变体。</td></tr>
+    </tbody>
+  </table>
+  <p>项目归档用于追溯和再编辑，PDF 用于人工审核，Gerber/钻孔用于制造，BOM/CPL 用于装配。发布包缺少其中任一类，
+    都会使某种审核或生产责任失去证据。</p>
+</section>
+
+<section aria-labelledby="ch28-9-integrity">
+  <h2 id="ch28-9-integrity">28.9 文件完整性、manifest、哈希与可复现发布</h2>
+  <p>SHA-256 把“文件名相同”提升为“字节内容相同”。R1 manifest 列出七个主要输出的哈希，外层发布 ZIP
+    另有一个整体哈希。当前文件复算结果与记录一致：</p>
+  <table>
+    <caption>R1 发布文件 SHA-256</caption>
+    <thead>
+      <tr><th scope="col">文件</th><th scope="col">SHA-256</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Gerber ZIP</td><td><code>7d81f32aaa0c86296a7b39104be11a2de33049ff0b6500de6bfc2f660a6a043f</code></td></tr>
+      <tr><td>BOM CSV</td><td><code>c1f8965b1e9cfa9eee6bed12ce98a8cd6b0d5aaf8f057e256290b0d154ac8908</code></td></tr>
+      <tr><td>BOM XLSX</td><td><code>a97009a6cc809470c354c5e5ec9fa95dee6e2ea6344e251df879d146871f9a29</code></td></tr>
+      <tr><td>CPL CSV</td><td><code>b0a2aa3c513eb7e0b21e271f813a5a3993778f367304b1fec7caf739fe4f3bd5</code></td></tr>
+      <tr><td>装配 PDF</td><td><code>51367cdc810f95f2e69de309e2612dc8ac08604e43bb8f0284adf20333d97d27</code></td></tr>
+      <tr><td>原理图 PDF</td><td><code>70501c8d913850ad9e2b7988422f06f6d632a7d1d570322c518eca02e2928f85</code></td></tr>
+      <tr><td>项目归档</td><td><code>3e9911c2ee80f79f4a75fceb980dcf14d88b57af99aa1146854ea087f5f261a0</code></td></tr>
+      <tr><td>外层发布 ZIP</td><td><code>9338b27dd72e221447259a6c77af5f8c95fc479c06f6b3febff2278b2fd916fd</code></td></tr>
+    </tbody>
+  </table>
+  <p>外层 ZIP 含 8 个有效载荷文件和 1 个目录项；8 个文件与 <code>fabrication/R1/</code> 中对应源文件逐字节相同，
+    压缩数据完整性测试通过。这里的“可复现”首先指来源、工具版本、检查步骤和字节身份可追溯；
+    因为导出时间戳或工具版本可能改变字节，不能假定任何重新导出都必然得到相同哈希。</p>
+</section>
+
+<section aria-labelledby="ch28-10-final-checklist">
+  <h2 id="ch28-10-final-checklist">28.10 最终制造检查表</h2>
+  <table>
+    <caption>发送文件前的最终门禁</caption>
+    <thead>
+      <tr><th scope="col">阶段</th><th scope="col">必须完成</th><th scope="col">阻断条件</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>身份</td><td>板名、R1、项目/PCB UUID、生成日期一致</td><td>文件来自不同修订或旧项目。</td></tr>
+      <tr><td>Gerber</td><td>14 个条目可读，铜/阻焊/钢网/丝印/板框映射正确</td><td>缺层、错层、底面多余钢网或实体铜缺失。</td></tr>
+      <tr><td>钻孔</td><td>PTH、NPTH、via 文件可读，孔径和落点与 PCB 一致</td><td>孔型错误、孔位偏移或重复计数无法解释。</td></tr>
+      <tr><td>机械</td><td>49.999900 × 24.000460 mm 闭合轮廓，无隐藏槽</td><td>开口、重复轮廓或未说明特殊工艺。</td></tr>
+      <tr><td>装配</td><td>46 拟装配、2 DNP、48 CPL 行和 7 页装配图一致</td><td>位号集合、方向或变体不一致。</td></tr>
+      <tr><td>完整性</td><td>哈希、ZIP 测试、外层 8 文件字节一致</td><td>任一哈希不符或压缩条目损坏。</td></tr>
+      <tr><td>批准范围</td><td>明确写“可送原型制造”及全部待实物验证项</td><td>把文件批准写成硬件或量产批准。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="error-case" aria-labelledby="ch28-failure-cases">
+  <h2 id="ch28-failure-cases">典型制造输出失败</h2>
+  <ul>
+    <li><strong>ZIP 有文件但层映射错误：</strong>文档层被当成铜层，或板框被忽略。</li>
+    <li><strong>钻孔数量被相加：</strong>完整 PTH 与 via-only 文件共享 130 个过孔，重复统计会虚增孔数。</li>
+    <li><strong>把阻焊当钢网：</strong>开窗目的不同，可能导致盖盘或焊膏过量。</li>
+    <li><strong>编辑器里看见边界就放行：</strong>实际 GTL/GBL 没有地铜，回流路径在制造板上消失。</li>
+    <li><strong>只按文件名覆盖旧包：</strong>同名文件字节不同而无人察觉；manifest 与哈希失去作用。</li>
+  </ul>
+</section>
+
+<section class="experiment" aria-labelledby="ch28-exercise">
+  <h2 id="ch28-exercise">审计练习：从归档反推制造意图</h2>
+  <ol>
+    <li>把 14 个 Gerber ZIP 条目分为铜、阻焊、钢网、丝印、机械、钻孔和辅助数据。</li>
+    <li>解释为什么 130 个 via-only 落点不能再加到完整 PTH 的 151 个落点上。</li>
+    <li>仅根据 GKO 坐标证明轮廓闭合并计算宽、高。</li>
+    <li>写出验证“17 个地铜区域真实存在”所需的最少查看步骤。</li>
+    <li>说明哈希相同能证明什么，以及不能证明什么。</li>
+  </ol>
+  <p><strong>通过判据：</strong>答案必须区分源对象、制造几何、文件完整性和实物性能四种证据。</p>
+</section>
+
+<section class="checkpoint" aria-labelledby="ch28-quality-gate">
+  <h2 id="ch28-quality-gate">本章质量门</h2>
+  <p>只有当 Gerber 层映射、钻孔落点、板框、阻焊/钢网、17 个实际地铜区域、BOM/CPL/装配辅助文件、
+    ZIP 完整性和全部记录哈希均通过独立审核时，制造包才可发送。</p>
+</section>
+
+<section aria-labelledby="ch28-summary">
+  <h2 id="ch28-summary">本章小结</h2>
+  <p>可靠制造发布不依赖“导出成功”提示，而依赖独立查看和可追溯证据。R1 的归档明确包含两层铜、阻焊、顶层钢网、
+    丝印、闭合板框、PTH/NPTH/via 钻孔、项目源、PDF、manifest 和哈希；每一种文件都只能证明其责任范围内的事实。</p>
+</section>
+
+<section aria-labelledby="ch28-sources">
+  <h2 id="ch28-sources">事实来源</h2>
+  <p>本章直接审核 <code>usb_gpio_R1_Gerber.zip</code>、<code>usb_gpio_R1_project.epro2</code>、
+    BOM/CPL、原理图/装配 PDF、<code>usb_gpio_R1_manifest.txt</code> 与外层发布 ZIP。
+    文件数量、孔落点、区域数、页数、大小和哈希均来自最终 R1 交付物；未引用任何实物测试结果。</p>
+</section>

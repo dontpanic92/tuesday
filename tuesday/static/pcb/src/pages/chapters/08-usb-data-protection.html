@@ -1,0 +1,188 @@
+<section class="notice" aria-labelledby="ch08-learning-objectives">
+  <h2 id="ch08-learning-objectives">学习目标与事实状态</h2>
+  <p>本章沿最终 R1 数据路径 <strong>J1 → U2 → R3/R4 → U1</strong> 解释 USB 差分信号、ESD 导流、串联阻尼、回流路径和几何匹配。</p>
+  <p><strong>状态约定：</strong>网络和值为【设计】；CAD 长度与偏斜为【计算】；信号完整性和失效后果为【预期】；受控阻抗、眼图、EMI 与 ESD 等级均为【待验证】。当前没有板级实测波形。</p>
+</section>
+
+<section aria-labelledby="ch08-8-1">
+  <h2 id="ch08-8-1">8.1 用直观语言理解差分传输</h2>
+  <p>USB D+ 与 D− 构成差分对。接收器主要关心两根线之间的电压差，而不是只把任意一根线相对地的电压当作数据：</p>
+  <figure class="definition" id="ch08-differential-equations">
+    <figcaption>差分量与共模量</figcaption>
+    <p><var>V</var><sub>diff</sub> = <var>V</var><sub>D+</sub> − <var>V</var><sub>D−</sub></p>
+    <p><var>V</var><sub>cm</sub> = (<var>V</var><sub>D+</sub> + <var>V</var><sub>D−</sub>) / 2</p>
+    <dl>
+      <dt><var>V</var><sub>diff</sub></dt><dd>差分电压，单位 V，承载接收器要判定的主要信息。</dd>
+      <dt><var>V</var><sub>cm</sub></dt><dd>共模电压，单位 V，表示两根线整体相对参考地的平均位置。</dd>
+    </dl>
+    <p><strong>假设：</strong>这是解释信号分解的数学定义，不是 R1 的示波器实测值，也不替代 USB 电气规范。</p>
+  </figure>
+  <p>若 D+ 上升而 D− 下降，<var>V</var><sub>diff</sub> 明显变化；若外界噪声几乎同样抬高两根线，变化更多体现在 <var>V</var><sub>cm</sub>。只有两条路径足够对称、接收器保持在线性工作范围且地参考连续时，共模抑制才真正有效。</p>
+</section>
+
+<section aria-labelledby="ch08-8-2">
+  <h2 id="ch08-8-2">8.2 共模噪声与差分数据为何不同</h2>
+  <p>差分数据是两线之间有意制造的相反变化；共模噪声则倾向于让两线同向变化。实际 PCB 上，两者会互相转换：线宽或间距不一致、单边过孔、单边支路、不同参考平面、器件寄生不对称，都可能把共模能量变成差模误差，或把差模能量辐射成共模噪声。</p>
+  <table>
+    <caption>差分路径中应保持对称的项目</caption>
+    <thead><tr><th scope="col">项目</th><th scope="col">不对称的后果【预期】</th></tr></thead>
+    <tbody>
+      <tr><td>R3 与 R4 的阻值、封装和位置</td><td>两线边沿与损耗不同，差分波形失衡。</td></tr>
+      <tr><td>D+ 与 D− 的线宽、间距和参考地</td><td>传播速度和阻抗不同，共模转换增加。</td></tr>
+      <tr><td>过孔数量及其附近地回流</td><td>一侧附加电感或回流绕行。</td></tr>
+      <tr><td>U2 两个通道的拓扑</td><td>寄生电容或钳位路径不一致。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch08-8-3">
+  <h2 id="ch08-8-3">8.3 U2：USB 数据线的双通道 ESD 导流器件</h2>
+  <p>U2 是 USBLC6-2SC6，SOT-23-6 封装【设计】。它不是串联保险丝，也不会“吸收所有静电”；它为短时高压事件提供比 U1 输入更可控的导流路径，以 <code>VBUS_IN</code> 和 <code>GND</code> 为钳位参考。真实抗扰度取决于器件本身、焊接、入口布局和回流电感，R1 尚未做实物 ESD 试验【待验证】。</p>
+  <table>
+    <caption>U2 六个焊盘的最终网络【设计】</caption>
+    <thead><tr><th scope="col">焊盘</th><th scope="col">网络</th><th scope="col">意义</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>USB_DM_CONN</code></td><td>来自 J1 的未保护 D− 侧。</td></tr>
+      <tr><td>6</td><td><code>USB_DM_ESD</code></td><td>经过 U2 通道后的 D− 侧。</td></tr>
+      <tr><td>3</td><td><code>USB_DP_CONN</code></td><td>来自 J1 的未保护 D+ 侧。</td></tr>
+      <tr><td>4</td><td><code>USB_DP_ESD</code></td><td>经过 U2 通道后的 D+ 侧。</td></tr>
+      <tr><td>2</td><td><code>GND</code></td><td>负向事件和回流参考。</td></tr>
+      <tr><td>5</td><td><code>VBUS_IN</code></td><td>正向钳位参考。</td></tr>
+    </tbody>
+  </table>
+  <p>U2 缺失或开路时，USB 在安静环境中可能仍能通信，但入口 ESD 防护显著下降；U2 短路、漏电或方向错误时，D+/D− 或 VBUS 可能被钳住，导致无法枚举【预期】。</p>
+</section>
+
+<section aria-labelledby="ch08-8-4">
+  <h2 id="ch08-8-4">8.4 为什么 ESD 器件必须靠近连接器</h2>
+  <p>静电脉冲边沿很快。连接器到 U2 之间的铜越长，寄生电感越大，电流越可能先在板内产生较高局部电压，并沿其他路径耦合到 MCU、晶振或电源。理想次序是：</p>
+  <ol>
+    <li>脉冲从 J1 进入；</li>
+    <li>立即到达 U2；</li>
+    <li>通过短、宽、低电感的参考路径流向 <code>GND</code>/<code>VBUS_IN</code>；</li>
+    <li>受保护的数据线再继续前往 R3/R4 和 U1。</li>
+  </ol>
+  <p>最终 CAD 记录的 J1→U2 段长度为 D− 700.884800 mil、D+ 700.884807 mil，即约 17.802474 mm；两线偏斜为 0.000007 mil【计算】。长度相等只说明几何对称，不能证明未保护段足够短或 ESD 合格。U2 位于连接器入口之后且布局等级为关键，但最终效果仍为【待验证】。</p>
+  <aside class="warning">
+    <strong>实验限制：</strong>不要用打火机压电点火器、裸线摩擦或人体放电“测试 ESD”。合规 ESD 试验需要规定的发生器、耦合网络、接地点、等级、重复次数和监督。
+  </aside>
+</section>
+
+<section aria-labelledby="ch08-8-5">
+  <h2 id="ch08-8-5">8.5 R3 与 R4：22 Ω 串联阻尼</h2>
+  <table>
+    <caption>USB 串联电阻事实</caption>
+    <thead><tr><th scope="col">位号</th><th scope="col">连接</th><th scope="col">作用与布局</th><th scope="col">失效影响</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>R3，22 Ω，0603</td>
+        <td><code>USB_DM_ESD</code>—<code>USB_DM_MCU</code>【设计】</td>
+        <td>D− 的源端阻尼/调节；与 R4 成对并靠近 U1，避免支路【设计】。</td>
+        <td>开路：D− 断路、无法枚举；错小可能增加振铃，错大可能使边沿过慢【预期】。</td>
+      </tr>
+      <tr>
+        <td>R4，22 Ω，0603</td>
+        <td><code>USB_DP_ESD</code>—<code>USB_DP_MCU</code>【设计】</td>
+        <td>D+ 的源端阻尼/调节；拓扑应与 R3 对称【设计】。</td>
+        <td>开路：D+ 断路；与 R3 不匹配会增加差分不对称【预期】。</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>串联电阻与驱动器输出阻抗、走线阻抗和负载共同影响反射。它们不是“越大越安全”：阻值过大虽然可能减弱高频振铃，却也会降低边沿速度和眼图裕量。22 Ω 是最终 R1 设计值，不是实测调优结论。</p>
+</section>
+
+<section aria-labelledby="ch08-8-6">
+  <h2 id="ch08-8-6">8.6 线宽、间距、偏斜、支路与过孔</h2>
+  <p>R1 的 USB D+/D− 使用 8 mil 走线【设计】。实际差分阻抗由铜厚、介质厚度和介电常数、线宽、两线间距、阻焊和附近铜共同决定；目前没有生产叠层，因此不能把“8 mil”直接等同于某个受控阻抗值。</p>
+  <figure class="example" id="ch08-skew-equation">
+    <figcaption>CAD 几何偏斜</figcaption>
+    <p><var>skew</var> = |<var>L</var><sub>DP</sub> − <var>L</var><sub>DM</sub>|</p>
+    <dl>
+      <dt><var>L</var><sub>DP</sub>、<var>L</var><sub>DM</sub></dt><dd>D+、D− 在同一分段中的 CAD 几何长度，单位 mil。</dd>
+      <dt><var>skew</var></dt><dd>两长度的绝对差，单位 mil。</dd>
+    </dl>
+    <p><strong>换算：</strong>1 mil = 0.0254 mm。该公式只比较几何长度，不含介质差异、过孔寄生或器件延迟。</p>
+  </figure>
+  <table>
+    <caption>R1 三段 USB 路径【计算】</caption>
+    <thead><tr><th scope="col">分段</th><th scope="col">D−</th><th scope="col">D+</th><th scope="col">偏斜</th></tr></thead>
+    <tbody>
+      <tr><td>J1 → U2</td><td>700.884800 mil（约 17.802474 mm）</td><td>700.884807 mil（约 17.802474 mm）</td><td>0.000007 mil</td></tr>
+      <tr><td>U2 → 串联电阻</td><td>483.619088 mil（约 12.283925 mm）</td><td>483.619146 mil（约 12.283926 mm）</td><td>0.000058 mil</td></tr>
+      <tr><td>串联电阻 → U1</td><td>361.880010 mil（约 9.191752 mm）</td><td>361.880026 mil（约 9.191753 mm）</td><td>0.000016 mil</td></tr>
+    </tbody>
+  </table>
+  <p>差分路径附近最大 USB 过孔到地层转换距离记录为 155.33 mil，约 3.945 mm【计算】。这是一项布局审核指标，不是电气性能证明。应同时检查：</p>
+  <ul>
+    <li>两线是否保持耦合和相同参考地；</li>
+    <li>器件焊盘处是否形成长支路；</li>
+    <li>换层时两线是否同步，并有邻近地过孔帮助回流换层；</li>
+    <li>是否跨越地铜缺口、静态填充边界或其他回流中断。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch08-8-7">
+  <h2 id="ch08-8-7">8.7 地参考与回流连续性</h2>
+  <p>差分对并不意味着“不需要地”。理想的两线电流会部分互相回流，但器件输入输出、电容、电缆屏蔽、共模分量和不平衡电流仍需低阻抗参考。若下面的地铜被切断，回流就会绕行，使环路面积、串扰和辐射增加。</p>
+  <p>R1 最终有 17 个连接到 GND 的静态 FILL 区域和 32 个 GND 缝合/树状过孔【计算】；这些铜已在 Gerber 中确认存在，但不是可自动重铺的原生 POUR。几何修改后必须重新生成并复核，否则“屏幕上看见边界”不等于制造铜仍连续。</p>
+</section>
+
+<section aria-labelledby="ch08-8-8">
+  <h2 id="ch08-8-8">8.8 为什么长度匹配不能单独保证信号完整性</h2>
+  <p>R1 的三段几何偏斜极小【计算】，这是正确的几何审核结果，但还缺少以下证据：</p>
+  <ul>
+    <li>真实生产叠层和受控差分阻抗；</li>
+    <li>焊盘、U2、R3/R4、过孔和连接器的寄生模型；</li>
+    <li>真实线缆、主机和温度条件下的 USB 眼图；</li>
+    <li>持续传输、挂起/恢复、重连、EMI 与 ESD 测试。</li>
+  </ul>
+  <div class="error-case">
+    <strong>错误推理：</strong>“D+ 与 D− 等长，所以 USB 一定合格。”<br>
+    <strong>正确表述：</strong>“CAD 几何偏斜已计算并很小；阻抗、损耗、共模和协议裕量仍待实物验证。”
+  </div>
+</section>
+
+<section class="experiment" aria-labelledby="ch08-8-9">
+  <h2 id="ch08-8-9">8.9 实验：比较单端波形与差分波形</h2>
+  <h3 id="ch08-experiment-purpose">目的与方法</h3>
+  <p>观察两条互补信号的单端波形，并用示波器数学通道得到 <var>V</var><sub>diff</sub>。初学实验优先在隔离的低压教学信号源上完成；直接测量运行中的 USB 仅限具备合适差分探头和监督的实验室。</p>
+  <h3 id="ch08-experiment-safety">安全要求</h3>
+  <ul>
+    <li>普通台式示波器探头地夹通常与保护地相连；不得把地夹接到 D+ 或 D−。</li>
+    <li>不要用长鳄鱼夹地线探测 USB；它会显著增加环路和振铃，甚至造成短路。</li>
+    <li>若测 R1，使用高阻、低电容差分探头或两根严格匹配的有源探头，并遵守探头共模范围。</li>
+    <li>不要把本实验结果称作 USB 合规眼图；没有规定夹具、模板和校准就不能作合规判定。</li>
+  </ul>
+  <h3 id="ch08-experiment-procedure">步骤</h3>
+  <ol>
+    <li>让教学信号源输出幅度相同、相位相反的两路低压方波。</li>
+    <li>同时显示通道 A、通道 B，并设置数学通道 A−B。</li>
+    <li>给两路同时叠加一个小的同向扰动，比较单端波形与 A−B 的变化。</li>
+    <li>有条件时再在 R1 上记录 U2 前后或 R3/R4 两侧的波形；每次只改变一个测量点。</li>
+  </ol>
+  <table>
+    <caption>实验 8-1 记录表</caption>
+    <thead><tr><th scope="col">观察项目</th><th scope="col">预期机理</th><th scope="col">实际记录</th></tr></thead>
+    <tbody>
+      <tr><td>A、B 反相</td><td>A−B 增强差分变化【预期】</td><td>待填</td></tr>
+      <tr><td>A、B 同向扰动</td><td>A−B 中部分抵消【预期】</td><td>待填</td></tr>
+      <tr><td>探头接入前后</td><td>探头可能改变边沿和振铃【预期】</td><td>待填</td></tr>
+      <tr><td>R1 USB 波形</td><td>没有预填结果；需记录条件</td><td>待填或“不实施”</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="ch08-summary">
+  <h2 id="ch08-summary">本章小结</h2>
+  <ul>
+    <li>USB 信息主要由 D+ 与 D− 的差分量承载，共模噪声能否被抑制取决于路径对称。</li>
+    <li>U2 把数据线 ESD 事件导向 VBUS/GND 参考；R3/R4 各为 22 Ω 串联阻尼。</li>
+    <li>R1 的三段 USB 几何偏斜已计算且很小，走线宽度为 8 mil。</li>
+    <li>这些 CAD 结果不证明受控阻抗、眼图、EMI 或 ESD 合规。</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ch08-sources">
+  <h2 id="ch08-sources">事实来源</h2>
+  <p>最终 EasyEDA 工程归档中的 J1、U2、R3、R4、U1 网络；R1 fabrication manifest 与 checklist 的 USB 几何和地回流记录；结构化事实库中的 <code>usb_geometry</code>、<code>routing.widths_mil</code> 与元件图谱。U2 机理只采用已复核的双线低电容 ESD 拓扑，不宣称未记录的实测等级。</p>
+</section>
