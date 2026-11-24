@@ -151,7 +151,7 @@ export default function ArticleList(props) {
             </ul>
           </>
         }
-        return <ArticleListWrapper>{renderXinferSeries()}{fragments}</ArticleListWrapper>;
+        return <ArticleListWrapper>{fragments}{renderXinferSeries()}</ArticleListWrapper>;
       }}
   />
 }

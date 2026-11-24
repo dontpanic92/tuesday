@@ -5,9 +5,6 @@ exports.articles = {
     pdf: true,
     chapters: [
       '0-preface',
-      '1-cpk',
-      '2-fmb',
-      '3-imd',
     ]
   },
   '栈缓冲区溢出 101': {

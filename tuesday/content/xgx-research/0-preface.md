@@ -19,3 +19,5 @@ description: Preface
 dontpanic
 
 2023 年 8 月，北京
+
+PS. AI 大人杀死了比赛，再无人需要文档描述资源格式。咕咕咕
